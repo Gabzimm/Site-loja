@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Pedidos</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--card);
+            padding: 2rem 1rem;
+            border-right: 2px solid var(--roxo);
+        }
+
+        .sidebar h2 {
+            color: var(--roxo);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 1rem;
+            color: var(--texto);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.ativo {
+            background: var(--roxo);
+            color: white;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .filtros {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filtro-btn {
+            padding: 0.5rem 1rem;
+            background: var(--card);
+            border: 2px solid var(--roxo);
+            border-radius: 8px;
+            color: var(--texto);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filtro-btn:hover,
+        .filtro-btn.ativo {
+            background: var(--roxo);
+            color: white;
+        }
+
+        .tabela-pedidos {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .tabela-pedidos table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabela-pedidos th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--roxo);
+            color: var(--amarelo);
+        }
+
+        .tabela-pedidos td {
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .status-pendente {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--amarelo);
+        }
+
+        .status-confirmado {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--verde);
+        }
+
+        .status-entregue {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--roxo);
+        }
+
+        .btn-confirmar {
+            background: var(--verde);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-confirmar:hover {
+            background: var(--verde-escuro);
+            transform: scale(1.05);
+        }
+
+        .btn-detalhes {
+            background: var(--roxo);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.ativo {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--roxo);
+        }
+
+        .modal-content h2 {
+            color: var(--amarelo);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-fechar {
+            background: #ff4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html">📦 Produtos</a>
+                <a href="pedidos.html" class="ativo">📋 Pedidos</a>
+                <a href="cupons.html">🏷️ Cupons</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="content">
+            <h1>📋 Gerenciar Pedidos</h1>
+            
+            <div class="filtros">
+                <button class="filtro-btn ativo" onclick="filtrarPedidos('todos')">📋 Todos</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('pendente')">⏳ Pendentes</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('confirmado')">✅ Confirmados</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('entregue')">📦 Entregues</button>
+            </div>
+
+            <div class="tabela-pedidos">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Produto</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-pedidos">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DETALHES -->
+    <div class="modal" id="modal-detalhes">
+        <div class="modal-content">
+            <h2>📋 Detalhes do Pedido</h2>
+            <div id="detalhes-content"></div>
+            <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        // Verificar login
+        if (!localStorage.getItem('admin_logado')) {
+            window.location.href = 'login.html';
+        }
+
+        function sair() {
+            localStorage.removeItem('admin_logado');
+            window.location.href = 'login.html';
+        }
+
+        // Pedidos mockados
+        let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [
+            { id: 1, cliente: "Player#1234", discordId: "123456789", produto: "VIP Mensal", valor: 29.90, status: "pendente", data: "2024-01-15" },
+            { id: 2, cliente: "ProPlayer#5678", discordId: "987654321", produto: "Cash 1000", valor: 9.90, status: "confirmado", data: "2024-01-14" },
+            { id: 3, cliente: "NoobMaster#9012", discordId: "456789123", produto: "Kit Iniciante", valor: 49.90, status: "entregue", data: "2024-01-13" }
+        ];
+
+        let filtroAtual = 'todos';
+
+        function salvarPedidos() {
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            renderizarPedidos();
+        }
+
+        function filtrarPedidos(status) {
+            filtroAtual = status;
+            document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('ativo'));
+            event.target.classList.add('ativo');
+            renderizarPedidos();
+        }
+
+        function confirmarPedido(id) {
+            const pedido = pedidos.find(p => p.id === id);
+            if (pedido && pedido.status === 'pendente') {
+                pedido.status = 'confirmado';
+                salvarPedidos();
+                
+                // Aqui vai chamar a API do bot
+                fetch('http://SEU_IP:5000/api/confirmar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ discordId: pedido.discordId, pedidoId: pedido.id })
+                }).catch(() => console.log('API offline - simulação'));
+                
+                alert(`✅ Pedido #${id} confirmado! DM enviada no Discord!`);
+            }
+        }
+
+        function verDetalhes(id) {
+            const pedido = pedidos.find(p => p.id === id);
+            if (pedido) {
+                document.getElementById('detalhes-content').innerHTML = `
+                    <p><strong>🆔 ID:</strong> #${pedido.id}</p>
+                    <p><strong>👤 Cliente:</strong> ${pedido.cliente}</p>
+                    <p><strong>💬 Discord ID:</strong> ${pedido.discordId}</p>
+                    <p><strong>📦 Produto:</strong> ${pedido.produto}</p>
+                    <p><strong>💰 Valor:</strong> R$ ${pedido.valor.toFixed(2)}</p>
+                    <p><strong>📅 Data:</strong> ${pedido.data}</p>
+                    <p><strong>📊 Status:</strong> ${pedido.status}</p>
+                `;
+                document.getElementById('modal-detalhes').classList.add('ativo');
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-detalhes').classList.remove('ativo');
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        function renderizarPedidos() {
+            const tbody = document.getElementById('lista-pedidos');
+            if (!tbody) return;
+
+            const pedidosFiltrados = filtroAtual === 'todos' 
+                ? pedidos 
+                : pedidos.filter(p => p.status === filtroAtual);
+
+            tbody.innerHTML = pedidosFiltrados.map(pedido => `
+                <tr>
+                    <td>#${pedido.id}</td>
+                    <td>${pedido.cliente}</td>
+                    <td>${pedido.produto}</td>
+                    <td>R$ ${pedido.valor.toFixed(2)}</td>
+                    <td><span class="status ${getStatusClass(pedido.status)}">${pedido.status}</span></td>
+                    <td>
+                        <button class="btn-detalhes" onclick="verDetalhes(${pedido.id})">🔍</button>
+                        ${pedido.status === 'pendente' 
+                            ? `<button class="btn-confirmar" onclick="confirmarPedido(${pedido.id})">✅ Confirmar</button>`
+                            : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        renderizarPedidos();
+    </script>
+</body>
+</html>
