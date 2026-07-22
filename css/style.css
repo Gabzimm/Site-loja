@@ -1,0 +1,145 @@
+/* ========== CORES DO TEMA ========== */
+:root {
+    --roxo: #8B5CF6;
+    --roxo-escuro: #6D28D9;
+    --verde: #10B981;
+    --verde-escuro: #059669;
+    --amarelo: #F59E0B;
+    --amarelo-escuro: #D97706;
+    --fundo: #0F0F1A;
+    --card: #1A1A2E;
+    --texto: #E2E8F0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    min-height: 100vh;
+}
+
+/* ========== HEADER ========== */
+.header {
+    background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--amarelo);
+}
+
+.logo h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(to right, #fff, var(--amarelo));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav a {
+    color: var(--texto);
+    text-decoration: none;
+    margin-left: 2rem;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav a:hover {
+    color: var(--amarelo);
+}
+
+/* ========== GRID DE PRODUTOS ========== */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.grid-produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.produto-card {
+    background: var(--card);
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.produto-card:hover {
+    border-color: var(--roxo);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+}
+
+.produto-imagem {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(45deg, var(--roxo), var(--verde));
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.produto-nome {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.produto-preco {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--verde);
+    margin-bottom: 1rem;
+}
+
+.btn-comprar {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--roxo);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-comprar:hover {
+    background: var(--roxo-escuro);
+    transform: scale(1.02);
+}
+
+/* ========== BOTÃO ADMIN ========== */
+.btn-admin {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--amarelo);
+    color: #000;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    transition: all 0.3s;
+}
+
+.btn-admin:hover {
+    background: var(--amarelo-escuro);
+    transform: scale(1.05);
+}
