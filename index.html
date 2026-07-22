@@ -1,75 +1,105 @@
-// ========== CONFIGURAÇÃO ==========
-const API_URL = 'http://SEU_IP:5000/api'; // Configure depois
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReyCraft Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-// ========== PRODUTOS (VAZIO - Admin adiciona depois) ==========
-let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-
-// ========== CARRINHO ==========
-let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-function salvarCarrinho() {
-    localStorage.setItem('carrinho', JSON.stringify(carrinho));
-    atualizarContador();
-}
-
-function adicionarAoCarrinho(id) {
-    const produto = produtos.find(p => p.id === id);
-    const itemNoCarrinho = carrinho.find(item => item.id === id);
-    
-    if (itemNoCarrinho) {
-        itemNoCarrinho.quantidade++;
-    } else {
-        carrinho.push({ ...produto, quantidade: 1 });
-    }
-    
-    salvarCarrinho();
-    alert(`${produto.nome} adicionado ao carrinho! 🛒`);
-}
-
-function atualizarContador() {
-    const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0);
-    const contador = document.getElementById('contador-carrinho');
-    if (contador) contador.textContent = `(${total})`;
-}
-
-// ========== RENDERIZAR PRODUTOS ==========
-function renderizarProdutos() {
-    const container = document.getElementById('lista-produtos');
-    if (!container) return;
-    
-    if (produtos.length === 0) {
-        container.innerHTML = `
-            <div class="loja-vazia" style="grid-column: 1 / -1;">
-                <div class="icone">📦</div>
-                <h2>Loja Vazia</h2>
-                <p>O administrador ainda não adicionou produtos.</p>
-                <p style="margin-top: 0.5rem;">Volte em breve! 🚀</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = produtos.map(produto => `
-        <div class="produto-card">
-            <div class="produto-imagem">${produto.emoji || '📦'}</div>
-            <h3 class="produto-nome">${produto.nome}</h3>
-            <p class="produto-descricao">${produto.descricao || ''}</p>
-            <div class="produto-preco">R$ ${produto.preco.toFixed(2)}</div>
-            <button class="btn-comprar" onclick="adicionarAoCarrinho(${produto.id})">
-                🛒 Comprar
-            </button>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <h1>🛒 ReyCraft Shop</h1>
         </div>
-    `).join('');
-}
+        <nav class="nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
+        </nav>
+    </header>
 
-// ========== INICIAR ==========
-renderizarProdutos();
-atualizarContador();
+    <!-- PRODUTOS -->
+    <div class="container">
+        <h2>🔥 Produtos em Destaque</h2>
+        
+        <div class="grid-produtos" id="lista-produtos">
+            <!-- Produtos carregados via JavaScript -->
+        </div>
+    </div>
 
-// Atualiza quando voltar do admin
-window.addEventListener('storage', function(e) {
-    if (e.key === 'produtos') {
-        produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+    <!-- BOTÃO ADMIN -->
+    <a href="admin/login.html" class="btn-admin">⚙️ Admin</a>
+
+    <script>
+        // ========== CONFIGURAÇÃO ==========
+        const API_URL = 'http://SEU_IP:5000/api';
+
+        // ========== PRODUTOS (VAZIO - Admin adiciona depois) ==========
+        let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+
+        // ========== CARRINHO ==========
+        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+        function salvarCarrinho() {
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            atualizarContador();
+        }
+
+        function adicionarAoCarrinho(id) {
+            const produto = produtos.find(p => p.id === id);
+            const itemNoCarrinho = carrinho.find(item => item.id === id);
+            
+            if (itemNoCarrinho) {
+                itemNoCarrinho.quantidade++;
+            } else {
+                carrinho.push({ ...produto, quantidade: 1 });
+            }
+            
+            salvarCarrinho();
+            alert(produto.nome + ' adicionado ao carrinho! 🛒');
+        }
+
+        function atualizarContador() {
+            const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0);
+            const contador = document.getElementById('contador-carrinho');
+            if (contador) contador.textContent = '(' + total + ')';
+        }
+
+        // ========== RENDERIZAR PRODUTOS ==========
+        function renderizarProdutos() {
+            const container = document.getElementById('lista-produtos');
+            if (!container) return;
+            
+            if (produtos.length === 0) {
+                container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p><p style="margin-top: 0.5rem;">Volte em breve! 🚀</p></div>';
+                return;
+            }
+            
+            let html = '';
+            produtos.forEach(function(produto) {
+                html += '<div class="produto-card">';
+                html += '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
+                html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
+                html += '<p class="produto-descricao">' + (produto.descricao || '') + '</p>';
+                html += '<div class="produto-preco">R$ ' + produto.preco.toFixed(2) + '</div>';
+                html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        // ========== INICIAR ==========
         renderizarProdutos();
-    }
-});
+        atualizarContador();
+
+        // Atualiza quando voltar do admin
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'produtos') {
+                produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+                renderizarProdutos();
+            }
+        });
+    </script>
+</body>
+</html>
