@@ -22,6 +22,7 @@
             color: var(--roxo);
             margin-bottom: 2rem;
             text-align: center;
+            font-size: 1.3rem;
         }
 
         .sidebar nav a {
@@ -106,8 +107,13 @@
             background: var(--card);
             padding: 1.5rem;
             border-radius: 10px;
-            border: 2px solid var(--amarelo);
             position: relative;
+            border: 2px solid var(--verde);
+        }
+
+        .cupom-card.inativo {
+            border-color: #ef4444;
+            opacity: 0.6;
         }
 
         .cupom-codigo {
@@ -126,13 +132,14 @@
             font-size: 1.2rem;
             font-weight: bold;
             color: var(--verde);
+            margin-bottom: 0.5rem;
         }
 
         .btn-remover-cupom {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #ff4444;
+            background: #ef4444;
             color: white;
             border: none;
             border-radius: 5px;
@@ -140,19 +147,48 @@
             cursor: pointer;
         }
 
-        .cupom-ativo {
-            border-color: var(--verde);
+        .btn-alternar {
+            background: var(--amarelo);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            width: 100%;
         }
 
-        .cupom-inativo {
-            border-color: #ff4444;
-            opacity: 0.6;
+        .sem-cupons {
+            text-align: center;
+            padding: 3rem;
+            color: var(--texto-cinza);
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--roxo);
+            }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .sidebar nav a {
+                flex: 1;
+                text-align: center;
+                min-width: 120px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-container">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <h2>⚙️ Admin</h2>
             <nav>
@@ -164,15 +200,13 @@
             </nav>
         </aside>
 
-        <!-- CONTEÚDO -->
         <main class="content">
             <h1>🏷️ Gerenciar Cupons</h1>
             
             <button class="btn-adicionar" onclick="mostrarFormCupom()">➕ Criar Cupom</button>
             
-            <!-- FORMULÁRIO -->
             <div class="form-cupom" id="form-cupom">
-                <h2>Novo Cupom</h2>
+                <h2 style="margin-bottom: 1rem;">🏷️ Novo Cupom</h2>
                 <div class="input-group">
                     <label>🏷️ Código do Cupom</label>
                     <input type="text" id="codigo-cupom" placeholder="Ex: WELCOME20">
@@ -192,13 +226,11 @@
                     <label>🔢 Limite de Usos</label>
                     <input type="number" id="limite-usos" placeholder="100">
                 </div>
-                <button class="btn-adicionar" onclick="salvarCupom()">💾 Salvar Cupom</button>
-                <button style="background: #ff4444; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;" onclick="fecharFormCupom()">Cancelar</button>
+                <button class="btn-salvar" onclick="salvarCupom()">💾 Salvar Cupom</button>
+                <button class="btn-cancelar-form" onclick="fecharFormCupom()">Cancelar</button>
             </div>
 
-            <!-- LISTA DE CUPONS -->
-            <div class="grid-cupons" id="lista-cupons">
-            </div>
+            <div class="grid-cupons" id="lista-cupons"></div>
         </main>
     </div>
 
@@ -212,10 +244,7 @@
             window.location.href = 'login.html';
         }
 
-        let cupons = JSON.parse(localStorage.getItem('cupons')) || [
-            { codigo: "WELCOME20", tipo: "porcentagem", valor: 20, limite: 50, usos: 0, ativo: true },
-            { codigo: "VIP10", tipo: "fixo", valor: 10, limite: 100, usos: 25, ativo: true }
-        ];
+        let cupons = JSON.parse(localStorage.getItem('cupons')) || [];
 
         function salvarCupons() {
             localStorage.setItem('cupons', JSON.stringify(cupons));
@@ -233,6 +262,45 @@
             document.getElementById('limite-usos').value = '';
         }
 
+        function mostrarConfirmacao(mensagem, icone, onConfirmar, tipoBotao = 'remover') {
+            let modal = document.getElementById('modal-confirmacao');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'modal-confirmacao';
+                modal.className = 'modal-confirmacao';
+                modal.innerHTML = `
+                    <div class="modal-confirmacao-box">
+                        <div class="modal-confirmacao-icone" id="modal-icone"></div>
+                        <h3 id="modal-titulo">Confirmação</h3>
+                        <p id="modal-mensagem"></p>
+                        <div class="modal-confirmacao-botoes">
+                            <button class="btn-cancelar" onclick="fecharConfirmacao()">Cancelar</button>
+                            <button class="btn-confirmar-acao" id="btn-confirmar-acao">Confirmar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('modal-icone').textContent = icone;
+            document.getElementById('modal-mensagem').textContent = mensagem;
+            const btnConfirmar = document.getElementById('btn-confirmar-acao');
+            btnConfirmar.className = 'btn-confirmar-acao';
+            if (tipoBotao === 'remover') {
+                btnConfirmar.classList.add('btn-remover-confirmar');
+                btnConfirmar.textContent = '🗑️ Remover';
+            } else {
+                btnConfirmar.classList.add('btn-salvar-confirmar');
+                btnConfirmar.textContent = '💾 Salvar';
+            }
+            btnConfirmar.onclick = () => { fecharConfirmacao(); onConfirmar(); };
+            modal.classList.add('ativo');
+        }
+
+        function fecharConfirmacao() {
+            const modal = document.getElementById('modal-confirmacao');
+            if (modal) modal.classList.remove('ativo');
+        }
+
         function salvarCupom() {
             const codigo = document.getElementById('codigo-cupom').value.toUpperCase();
             const tipo = document.getElementById('tipo-desconto').value;
@@ -240,26 +308,37 @@
             const limite = parseInt(document.getElementById('limite-usos').value);
 
             if (!codigo || !valor) {
-                alert('Preencha todos os campos!');
+                alert('⚠️ Preencha todos os campos!');
                 return;
             }
 
             if (cupons.find(c => c.codigo === codigo)) {
-                alert('Este cupom já existe!');
+                alert('⚠️ Este cupom já existe!');
                 return;
             }
 
-            cupons.push({ codigo, tipo, valor, limite, usos: 0, ativo: true });
-            salvarCupons();
-            fecharFormCupom();
-            alert(`Cupom ${codigo} criado com sucesso! 🎉`);
+            mostrarConfirmacao(
+                `Criar cupom "${codigo}"?\nDesconto: ${valor}${tipo === 'porcentagem' ? '%' : 'R$'}`,
+                '🏷️',
+                () => {
+                    cupons.push({ codigo, tipo, valor, limite, usos: 0, ativo: true });
+                    salvarCupons();
+                    fecharFormCupom();
+                },
+                'salvar'
+            );
         }
 
         function removerCupom(codigo) {
-            if (confirm(`Remover cupom ${codigo}?`)) {
-                cupons = cupons.filter(c => c.codigo !== codigo);
-                salvarCupons();
-            }
+            mostrarConfirmacao(
+                `Remover cupom "${codigo}"?\nEsta ação não pode ser desfeita!`,
+                '⚠️',
+                () => {
+                    cupons = cupons.filter(c => c.codigo !== codigo);
+                    salvarCupons();
+                },
+                'remover'
+            );
         }
 
         function alternarCupom(codigo) {
@@ -274,8 +353,13 @@
             const container = document.getElementById('lista-cupons');
             if (!container) return;
 
+            if (cupons.length === 0) {
+                container.innerHTML = `<div class="sem-cupons">🏷️ Nenhum cupom criado ainda</div>`;
+                return;
+            }
+
             container.innerHTML = cupons.map(cupom => `
-                <div class="cupom-card ${cupom.ativo ? 'cupom-ativo' : 'cupom-inativo'}">
+                <div class="cupom-card ${cupom.ativo ? '' : 'inativo'}">
                     <button class="btn-remover-cupom" onclick="removerCupom('${cupom.codigo}')">🗑️</button>
                     <div class="cupom-codigo">${cupom.codigo}</div>
                     <div class="cupom-desconto">
@@ -283,7 +367,7 @@
                     </div>
                     <div class="cupom-info">📊 Usos: ${cupom.usos}/${cupom.limite}</div>
                     <div class="cupom-info">📌 Status: ${cupom.ativo ? '✅ Ativo' : '❌ Inativo'}</div>
-                    <button class="btn-editar" onclick="alternarCupom('${cupom.codigo}')" style="margin-top: 0.5rem;">
+                    <button class="btn-alternar" onclick="alternarCupom('${cupom.codigo}')">
                         ${cupom.ativo ? '❌ Desativar' : '✅ Ativar'}
                     </button>
                 </div>
