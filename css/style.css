@@ -341,3 +341,13 @@ body {
     border-radius: 10px;
     margin-bottom: 1rem;
 }
+
+/* Garantir que a imagem se molde */
+.produto-card img {
+    width: 100% !important;
+    height: 200px !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
+    margin-bottom: 1rem !important;
+    display: block !important;
+}
