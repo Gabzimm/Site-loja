@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Produtos</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--card);
+            padding: 2rem 1rem;
+            border-right: 2px solid var(--roxo);
+        }
+
+        .sidebar h2 {
+            color: var(--roxo);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 1rem;
+            color: var(--texto);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.ativo {
+            background: var(--roxo);
+            color: white;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .btn-adicionar {
+            background: var(--verde);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .btn-adicionar:hover {
+            background: var(--verde-escuro);
+            transform: scale(1.05);
+        }
+
+        .form-produto {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .form-produto.ativo {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--fundo);
+            border: 2px solid var(--roxo);
+            border-radius: 8px;
+            color: var(--texto);
+            font-size: 1rem;
+        }
+
+        .tabela-produtos {
+            width: 100%;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .tabela-produtos table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabela-produtos th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--roxo);
+            color: var(--amarelo);
+        }
+
+        .tabela-produtos td {
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn-editar {
+            background: var(--amarelo);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn-remover {
+            background: #ff4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html" class="ativo">📦 Produtos</a>
+                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="cupons.html">🏷️ Cupons</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="content">
+            <h1>📦 Gerenciar Produtos</h1>
+            
+            <button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
+            
+            <!-- FORMULÁRIO -->
+            <div class="form-produto" id="form-produto">
+                <h2 id="form-titulo">Novo Produto</h2>
+                <div class="input-group">
+                    <label>Nome do Produto</label>
+                    <input type="text" id="nome-produto" placeholder="Ex: VIP Mensal">
+                </div>
+                <div class="input-group">
+                    <label>Preço (R$)</label>
+                    <input type="number" id="preco-produto" placeholder="29.90" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Emoji</label>
+                    <input type="text" id="emoji-produto" placeholder="👑">
+                </div>
+                <div class="input-group">
+                    <label>Descrição</label>
+                    <textarea id="descricao-produto" placeholder="Descrição do produto..."></textarea>
+                </div>
+                <button class="btn-adicionar" onclick="salvarProduto()">💾 Salvar</button>
+                <button class="btn-remover" onclick="fecharForm()">Cancelar</button>
+            </div>
+
+            <!-- TABELA DE PRODUTOS -->
+            <div class="tabela-produtos">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-produtos-admin">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>
