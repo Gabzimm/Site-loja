@@ -221,6 +221,9 @@
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
         var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
+        // ADICIONE ESTA LINHA:
+        if (!carrinho || typeof carrinho === 'string') { carrinho = []; localStorage.setItem('carrinho', '[]'); }
+
         function salvarCarrinho() {
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
             atualizarContador();
