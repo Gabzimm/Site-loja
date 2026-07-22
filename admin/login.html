@@ -6,21 +6,34 @@
     <title>Admin - Login</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 2rem;
             background: var(--card);
+            padding: 2.5rem;
             border-radius: 15px;
             border: 2px solid var(--roxo);
             box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+            width: 100%;
+            max-width: 400px;
         }
 
         .login-container h2 {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 0.5rem;
             color: var(--roxo);
             font-size: 2rem;
+        }
+
+        .login-container .subtitulo {
+            text-align: center;
+            color: var(--texto-cinza);
+            margin-bottom: 2rem;
         }
 
         .input-group {
@@ -31,6 +44,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
+            color: var(--texto);
         }
 
         .input-group input {
@@ -41,6 +55,7 @@
             border-radius: 8px;
             color: var(--texto);
             font-size: 1rem;
+            transition: border-color 0.3s;
         }
 
         .input-group input:focus {
@@ -66,16 +81,17 @@
         }
 
         .erro-msg {
-            color: #ff4444;
+            color: #ef4444;
             text-align: center;
             margin-top: 1rem;
             display: none;
+            font-weight: bold;
         }
 
         .voltar {
             display: block;
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             color: var(--amarelo);
             text-decoration: none;
         }
@@ -88,11 +104,12 @@
 <body>
     <div class="login-container">
         <h2>🔐 Painel Admin</h2>
+        <p class="subtitulo">Acesso restrito à administração</p>
         
         <form id="login-form">
             <div class="input-group">
                 <label>👤 Usuário</label>
-                <input type="text" id="usuario" placeholder="Digite o usuário" required>
+                <input type="text" id="usuario" placeholder="Digite o usuário" required autocomplete="off">
             </div>
             
             <div class="input-group">
@@ -100,15 +117,15 @@
                 <input type="password" id="senha" placeholder="Digite a senha" required>
             </div>
             
-            <button type="submit" class="btn-login">Entrar</button>
+            <button type="submit" class="btn-login">🚀 Entrar</button>
         </form>
         
-        <div class="erro-msg" id="erro-msg">Usuário ou senha incorretos!</div>
+        <div class="erro-msg" id="erro-msg">❌ Usuário ou senha incorretos!</div>
         <a href="../index.html" class="voltar">← Voltar para loja</a>
     </div>
 
     <script>
-        // Configuração - ALTERE AQUI!
+        // ⚙️ CONFIGURE AQUI SUAS CREDENCIAIS
         const ADMIN_USER = 'admin';
         const ADMIN_PASS = 'reycraft2024';
         
