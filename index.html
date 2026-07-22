@@ -6,7 +6,6 @@
     <title>ReyCraft Shop</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Imagem do produto no card */
         .produto-img {
             width: 100%;
             height: 200px;
@@ -15,7 +14,7 @@
             margin-bottom: 1rem;
         }
         
-        /* Fundo escuro do modal */
+        /* Modal fundo */
         .modal-detalhes-fundo {
             position: fixed;
             top: 0;
@@ -27,75 +26,74 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 2rem;
         }
         
-        /* Caixa retangular do modal */
+        /* Caixa maior preenchendo a tela */
         .modal-detalhes-box {
             background: var(--card, #1A1A2E);
             border: 2px solid var(--roxo, #8B5CF6);
             border-radius: 15px;
-            padding: 2rem;
-            max-width: 700px;
-            width: 90%;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
         }
         
-        /* Título */
         .modal-detalhes-titulo {
             color: var(--amarelo, #F59E0B);
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
             text-align: center;
+            margin-bottom: 2rem;
         }
         
-        /* Container da imagem + descrição lado a lado */
         .modal-detalhes-conteudo {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
             align-items: flex-start;
         }
         
-        /* Imagem à esquerda */
         .modal-detalhes-imagem {
-            width: 250px;
-            height: 250px;
+            width: 350px;
+            height: 350px;
             object-fit: cover;
             border-radius: 10px;
             flex-shrink: 0;
         }
         
-        /* Placeholder se não tiver imagem */
         .modal-detalhes-placeholder {
-            width: 250px;
-            height: 250px;
+            width: 350px;
+            height: 350px;
             border-radius: 10px;
             background: linear-gradient(45deg, var(--roxo, #8B5CF6), var(--verde, #10B981));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 5rem;
+            font-size: 6rem;
             flex-shrink: 0;
         }
         
-        /* Descrição à direita */
         .modal-detalhes-texto {
             color: var(--texto, #E2E8F0);
-            font-size: 1rem;
+            font-size: 1.1rem;
             line-height: 1.8;
             flex: 1;
+            white-space: pre-line;
         }
         
-        /* Preço e botão */
         .modal-detalhes-rodape {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #333;
         }
         
         .modal-detalhes-preco {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: var(--verde, #10B981);
         }
@@ -103,10 +101,10 @@
         .modal-detalhes-fechar {
             background: var(--roxo, #8B5CF6);
             color: white;
-            padding: 0.8rem 2rem;
+            padding: 1rem 2.5rem;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
@@ -114,10 +112,18 @@
         
         .modal-detalhes-fechar:hover {
             background: var(--roxo-escuro, #6D28D9);
+            transform: scale(1.05);
         }
         
-        /* Responsivo para celular */
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
+            .modal-detalhes-fundo {
+                padding: 1rem;
+            }
+            
+            .modal-detalhes-box {
+                padding: 1.5rem;
+            }
+            
             .modal-detalhes-conteudo {
                 flex-direction: column;
                 align-items: center;
@@ -126,14 +132,13 @@
             .modal-detalhes-imagem,
             .modal-detalhes-placeholder {
                 width: 100%;
-                height: 200px;
+                height: 250px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
     <header class="header">
         <div class="logo">
             <h1>🛒 ReyCraft Shop</h1>
@@ -144,50 +149,39 @@
         </nav>
     </header>
 
-    <!-- PRODUTOS -->
     <div class="container">
         <h2>🔥 Produtos em Destaque</h2>
         
-        <div class="grid-produtos" id="lista-produtos">
-            <!-- Produtos carregados via JavaScript -->
-        </div>
+        <div class="grid-produtos" id="lista-produtos"></div>
     </div>
 
-    <!-- BOTÃO ADMIN -->
     <a href="admin/login.html" class="btn-admin">⚙️ Admin</a>
 
     <script>
-        // ========== APLICAR CORES PERSONALIZADAS ==========
+        // ========== CORES ==========
         (function() {
             try {
                 var config = JSON.parse(localStorage.getItem('config_loja'));
-                
                 if (config && config.corRoxo) {
                     var style = document.createElement('style');
-                    style.id = 'cores-personalizadas';
                     style.textContent = 
                         ':root {' +
                         '--roxo: ' + config.corRoxo + ' !important;' +
                         '--roxo-escuro: ' + config.corRoxo + 'cc !important;' +
-                        '--roxo-claro: ' + config.corRoxo + '99 !important;' +
                         '--verde: ' + config.corVerde + ' !important;' +
                         '--verde-escuro: ' + config.corVerde + 'cc !important;' +
-                        '--verde-claro: ' + config.corVerde + '99 !important;' +
                         '--amarelo: ' + config.corAmarelo + ' !important;' +
                         '--amarelo-escuro: ' + config.corAmarelo + 'cc !important;' +
-                        '--amarelo-claro: ' + config.corAmarelo + '99 !important;' +
                         '}';
                     document.head.appendChild(style);
                     
                     if (config.bgImagem) {
                         var fundo = document.createElement('div');
-                        fundo.id = 'fundo-customizado';
                         fundo.style.cssText = 
                             'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;' +
                             'background-image:url(' + config.bgImagem + ');' +
                             'background-size:' + (config.bgModo || 'cover') + ';' +
                             'background-position:' + (config.bgPosicao || 'center') + ';' +
-                            'background-repeat:' + (config.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + ';' +
                             'opacity:' + ((config.bgOpacidade || 50) / 100) + ';';
                         document.body.insertBefore(fundo, document.body.firstChild);
                     }
@@ -202,10 +196,8 @@
             } catch(e) {}
         })();
 
-        // ========== PRODUTOS ==========
+        // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-
-        // ========== CARRINHO ==========
         var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
         function salvarCarrinho() {
@@ -213,32 +205,27 @@
             atualizarContador();
         }
 
-        window.adicionarAoCarrinho = function(id) {
+        function adicionarAoCarrinho(id) {
             var produto = produtos.find(function(p) { return p.id === id; });
+            if (!produto) return;
             
-            if (!produto) {
-                alert('Produto não encontrado!');
-                return;
-            }
-            
-            var itemNoCarrinho = carrinho.find(function(item) { return item.id === id; });
-            
-            if (itemNoCarrinho) {
-                itemNoCarrinho.quantidade++;
+            var item = carrinho.find(function(i) { return i.id === id; });
+            if (item) {
+                item.quantidade++;
             } else {
-                carrinho.push({ 
+                carrinho.push({
                     id: produto.id,
                     nome: produto.nome,
-                    preco: produto.preco,
+                    preco: Number(produto.preco),
                     emoji: produto.emoji || '',
                     imagem: produto.imagem || '',
-                    quantidade: 1 
+                    quantidade: 1
                 });
             }
             
             salvarCarrinho();
             alert(produto.nome + ' adicionado ao carrinho! 🛒');
-        };
+        }
 
         function atualizarContador() {
             var total = 0;
@@ -249,54 +236,43 @@
             if (contador) contador.textContent = '(' + total + ')';
         }
 
-        // ========== MOSTRAR DETALHES (Modal Retangular) ==========
-        window.mostrarDetalhes = function(id) {
+        function mostrarDetalhes(id) {
             var produto = produtos.find(function(p) { return p.id === id; });
             if (!produto) return;
             
-            // Remover modal antigo se existir
-            var modalAntigo = document.querySelector('.modal-detalhes-fundo');
-            if (modalAntigo) modalAntigo.remove();
+            var antigo = document.querySelector('.modal-detalhes-fundo');
+            if (antigo) antigo.remove();
             
             var modal = document.createElement('div');
             modal.className = 'modal-detalhes-fundo';
             
-            // Imagem ou placeholder
-            var imagemHtml = '';
-            if (produto.imagem) {
-                imagemHtml = '<img src="' + produto.imagem + '" class="modal-detalhes-imagem" alt="' + produto.nome + '">';
-            } else {
-                imagemHtml = '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
-            }
+            var imagemHtml = produto.imagem 
+                ? '<img src="' + produto.imagem + '" class="modal-detalhes-imagem" alt="' + produto.nome + '">'
+                : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
             
             modal.innerHTML = 
                 '<div class="modal-detalhes-box">' +
                     '<div class="modal-detalhes-titulo">' + produto.nome + '</div>' +
                     '<div class="modal-detalhes-conteudo">' +
                         imagemHtml +
-                        '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição disponível.') + '</div>' +
+                        '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição.') + '</div>' +
                     '</div>' +
                     '<div class="modal-detalhes-rodape">' +
-                        '<div class="modal-detalhes-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>' +
+                        '<div class="modal-detalhes-preco">R$ ' + Number(produto.preco).toFixed(2) + '</div>' +
                         '<button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button>' +
                     '</div>' +
                 '</div>';
             
             document.body.appendChild(modal);
-            
-            // Fechar ao clicar fora
-            modal.onclick = function(e) {
-                if (e.target === modal) modal.remove();
-            };
-        };
+            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+        }
 
-        // ========== RENDERIZAR PRODUTOS ==========
         function renderizarProdutos() {
             var container = document.getElementById('lista-produtos');
             if (!container) return;
             
             if (produtos.length === 0) {
-                container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p><p style="margin-top: 0.5rem;">Volte em breve! 🚀</p></div>';
+                container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p></div>';
                 return;
             }
             
@@ -304,7 +280,6 @@
             produtos.forEach(function(produto) {
                 html += '<div class="produto-card">';
                 
-                // Imagem ou placeholder
                 if (produto.imagem) {
                     html += '<img src="' + produto.imagem + '" class="produto-img" alt="' + produto.nome + '">';
                 } else {
@@ -312,11 +287,11 @@
                 }
                 
                 html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
-                html += '<div class="produto-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>';
+                html += '<div class="produto-preco">R$ ' + Number(produto.preco).toFixed(2) + '</div>';
                 html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
                 
                 if (produto.descricao && produto.descricao.trim() !== '') {
-                    html += '<button class="btn-detalhes" onclick="mostrarDetalhes(' + produto.id + ')" style="width:100%;padding:0.6rem;background:transparent;border:1px solid var(--roxo);color:var(--texto);border-radius:8px;margin-top:0.5rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background=\'var(--roxo)\'" onmouseout="this.style.background=\'transparent\'">📋 Detalhes</button>';
+                    html += '<button style="width:100%;padding:0.6rem;background:transparent;border:1px solid var(--roxo);color:var(--texto);border-radius:8px;margin-top:0.5rem;cursor:pointer;" onclick="mostrarDetalhes(' + produto.id + ')">📋 Detalhes</button>';
                 }
                 
                 html += '</div>';
@@ -324,7 +299,6 @@
             container.innerHTML = html;
         }
 
-        // ========== INICIAR ==========
         renderizarProdutos();
         atualizarContador();
     </script>
