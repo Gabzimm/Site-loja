@@ -342,7 +342,7 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Garantir que a imagem se molde */
+/* ========== CORREÇÃO IMAGEM PRODUTO ========== */
 .produto-card img {
     width: 100% !important;
     height: 200px !important;
@@ -350,4 +350,9 @@ body {
     border-radius: 10px !important;
     margin-bottom: 1rem !important;
     display: block !important;
+}
+
+/* ========== BOTÃO DETALHES HOVER ========== */
+.btn-detalhes-hover:hover {
+    background: var(--roxo) !important;
 }
