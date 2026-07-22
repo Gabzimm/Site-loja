@@ -22,6 +22,7 @@
             color: var(--roxo);
             margin-bottom: 2rem;
             text-align: center;
+            font-size: 1.3rem;
         }
 
         .sidebar nav a {
@@ -47,8 +48,9 @@
 
         .filtros {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         .filtro-btn {
@@ -71,6 +73,7 @@
             background: var(--card);
             border-radius: 10px;
             padding: 1rem;
+            overflow-x: auto;
         }
 
         .tabela-pedidos table {
@@ -119,72 +122,42 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .btn-confirmar:hover {
             background: var(--verde-escuro);
-            transform: scale(1.05);
         }
 
-        .btn-detalhes {
-            background: var(--roxo);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 0.5rem;
+        .sem-pedidos {
+            text-align: center;
+            padding: 3rem;
+            color: var(--texto-cinza);
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.ativo {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--card);
-            padding: 2rem;
-            border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
-            border: 2px solid var(--roxo);
-        }
-
-        .modal-content h2 {
-            color: var(--amarelo);
-            margin-bottom: 1rem;
-        }
-
-        .modal-content p {
-            margin-bottom: 0.5rem;
-        }
-
-        .btn-fechar {
-            background: #ff4444;
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 1rem;
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--roxo);
+            }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .sidebar nav a {
+                flex: 1;
+                text-align: center;
+                min-width: 120px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-container">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <h2>⚙️ Admin</h2>
             <nav>
@@ -196,7 +169,6 @@
             </nav>
         </aside>
 
-        <!-- CONTEÚDO -->
         <main class="content">
             <h1>📋 Gerenciar Pedidos</h1>
             
@@ -213,30 +185,19 @@
                         <tr>
                             <th>ID</th>
                             <th>Cliente</th>
-                            <th>Produto</th>
                             <th>Valor</th>
+                            <th>Data</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="lista-pedidos">
-                    </tbody>
+                    <tbody id="lista-pedidos"></tbody>
                 </table>
             </div>
         </main>
     </div>
 
-    <!-- MODAL DETALHES -->
-    <div class="modal" id="modal-detalhes">
-        <div class="modal-content">
-            <h2>📋 Detalhes do Pedido</h2>
-            <div id="detalhes-content"></div>
-            <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
-        </div>
-    </div>
-
     <script>
-        // Verificar login
         if (!localStorage.getItem('admin_logado')) {
             window.location.href = 'login.html';
         }
@@ -246,13 +207,7 @@
             window.location.href = 'login.html';
         }
 
-        // Pedidos mockados
-        let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [
-            { id: 1, cliente: "Player#1234", discordId: "123456789", produto: "VIP Mensal", valor: 29.90, status: "pendente", data: "2024-01-15" },
-            { id: 2, cliente: "ProPlayer#5678", discordId: "987654321", produto: "Cash 1000", valor: 9.90, status: "confirmado", data: "2024-01-14" },
-            { id: 3, cliente: "NoobMaster#9012", discordId: "456789123", produto: "Kit Iniciante", valor: 49.90, status: "entregue", data: "2024-01-13" }
-        ];
-
+        let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
         let filtroAtual = 'todos';
 
         function salvarPedidos() {
@@ -267,45 +222,53 @@
             renderizarPedidos();
         }
 
+        function mostrarConfirmacao(mensagem, icone, onConfirmar, tipoBotao = 'remover') {
+            let modal = document.getElementById('modal-confirmacao');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'modal-confirmacao';
+                modal.className = 'modal-confirmacao';
+                modal.innerHTML = `
+                    <div class="modal-confirmacao-box">
+                        <div class="modal-confirmacao-icone" id="modal-icone"></div>
+                        <h3 id="modal-titulo">Confirmação</h3>
+                        <p id="modal-mensagem"></p>
+                        <div class="modal-confirmacao-botoes">
+                            <button class="btn-cancelar" onclick="fecharConfirmacao()">Cancelar</button>
+                            <button class="btn-confirmar-acao" id="btn-confirmar-acao">Confirmar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('modal-icone').textContent = icone;
+            document.getElementById('modal-mensagem').textContent = mensagem;
+            const btnConfirmar = document.getElementById('btn-confirmar-acao');
+            btnConfirmar.className = 'btn-confirmar-acao btn-salvar-confirmar';
+            btnConfirmar.textContent = '✅ Confirmar';
+            btnConfirmar.onclick = () => { fecharConfirmacao(); onConfirmar(); };
+            modal.classList.add('ativo');
+        }
+
+        function fecharConfirmacao() {
+            const modal = document.getElementById('modal-confirmacao');
+            if (modal) modal.classList.remove('ativo');
+        }
+
         function confirmarPedido(id) {
             const pedido = pedidos.find(p => p.id === id);
             if (pedido && pedido.status === 'pendente') {
-                pedido.status = 'confirmado';
-                salvarPedidos();
-                
-                // Aqui vai chamar a API do bot
-                fetch('http://SEU_IP:5000/api/confirmar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ discordId: pedido.discordId, pedidoId: pedido.id })
-                }).catch(() => console.log('API offline - simulação'));
-                
-                alert(`✅ Pedido #${id} confirmado! DM enviada no Discord!`);
+                mostrarConfirmacao(
+                    `Deseja confirmar o pedido #${id}?\nO cliente receberá uma DM no Discord.`,
+                    '✅',
+                    () => {
+                        pedido.status = 'confirmado';
+                        salvarPedidos();
+                        alert('✅ Pedido confirmado! DM enviada no Discord!');
+                    },
+                    'salvar'
+                );
             }
-        }
-
-        function verDetalhes(id) {
-            const pedido = pedidos.find(p => p.id === id);
-            if (pedido) {
-                document.getElementById('detalhes-content').innerHTML = `
-                    <p><strong>🆔 ID:</strong> #${pedido.id}</p>
-                    <p><strong>👤 Cliente:</strong> ${pedido.cliente}</p>
-                    <p><strong>💬 Discord ID:</strong> ${pedido.discordId}</p>
-                    <p><strong>📦 Produto:</strong> ${pedido.produto}</p>
-                    <p><strong>💰 Valor:</strong> R$ ${pedido.valor.toFixed(2)}</p>
-                    <p><strong>📅 Data:</strong> ${pedido.data}</p>
-                    <p><strong>📊 Status:</strong> ${pedido.status}</p>
-                `;
-                document.getElementById('modal-detalhes').classList.add('ativo');
-            }
-        }
-
-        function fecharModal() {
-            document.getElementById('modal-detalhes').classList.remove('ativo');
-        }
-
-        function getStatusClass(status) {
-            return `status-${status}`;
         }
 
         function renderizarPedidos() {
@@ -316,18 +279,22 @@
                 ? pedidos 
                 : pedidos.filter(p => p.status === filtroAtual);
 
+            if (pedidosFiltrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="sem-pedidos">📋 Nenhum pedido encontrado</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = pedidosFiltrados.map(pedido => `
                 <tr>
                     <td>#${pedido.id}</td>
                     <td>${pedido.cliente}</td>
-                    <td>${pedido.produto}</td>
                     <td>R$ ${pedido.valor.toFixed(2)}</td>
-                    <td><span class="status ${getStatusClass(pedido.status)}">${pedido.status}</span></td>
+                    <td>${pedido.data}</td>
+                    <td><span class="status status-${pedido.status}">${pedido.status}</span></td>
                     <td>
-                        <button class="btn-detalhes" onclick="verDetalhes(${pedido.id})">🔍</button>
                         ${pedido.status === 'pendente' 
                             ? `<button class="btn-confirmar" onclick="confirmarPedido(${pedido.id})">✅ Confirmar</button>`
-                            : ''}
+                            : '—'}
                     </td>
                 </tr>
             `).join('');
