@@ -1,49 +1,56 @@
 // ========== APLICAR CONFIGURAÇÕES SALVAS ==========
 (function() {
-    const cores = JSON.parse(localStorage.getItem('cores_tema'));
-    if (cores) {
-        const root = document.documentElement;
-        root.style.setProperty('--roxo', cores.roxo);
-        root.style.setProperty('--roxo-escuro', cores.roxo + 'cc');
-        root.style.setProperty('--verde', cores.verde);
-        root.style.setProperty('--verde-escuro', cores.verde + 'cc');
-        root.style.setProperty('--amarelo', cores.amarelo);
+    var config = JSON.parse(localStorage.getItem('config_loja'));
+    
+    if (config) {
+        var root = document.documentElement;
         
-        // Favicon
-        if (cores.favicon) {
-            let link = document.querySelector("link[rel*='icon']");
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'icon';
+        // Aplicar cores
+        root.style.setProperty('--roxo', config.corRoxo);
+        root.style.setProperty('--roxo-escuro', config.corRoxo + 'cc');
+        root.style.setProperty('--roxo-claro', config.corRoxo + '99');
+        root.style.setProperty('--verde', config.corVerde);
+        root.style.setProperty('--verde-escuro', config.corVerde + 'cc');
+        root.style.setProperty('--verde-claro', config.corVerde + '99');
+        root.style.setProperty('--amarelo', config.corAmarelo);
+        root.style.setProperty('--amarelo-escuro', config.corAmarelo + 'cc');
+        root.style.setProperty('--amarelo-claro', config.corAmarelo + '99');
+        
+        // Aplicar favicon
+        if (config.favicon) {
+            var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.rel = 'icon';
+            link.type = 'image/png';
+            link.href = config.favicon;
+            if (!document.querySelector("link[rel*='icon']")) {
                 document.head.appendChild(link);
             }
-            link.href = cores.favicon;
         }
         
-        // Imagem de fundo
-        if (cores.bgImagem) {
-            document.body.classList.add('com-fundo');
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 
-                'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; ' +
-                'background-image: url(' + cores.bgImagem + '); ' +
-                'background-size: ' + cores.bgModo + '; ' +
-                'background-position: ' + cores.bgPosicao + '; ' +
-                'background-repeat: ' + (cores.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + '; ' +
-                'opacity: ' + (cores.bgOpacidade / 100) + ';';
-            document.body.appendChild(overlay);
+        // Aplicar imagem de fundo
+        if (config.bgImagem) {
+            var fundoDiv = document.getElementById('fundo-personalizado');
+            if (!fundoDiv) {
+                fundoDiv = document.createElement('div');
+                fundoDiv.id = 'fundo-personalizado';
+                document.body.insertBefore(fundoDiv, document.body.firstChild);
+            }
+            
+            var opacidade = (config.bgOpacidade || 50) / 100;
+            fundoDiv.style.backgroundImage = 'url(' + config.bgImagem + ')';
+            fundoDiv.style.backgroundSize = config.bgModo || 'cover';
+            fundoDiv.style.backgroundPosition = config.bgPosicao || 'center';
+            fundoDiv.style.backgroundRepeat = config.bgModo === 'repeat' ? 'repeat' : 'no-repeat';
+            fundoDiv.style.opacity = opacidade;
         }
     }
 })();
 
-// ========== CONFIGURAÇÃO ==========
-const API_URL = 'http://SEU_IP:5000/api';
-
 // ========== PRODUTOS ==========
-let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
 // ========== CARRINHO ==========
-let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
 function salvarCarrinho() {
     localStorage.setItem('carrinho', JSON.stringify(carrinho));
@@ -51,13 +58,19 @@ function salvarCarrinho() {
 }
 
 function adicionarAoCarrinho(id) {
-    const produto = produtos.find(p => p.id === id);
-    const itemNoCarrinho = carrinho.find(item => item.id === id);
+    var produto = produtos.find(function(p) { return p.id === id; });
+    var itemNoCarrinho = carrinho.find(function(item) { return item.id === id; });
     
     if (itemNoCarrinho) {
         itemNoCarrinho.quantidade++;
     } else {
-        carrinho.push({ ...produto, quantidade: 1 });
+        carrinho.push({ 
+            id: produto.id,
+            nome: produto.nome,
+            preco: produto.preco,
+            emoji: produto.emoji,
+            quantidade: 1 
+        });
     }
     
     salvarCarrinho();
@@ -65,13 +78,16 @@ function adicionarAoCarrinho(id) {
 }
 
 function atualizarContador() {
-    const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0);
-    const contador = document.getElementById('contador-carrinho');
+    var total = 0;
+    carrinho.forEach(function(item) {
+        total += item.quantidade;
+    });
+    var contador = document.getElementById('contador-carrinho');
     if (contador) contador.textContent = '(' + total + ')';
 }
 
 function renderizarProdutos() {
-    const container = document.getElementById('lista-produtos');
+    var container = document.getElementById('lista-produtos');
     if (!container) return;
     
     if (produtos.length === 0) {
@@ -79,13 +95,13 @@ function renderizarProdutos() {
         return;
     }
     
-    let html = '';
+    var html = '';
     produtos.forEach(function(produto) {
         html += '<div class="produto-card">';
         html += '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
         html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
         html += '<p class="produto-descricao">' + (produto.descricao || '') + '</p>';
-        html += '<div class="produto-preco">R$ ' + produto.preco.toFixed(2) + '</div>';
+        html += '<div class="produto-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>';
         html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
         html += '</div>';
     });
