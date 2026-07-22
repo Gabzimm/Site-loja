@@ -1,14 +1,21 @@
-/* ========== CORES DO TEMA ========== */
+/* ============================================
+   🎨 LOJA - TEMA ROXO/VERDE/AMARELO
+   ============================================ */
+
 :root {
     --roxo: #8B5CF6;
     --roxo-escuro: #6D28D9;
+    --roxo-claro: #A78BFA;
     --verde: #10B981;
     --verde-escuro: #059669;
+    --verde-claro: #6EE7B7;
     --amarelo: #F59E0B;
     --amarelo-escuro: #D97706;
+    --amarelo-claro: #FCD34D;
     --fundo: #0F0F1A;
     --card: #1A1A2E;
     --texto: #E2E8F0;
+    --texto-cinza: #94A3B8;
 }
 
 * {
@@ -32,13 +39,15 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 3px solid var(--amarelo);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .logo h1 {
     font-size: 1.8rem;
-    background: linear-gradient(to right, #fff, var(--amarelo));
+    background: linear-gradient(to right, #fff, var(--amarelo-claro));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nav a {
@@ -53,18 +62,24 @@ body {
     color: var(--amarelo);
 }
 
-/* ========== GRID DE PRODUTOS ========== */
+/* ========== CONTAINER ========== */
 .container {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
+.container h2 {
+    margin-bottom: 1rem;
+    color: var(--amarelo);
+}
+
+/* ========== GRID DE PRODUTOS ========== */
 .grid-produtos {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .produto-card {
@@ -73,6 +88,7 @@ body {
     padding: 1.5rem;
     border: 2px solid transparent;
     transition: all 0.3s;
+    text-align: center;
 }
 
 .produto-card:hover {
@@ -90,17 +106,24 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 4rem;
 }
 
 .produto-nome {
     font-size: 1.3rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
+    color: var(--texto);
+}
+
+.produto-descricao {
+    color: var(--texto-cinza);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .produto-preco {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     color: var(--verde);
     margin-bottom: 1rem;
@@ -124,7 +147,7 @@ body {
     transform: scale(1.02);
 }
 
-/* ========== BOTÃO ADMIN ========== */
+/* ========== BOTÃO ADMIN FIXO ========== */
 .btn-admin {
     position: fixed;
     bottom: 20px;
@@ -137,9 +160,163 @@ body {
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
     transition: all 0.3s;
+    z-index: 1000;
 }
 
 .btn-admin:hover {
     background: var(--amarelo-escuro);
     transform: scale(1.05);
+}
+
+/* ========== LOJA VAZIA ========== */
+.loja-vazia {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card);
+    border-radius: 15px;
+    border: 2px dashed var(--roxo);
+}
+
+.loja-vazia .icone {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+
+.loja-vazia h2 {
+    color: var(--amarelo);
+    margin-bottom: 0.5rem;
+}
+
+.loja-vazia p {
+    color: var(--texto-cinza);
+}
+
+/* ========== MODAL DE CONFIRMAÇÃO ========== */
+.modal-confirmacao {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-confirmacao.ativo {
+    display: flex;
+}
+
+.modal-confirmacao-box {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid var(--roxo);
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-confirmacao-icone {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.modal-confirmacao-box h3 {
+    color: var(--amarelo);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-confirmacao-box p {
+    color: var(--texto-cinza);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.modal-confirmacao-botoes {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-cancelar {
+    background: #64748b;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancelar:hover {
+    background: #475569;
+    transform: scale(1.05);
+}
+
+.btn-confirmar-acao {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-confirmar-acao:hover {
+    transform: scale(1.05);
+}
+
+.btn-remover-confirmar {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-remover-confirmar:hover {
+    background: #dc2626;
+}
+
+.btn-salvar-confirmar {
+    background: var(--verde);
+    color: white;
+}
+
+.btn-salvar-confirmar:hover {
+    background: var(--verde-escuro);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .nav a {
+        margin: 0 0.5rem;
+    }
+    
+    .grid-produtos {
+        grid-template-columns: 1fr;
+    }
 }
