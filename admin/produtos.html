@@ -77,17 +77,19 @@
         }
 
         .input-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
+            color: var(--texto);
         }
 
         .input-group input,
-        .input-group textarea {
+        .input-group textarea,
+        .input-group select {
             width: 100%;
             padding: 0.8rem;
             background: var(--fundo);
@@ -99,30 +101,65 @@
 
         .input-group textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
         }
 
-        .btn-salvar {
-            background: var(--verde);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
+        .input-group small {
+            color: var(--texto-cinza);
+            display: block;
+            margin-top: 0.3rem;
+        }
+
+        /* Upload de imagem */
+        .upload-area {
+            border: 2px dashed var(--roxo);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
             cursor: pointer;
-            margin-right: 0.5rem;
+            transition: all 0.3s;
+            background: var(--fundo);
         }
 
-        .btn-cancelar-form {
+        .upload-area:hover {
+            border-color: var(--amarelo);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .upload-area .icone {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-imagem {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .preview-imagem.ativo {
+            display: block;
+        }
+
+        .btn-remover-imagem {
             background: #ef4444;
             color: white;
-            padding: 0.8rem 1.5rem;
+            padding: 0.5rem 1rem;
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
+            margin-top: 0.5rem;
+            display: none;
         }
 
+        .btn-remover-imagem.ativo {
+            display: inline-block;
+        }
+
+        /* Tabela */
         .tabela-produtos {
             background: var(--card);
             border-radius: 10px;
@@ -145,6 +182,14 @@
         .tabela-produtos td {
             padding: 1rem;
             border-bottom: 1px solid #333;
+        }
+
+        .mini-imagem {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--fundo);
         }
 
         .btn-editar {
@@ -170,6 +215,27 @@
             text-align: center;
             padding: 3rem;
             color: var(--texto-cinza);
+        }
+
+        .btn-salvar {
+            background: var(--verde);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn-cancelar-form {
+            background: #64748b;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
@@ -203,6 +269,7 @@
                 <a href="produtos.html" class="ativo">📦 Produtos</a>
                 <a href="pedidos.html">📋 Pedidos</a>
                 <a href="cupons.html">🏷️ Cupons</a>
+                <a href="configuracoes.html">🎨 Configurações</a>
                 <a href="#" onclick="sair()">🚪 Sair</a>
             </nav>
         </aside>
@@ -212,32 +279,54 @@
             
             <button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
             
+            <!-- FORMULÁRIO -->
             <div class="form-produto" id="form-produto">
-                <h2 id="form-titulo" style="margin-bottom: 1rem;">➕ Novo Produto</h2>
+                <h2 id="form-titulo" style="margin-bottom: 1.5rem;">➕ Novo Produto</h2>
+                
                 <div class="input-group">
                     <label>🏷️ Nome do Produto</label>
                     <input type="text" id="nome-produto" placeholder="Ex: VIP Mensal">
                 </div>
+                
                 <div class="input-group">
                     <label>💰 Preço (R$)</label>
                     <input type="number" id="preco-produto" placeholder="29.90" step="0.01">
                 </div>
+                
                 <div class="input-group">
-                    <label>😀 Emoji</label>
+                    <label>😀 Emoji (opcional, aparece se não tiver imagem)</label>
                     <input type="text" id="emoji-produto" placeholder="👑" maxlength="2">
                 </div>
+                
                 <div class="input-group">
-                    <label>📝 Descrição</label>
-                    <textarea id="descricao-produto" placeholder="Descreva o produto..."></textarea>
+                    <label>🖼️ Imagem do Produto</label>
+                    <div class="upload-area" onclick="document.getElementById('input-imagem').click()">
+                        <div class="icone">📁</div>
+                        <p>Clique para escolher uma imagem</p>
+                        <small>Formatos: JPG, PNG, GIF. Máx: 5MB</small>
+                    </div>
+                    <input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
+                    <img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
+                    <button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
+                    <small>Ou cole uma URL de imagem:</small>
+                    <input type="url" id="url-imagem" placeholder="https://exemplo.com/imagem.jpg" oninput="previewUrl(this.value)">
                 </div>
-                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar</button>
+                
+                <div class="input-group">
+                    <label>📝 Descrição do Produto</label>
+                    <textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece em um painel ao clicar no botão de detalhes)"></textarea>
+                </div>
+                
+                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
                 <button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
             </div>
 
+            <!-- TABELA -->
             <div class="tabela-produtos">
                 <table>
                     <thead>
                         <tr>
+                            <th>Imagem</th>
                             <th>Produto</th>
                             <th>Preço</th>
                             <th>Ações</th>
