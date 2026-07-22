@@ -1,51 +1,46 @@
-// ========== CONFIGURAÇÃO ==========
-const API_URL = 'http://SEU_IP:5000/api'; // Depois configuramos
-
-// ========== PRODUTOS (Exemplo) ==========
-const produtos = [
-    {
-        id: 1,
-        nome: "VIP Mensal",
-        preco: 29.90,
-        emoji: "👑",
-        descricao: "Acesso VIP por 30 dias"
-    },
-    {
-        id: 2,
-        nome: "VIP Vitalício",
-        preco: 149.90,
-        emoji: "💎",
-        descricao: "VIP para sempre!"
-    },
-    {
-        id: 3,
-        nome: "Cash 1000",
-        preco: 9.90,
-        emoji: "💰",
-        descricao: "1000 de cash no servidor"
-    },
-    {
-        id: 4,
-        nome: "Kit Iniciante",
-        preco: 49.90,
-        emoji: "🎒",
-        descricao: "Kit completo para começar"
-    },
-    {
-        id: 5,
-        nome: "Cargo Colorido",
-        preco: 19.90,
-        emoji: "🌈",
-        descricao: "Cargo com cor personalizada"
-    },
-    {
-        id: 6,
-        nome: "Montaria Especial",
-        preco: 79.90,
-        emoji: "🐉",
-        descricao: "Montaria exclusiva"
+// ========== APLICAR CONFIGURAÇÕES SALVAS ==========
+(function() {
+    const cores = JSON.parse(localStorage.getItem('cores_tema'));
+    if (cores) {
+        const root = document.documentElement;
+        root.style.setProperty('--roxo', cores.roxo);
+        root.style.setProperty('--roxo-escuro', cores.roxo + 'cc');
+        root.style.setProperty('--verde', cores.verde);
+        root.style.setProperty('--verde-escuro', cores.verde + 'cc');
+        root.style.setProperty('--amarelo', cores.amarelo);
+        
+        // Favicon
+        if (cores.favicon) {
+            let link = document.querySelector("link[rel*='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = cores.favicon;
+        }
+        
+        // Imagem de fundo
+        if (cores.bgImagem) {
+            document.body.classList.add('com-fundo');
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 
+                'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; ' +
+                'background-image: url(' + cores.bgImagem + '); ' +
+                'background-size: ' + cores.bgModo + '; ' +
+                'background-position: ' + cores.bgPosicao + '; ' +
+                'background-repeat: ' + (cores.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + '; ' +
+                'opacity: ' + (cores.bgOpacidade / 100) + ';';
+            document.body.appendChild(overlay);
+        }
     }
-];
+})();
+
+// ========== CONFIGURAÇÃO ==========
+const API_URL = 'http://SEU_IP:5000/api';
+
+// ========== PRODUTOS ==========
+let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 
 // ========== CARRINHO ==========
 let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
@@ -66,33 +61,43 @@ function adicionarAoCarrinho(id) {
     }
     
     salvarCarrinho();
-    alert(`${produto.nome} adicionado ao carrinho! 🛒`);
+    alert(produto.nome + ' adicionado ao carrinho! 🛒');
 }
 
 function atualizarContador() {
     const total = carrinho.reduce((soma, item) => soma + item.quantidade, 0);
     const contador = document.getElementById('contador-carrinho');
-    if (contador) contador.textContent = `(${total})`;
+    if (contador) contador.textContent = '(' + total + ')';
 }
 
-// ========== RENDERIZAR PRODUTOS ==========
 function renderizarProdutos() {
     const container = document.getElementById('lista-produtos');
     if (!container) return;
     
-    container.innerHTML = produtos.map(produto => `
-        <div class="produto-card">
-            <div class="produto-imagem">${produto.emoji}</div>
-            <h3 class="produto-nome">${produto.nome}</h3>
-            <p>${produto.descricao}</p>
-            <div class="produto-preco">R$ ${produto.preco.toFixed(2)}</div>
-            <button class="btn-comprar" onclick="adicionarAoCarrinho(${produto.id})">
-                🛒 Comprar
-            </button>
-        </div>
-    `).join('');
+    if (produtos.length === 0) {
+        container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p><p style="margin-top: 0.5rem;">Volte em breve! 🚀</p></div>';
+        return;
+    }
+    
+    let html = '';
+    produtos.forEach(function(produto) {
+        html += '<div class="produto-card">';
+        html += '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
+        html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
+        html += '<p class="produto-descricao">' + (produto.descricao || '') + '</p>';
+        html += '<div class="produto-preco">R$ ' + produto.preco.toFixed(2) + '</div>';
+        html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
 }
 
-// ========== INICIAR ==========
 renderizarProdutos();
 atualizarContador();
+
+window.addEventListener('storage', function(e) {
+    if (e.key === 'produtos') {
+        produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+        renderizarProdutos();
+    }
+});
