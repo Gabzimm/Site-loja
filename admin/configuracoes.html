@@ -76,8 +76,7 @@
         }
 
         .input-group input[type="text"],
-        .input-group input[type="url"],
-        .input-group input[type="color"] {
+        .input-group input[type="url"] {
             width: 100%;
             padding: 0.8rem;
             background: var(--fundo);
@@ -97,6 +96,22 @@
         .input-group input[type="range"] {
             width: 100%;
             cursor: pointer;
+        }
+
+        .input-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--fundo);
+            border: 2px solid var(--roxo);
+            border-radius: 8px;
+            color: var(--texto);
+            font-size: 1rem;
+        }
+
+        .input-group small {
+            color: var(--texto-cinza);
+            display: block;
+            margin-top: 0.3rem;
         }
 
         .color-grid {
@@ -125,9 +140,12 @@
             flex: 1;
         }
 
+        .color-info strong {
+            display: block;
+        }
+
         .color-info small {
             color: var(--texto-cinza);
-            display: block;
         }
 
         .preview-box {
@@ -142,6 +160,8 @@
             justify-content: center;
             flex-direction: column;
             gap: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .preview-header {
@@ -152,6 +172,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .preview-btn {
@@ -192,6 +214,10 @@
             width: 100%;
         }
 
+        .btn-resetar:hover {
+            background: #dc2626;
+        }
+
         .range-value {
             display: inline-block;
             background: var(--roxo);
@@ -201,11 +227,29 @@
             font-size: 0.9rem;
         }
 
+        .favicon-preview-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
         .favicon-preview {
-            width: 32px;
-            height: 32px;
-            border-radius: 5px;
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
             border: 2px solid var(--roxo);
+            object-fit: cover;
+        }
+
+        .mensagem-sucesso {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--verde);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -232,6 +276,7 @@
 </head>
 <body>
     <div class="admin-container">
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <h2>⚙️ Admin</h2>
             <nav>
@@ -244,33 +289,37 @@
             </nav>
         </aside>
 
+        <!-- CONTEÚDO -->
         <main class="content">
             <h1>🎨 Configurações da Loja</h1>
-            <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize as cores, imagens e aparência da sua loja</p>
+            <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize as cores, imagens e aparência da sua loja. Todas as mudanças são aplicadas em tempo real!</p>
 
-            <!-- CORES -->
+            <div class="mensagem-sucesso" id="msg-sucesso">✅ Configurações salvas com sucesso!</div>
+
+            <!-- CORES DO TEMA -->
             <div class="config-section">
                 <h3>🎨 Cores do Tema</h3>
+                <p style="color: var(--texto-cinza); margin-bottom: 1rem;">Escolha as cores principais da sua loja</p>
                 <div class="color-grid">
                     <div class="color-item">
                         <input type="color" id="cor-roxo" value="#8B5CF6" onchange="atualizarPreview()">
                         <div class="color-info">
                             <strong>Roxo Principal</strong>
-                            <small>Cor primária</small>
+                            <small>Headers, botões, bordas</small>
                         </div>
                     </div>
                     <div class="color-item">
                         <input type="color" id="cor-verde" value="#10B981" onchange="atualizarPreview()">
                         <div class="color-info">
                             <strong>Verde Secundário</strong>
-                            <small>Preços e botões</small>
+                            <small>Preços, confirmações</small>
                         </div>
                     </div>
                     <div class="color-item">
                         <input type="color" id="cor-amarelo" value="#F59E0B" onchange="atualizarPreview()">
                         <div class="color-info">
                             <strong>Amarelo Terciário</strong>
-                            <small>Destaques</small>
+                            <small>Títulos, destaques</small>
                         </div>
                     </div>
                 </div>
@@ -281,70 +330,75 @@
                 <h3>🖼️ Favicon (Ícone da Aba)</h3>
                 <div class="input-group">
                     <label>URL do Favicon</label>
-                    <input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png" onchange="atualizarPreview()">
-                    <small style="color: var(--texto-cinza);">Recomendado: imagem quadrada (32x32 ou 64x64)</small>
+                    <input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png" oninput="atualizarPreview()">
+                    <small>Recomendado: imagem quadrada PNG (32x32 ou 64x64 pixels)</small>
                 </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                <div class="favicon-preview-container">
                     <span>Preview:</span>
-                    <img id="favicon-preview-img" class="favicon-preview" src="" alt="Favicon Preview" style="display: none;">
-                    <span id="favicon-placeholder" style="color: var(--texto-cinza);">Nenhuma imagem</span>
+                    <img id="favicon-preview-img" class="favicon-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%231A1A2E' width='48' height='48'/%3E%3Ctext fill='%238B5CF6' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='24'%3E🛒%3C/text%3E%3C/svg%3E" alt="Preview Favicon">
+                    <span style="color: var(--texto-cinza); font-size: 0.9rem;" id="favicon-status">Nenhuma imagem</span>
                 </div>
             </div>
 
             <!-- IMAGEM DE FUNDO -->
             <div class="config-section">
-                <h3>🌄 Imagem de Fundo</h3>
+                <h3>🌄 Imagem de Fundo da Loja</h3>
                 <div class="input-group">
                     <label>URL da Imagem de Fundo</label>
-                    <input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg" onchange="atualizarPreview()">
+                    <input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg" oninput="atualizarPreview()">
+                    <small>Deixe em branco para usar a cor de fundo padrão</small>
                 </div>
                 <div class="input-group">
-                    <label>Opacidade: <span class="range-value" id="opacidade-valor">50%</span></label>
+                    <label>Opacidade da Imagem: <span class="range-value" id="opacidade-valor">50%</span></label>
                     <input type="range" id="bg-opacidade" min="0" max="100" value="50" oninput="atualizarOpacidade()">
+                    <small>0% = invisível | 100% = totalmente visível</small>
                 </div>
                 <div class="input-group">
                     <label>Modo de Exibição</label>
                     <select id="bg-modo" onchange="atualizarPreview()">
-                        <option value="cover">Cobrir tela inteira</option>
-                        <option value="contain">Mostrar imagem completa</option>
-                        <option value="repeat">Repetir (padrão)</option>
-                        <option value="no-repeat">Não repetir</option>
+                        <option value="cover">📐 Cobrir tela inteira (Recomendado)</option>
+                        <option value="contain">📏 Mostrar imagem completa</option>
+                        <option value="repeat">🔁 Repetir como padrão</option>
+                        <option value="no-repeat">📌 Não repetir</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Posição da Imagem</label>
                     <select id="bg-posicao" onchange="atualizarPreview()">
-                        <option value="center">Centro</option>
-                        <option value="top">Topo</option>
-                        <option value="bottom">Embaixo</option>
-                        <option value="left">Esquerda</option>
-                        <option value="right">Direita</option>
+                        <option value="center">🎯 Centro</option>
+                        <option value="top">⬆️ Topo</option>
+                        <option value="bottom">⬇️ Embaixo</option>
+                        <option value="left">⬅️ Esquerda</option>
+                        <option value="right">➡️ Direita</option>
                     </select>
                 </div>
             </div>
 
-            <!-- PREVIEW -->
+            <!-- PREVIEW EM TEMPO REAL -->
             <div class="config-section">
                 <h3>👁️ Preview em Tempo Real</h3>
+                <p style="color: var(--texto-cinza); margin-bottom: 1rem;">Veja como sua loja vai ficar antes de salvar</p>
                 <div class="preview-box" id="preview-box">
                     <div class="preview-header" id="preview-header">
-                        <span style="color: white; font-weight: bold;">🛒 Minha Loja</span>
-                        <button class="preview-btn" id="preview-btn-comprar" style="background: var(--verde); color: white;">Comprar</button>
+                        <span style="color: white; font-weight: bold; font-size: 1.2rem;">🛒 Minha Loja</span>
+                        <button class="preview-btn" id="preview-btn-comprar" style="background: var(--verde); color: white;">Comprar Agora</button>
                     </div>
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <div style="background: var(--card); padding: 1rem; border-radius: 8px; width: 150px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;" id="preview-card">📦</div>
-                        <div style="background: var(--card); padding: 1rem; border-radius: 8px; width: 150px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem;" id="preview-card2">💎</div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem; position: relative; z-index: 1;">
+                        <div style="background: var(--card); padding: 1rem; border-radius: 8px; width: 150px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid;" id="preview-card1">📦</div>
+                        <div style="background: var(--card); padding: 1rem; border-radius: 8px; width: 150px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid;" id="preview-card2">💎</div>
                     </div>
+                    <div style="position: relative; z-index: 1; margin-top: 0.5rem; color: var(--verde); font-weight: bold; font-size: 1.2rem;">R$ 29,90</div>
                 </div>
             </div>
 
-            <!-- BOTÕES -->
-            <button class="btn-salvar-config" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
-            <button class="btn-resetar" onclick="resetarConfiguracoes()">🔄 Restaurar Padrão</button>
+            <!-- BOTÕES DE AÇÃO -->
+            <button class="btn-salvar-config" onclick="salvarConfiguracoes()">💾 Salvar e Aplicar Configurações</button>
+            <button class="btn-resetar" onclick="resetarConfiguracoes()">🔄 Restaurar Cores Padrão</button>
         </main>
     </div>
 
     <script>
+        // Verificar login
         if (!localStorage.getItem('admin_logado')) {
             window.location.href = 'login.html';
         }
@@ -354,8 +408,8 @@
             window.location.href = 'login.html';
         }
 
-        // Carregar configurações salvas
-        const config = JSON.parse(localStorage.getItem('config_loja')) || {
+        // Carregar configurações salvas ou usar padrão
+        var config = JSON.parse(localStorage.getItem('config_loja')) || {
             corRoxo: '#8B5CF6',
             corVerde: '#10B981',
             corAmarelo: '#F59E0B',
@@ -366,129 +420,149 @@
             bgPosicao: 'center'
         };
 
+        // Aplicar cores salvas ao carregar a página
+        function aplicarCoresNaPagina() {
+            var root = document.documentElement;
+            root.style.setProperty('--roxo', config.corRoxo);
+            root.style.setProperty('--roxo-escuro', config.corRoxo + 'cc');
+            root.style.setProperty('--roxo-claro', config.corRoxo + '99');
+            root.style.setProperty('--verde', config.corVerde);
+            root.style.setProperty('--verde-escuro', config.corVerde + 'cc');
+            root.style.setProperty('--verde-claro', config.corVerde + '99');
+            root.style.setProperty('--amarelo', config.corAmarelo);
+            root.style.setProperty('--amarelo-escuro', config.corAmarelo + 'cc');
+            root.style.setProperty('--amarelo-claro', config.corAmarelo + '99');
+        }
+
         function carregarConfig() {
             document.getElementById('cor-roxo').value = config.corRoxo;
             document.getElementById('cor-verde').value = config.corVerde;
             document.getElementById('cor-amarelo').value = config.corAmarelo;
-            document.getElementById('favicon-url').value = config.favicon;
-            document.getElementById('bg-imagem').value = config.bgImagem;
+            document.getElementById('favicon-url').value = config.favicon || '';
+            document.getElementById('bg-imagem').value = config.bgImagem || '';
             document.getElementById('bg-opacidade').value = config.bgOpacidade;
             document.getElementById('bg-modo').value = config.bgModo;
             document.getElementById('bg-posicao').value = config.bgPosicao;
             document.getElementById('opacidade-valor').textContent = config.bgOpacidade + '%';
+            
+            aplicarCoresNaPagina();
             atualizarPreview();
         }
 
         function atualizarOpacidade() {
-            const valor = document.getElementById('bg-opacidade').value;
+            var valor = document.getElementById('bg-opacidade').value;
             document.getElementById('opacidade-valor').textContent = valor + '%';
             atualizarPreview();
         }
 
         function atualizarPreview() {
-            const roxo = document.getElementById('cor-roxo').value;
-            const verde = document.getElementById('cor-verde').value;
-            const amarelo = document.getElementById('cor-amarelo').value;
-            const favicon = document.getElementById('favicon-url').value;
-            const bgImagem = document.getElementById('bg-imagem').value;
-            const bgOpacidade = document.getElementById('bg-opacidade').value;
-            const bgModo = document.getElementById('bg-modo').value;
-            const bgPosicao = document.getElementById('bg-posicao').value;
+            var roxo = document.getElementById('cor-roxo').value;
+            var verde = document.getElementById('cor-verde').value;
+            var amarelo = document.getElementById('cor-amarelo').value;
+            var faviconUrl = document.getElementById('favicon-url').value;
+            var bgImagem = document.getElementById('bg-imagem').value;
+            var bgOpacidade = document.getElementById('bg-opacidade').value;
+            var bgModo = document.getElementById('bg-modo').value;
+            var bgPosicao = document.getElementById('bg-posicao').value;
 
-            // Atualizar preview header
-            document.getElementById('preview-header').style.background = 
-                'linear-gradient(135deg, ' + roxo + ', ' + roxo + 'cc)';
-            document.getElementById('preview-header').style.borderBottom = 
-                '3px solid ' + amarelo;
+            // Atualizar cores do preview
+            document.getElementById('preview-header').style.background = 'linear-gradient(135deg, ' + roxo + 'cc, ' + roxo + ')';
+            document.getElementById('preview-header').style.borderBottom = '3px solid ' + amarelo;
             document.getElementById('preview-btn-comprar').style.background = verde;
-            document.getElementById('preview-card').style.border = '2px solid ' + roxo;
-            document.getElementById('preview-card2').style.border = '2px solid ' + roxo;
+            document.getElementById('preview-card1').style.borderColor = roxo;
+            document.getElementById('preview-card2').style.borderColor = roxo;
 
             // Atualizar preview da imagem de fundo
-            const previewBox = document.getElementById('preview-box');
+            var previewBox = document.getElementById('preview-box');
+            
+            // Remover overlay antigo
+            var overlayAntigo = previewBox.querySelector('.bg-overlay');
+            if (overlayAntigo) overlayAntigo.remove();
+
             if (bgImagem) {
                 previewBox.style.backgroundImage = 'url(' + bgImagem + ')';
                 previewBox.style.backgroundSize = bgModo;
                 previewBox.style.backgroundPosition = bgPosicao;
                 previewBox.style.backgroundRepeat = bgModo === 'repeat' ? 'repeat' : 'no-repeat';
-                previewBox.style.position = 'relative';
-                // Overlay para opacidade
-                const overlay = previewBox.querySelector('.bg-overlay') || document.createElement('div');
+                
+                // Criar overlay para simular opacidade
+                var overlay = document.createElement('div');
                 overlay.className = 'bg-overlay';
                 overlay.style.cssText = 
                     'position: absolute; top: 0; left: 0; width: 100%; height: 100%; ' +
                     'background: rgba(15, 15, 26, ' + (1 - bgOpacidade / 100) + '); ' +
-                    'border-radius: 10px; pointer-events: none;';
-                if (!previewBox.querySelector('.bg-overlay')) {
-                    previewBox.appendChild(overlay);
-                }
+                    'border-radius: 10px; pointer-events: none; z-index: 0;';
+                previewBox.appendChild(overlay);
             } else {
                 previewBox.style.backgroundImage = 'none';
-                const overlay = previewBox.querySelector('.bg-overlay');
-                if (overlay) overlay.remove();
+                previewBox.style.backgroundColor = '#0F0F1A';
             }
 
-            // Atualizar favicon preview
-            const faviconImg = document.getElementById('favicon-preview-img');
-            const faviconPlaceholder = document.getElementById('favicon-placeholder');
-            if (favicon) {
-                faviconImg.src = favicon;
+            // Atualizar preview do favicon
+            var faviconImg = document.getElementById('favicon-preview-img');
+            var faviconStatus = document.getElementById('favicon-status');
+            
+            if (faviconUrl) {
+                faviconImg.src = faviconUrl;
                 faviconImg.style.display = 'block';
-                faviconPlaceholder.style.display = 'none';
+                faviconStatus.textContent = '✅ Imagem carregada';
+                faviconStatus.style.color = '#10B981';
             } else {
-                faviconImg.style.display = 'none';
-                faviconPlaceholder.style.display = 'inline';
+                faviconImg.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\'%3E%3Crect fill=\'%231A1A2E\' width=\'48\' height=\'48\'/%3E%3Ctext fill=\'%238B5CF6\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' font-size=\'24\'%3E🛒%3C/text%3E%3C/svg%3E';
+                faviconImg.style.display = 'block';
+                faviconStatus.textContent = 'Nenhuma imagem';
+                faviconStatus.style.color = '#94A3B8';
             }
         }
 
         function salvarConfiguracoes() {
-    var novasConfig = {
-        corRoxo: document.getElementById('cor-roxo').value,
-        corVerde: document.getElementById('cor-verde').value,
-        corAmarelo: document.getElementById('cor-amarelo').value,
-        favicon: document.getElementById('favicon-url').value,
-        bgImagem: document.getElementById('bg-imagem').value,
-        bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
-        bgModo: document.getElementById('bg-modo').value,
-        bgPosicao: document.getElementById('bg-posicao').value
-    };
+            var novasConfig = {
+                corRoxo: document.getElementById('cor-roxo').value,
+                corVerde: document.getElementById('cor-verde').value,
+                corAmarelo: document.getElementById('cor-amarelo').value,
+                favicon: document.getElementById('favicon-url').value,
+                bgImagem: document.getElementById('bg-imagem').value,
+                bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
+                bgModo: document.getElementById('bg-modo').value,
+                bgPosicao: document.getElementById('bg-posicao').value
+            };
 
-    localStorage.setItem('config_loja', JSON.stringify(novasConfig));
-    
-    // Aplicar imediatamente na página atual
-    var root = document.documentElement;
-    root.style.setProperty('--roxo', novasConfig.corRoxo);
-    root.style.setProperty('--roxo-escuro', novasConfig.corRoxo + 'cc');
-    root.style.setProperty('--verde', novasConfig.corVerde);
-    root.style.setProperty('--verde-escuro', novasConfig.corVerde + 'cc');
-    root.style.setProperty('--amarelo', novasConfig.corAmarelo);
-    
-    alert('✅ Configurações salvas! As mudanças já estão visíveis na loja.');
-}
-        }
-
-        function aplicarCoresGlobais(cfg) {
-            // Salva num localStorage separado que o style.css pode ler
-            localStorage.setItem('cores_tema', JSON.stringify({
-                roxo: cfg.corRoxo,
-                verde: cfg.corVerde,
-                amarelo: cfg.corAmarelo,
-                favicon: cfg.favicon,
-                bgImagem: cfg.bgImagem,
-                bgOpacidade: cfg.bgOpacidade,
-                bgModo: cfg.bgModo,
-                bgPosicao: cfg.bgPosicao
-            }));
+            // Salvar no localStorage
+            localStorage.setItem('config_loja', JSON.stringify(novasConfig));
+            
+            // Atualizar variável local
+            config = novasConfig;
+            
+            // Aplicar cores imediatamente
+            aplicarCoresNaPagina();
+            
+            // Mostrar mensagem de sucesso
+            var msg = document.getElementById('msg-sucesso');
+            msg.style.display = 'block';
+            setTimeout(function() {
+                msg.style.display = 'none';
+            }, 3000);
         }
 
         function resetarConfiguracoes() {
-            if (confirm('Restaurar cores padrão?')) {
+            if (confirm('Tem certeza que deseja restaurar as cores padrão?\n\nRoxo: #8B5CF6\nVerde: #10B981\nAmarelo: #F59E0B')) {
                 localStorage.removeItem('config_loja');
-                localStorage.removeItem('cores_tema');
-                location.reload();
+                config = {
+                    corRoxo: '#8B5CF6',
+                    corVerde: '#10B981',
+                    corAmarelo: '#F59E0B',
+                    favicon: '',
+                    bgImagem: '',
+                    bgOpacidade: 50,
+                    bgModo: 'cover',
+                    bgPosicao: 'center'
+                };
+                carregarConfig();
+                alert('✅ Cores restauradas com sucesso!');
             }
         }
 
+        // Iniciar
         carregarConfig();
     </script>
 </body>
