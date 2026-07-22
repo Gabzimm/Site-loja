@@ -69,4 +69,186 @@
             padding: 2rem;
             border-radius: 10px;
             margin-bottom: 2rem;
-            display
+            display: none;
+        }
+
+        .form-produto.ativo {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--fundo);
+            border: 2px solid var(--roxo);
+            border-radius: 8px;
+            color: var(--texto);
+            font-size: 1rem;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-salvar {
+            background: var(--verde);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn-cancelar-form {
+            background: #ef4444;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tabela-produtos {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .tabela-produtos table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabela-produtos th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--roxo);
+            color: var(--amarelo);
+        }
+
+        .tabela-produtos td {
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn-editar {
+            background: var(--amarelo);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        .btn-remover {
+            background: #ef4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sem-produtos {
+            text-align: center;
+            padding: 3rem;
+            color: var(--texto-cinza);
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--roxo);
+            }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .sidebar nav a {
+                flex: 1;
+                text-align: center;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html" class="ativo">📦 Produtos</a>
+                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="cupons.html">🏷️ Cupons</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <h1>📦 Gerenciar Produtos</h1>
+            
+            <button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
+            
+            <div class="form-produto" id="form-produto">
+                <h2 id="form-titulo" style="margin-bottom: 1rem;">➕ Novo Produto</h2>
+                <div class="input-group">
+                    <label>🏷️ Nome do Produto</label>
+                    <input type="text" id="nome-produto" placeholder="Ex: VIP Mensal">
+                </div>
+                <div class="input-group">
+                    <label>💰 Preço (R$)</label>
+                    <input type="number" id="preco-produto" placeholder="29.90" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>😀 Emoji</label>
+                    <input type="text" id="emoji-produto" placeholder="👑" maxlength="2">
+                </div>
+                <div class="input-group">
+                    <label>📝 Descrição</label>
+                    <textarea id="descricao-produto" placeholder="Descreva o produto..."></textarea>
+                </div>
+                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar</button>
+                <button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
+            </div>
+
+            <div class="tabela-produtos">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-produtos-admin"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>
