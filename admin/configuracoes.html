@@ -516,33 +516,36 @@
         }
 
         function salvarConfiguracoes() {
-            var novasConfig = {
-                corRoxo: document.getElementById('cor-roxo').value,
-                corVerde: document.getElementById('cor-verde').value,
-                corAmarelo: document.getElementById('cor-amarelo').value,
-                favicon: document.getElementById('favicon-url').value,
-                bgImagem: document.getElementById('bg-imagem').value,
-                bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
-                bgModo: document.getElementById('bg-modo').value,
-                bgPosicao: document.getElementById('bg-posicao').value
-            };
+    var novasConfig = {
+        corRoxo: document.getElementById('cor-roxo').value,
+        corVerde: document.getElementById('cor-verde').value,
+        corAmarelo: document.getElementById('cor-amarelo').value,
+        favicon: document.getElementById('favicon-url').value,
+        bgImagem: document.getElementById('bg-imagem').value,
+        bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
+        bgModo: document.getElementById('bg-modo').value,
+        bgPosicao: document.getElementById('bg-posicao').value
+    };
 
-            // Salvar no localStorage
-            localStorage.setItem('config_loja', JSON.stringify(novasConfig));
-            
-            // Atualizar variável local
-            config = novasConfig;
-            
-            // Aplicar cores imediatamente
-            aplicarCoresNaPagina();
-            
-            // Mostrar mensagem de sucesso
-            var msg = document.getElementById('msg-sucesso');
-            msg.style.display = 'block';
-            setTimeout(function() {
-                msg.style.display = 'none';
-            }, 3000);
-        }
+    localStorage.setItem('config_loja', JSON.stringify(novasConfig));
+    
+    // Aplicar imediatamente na página admin
+    var root = document.documentElement;
+    root.style.setProperty('--roxo', novasConfig.corRoxo);
+    root.style.setProperty('--roxo-escuro', novasConfig.corRoxo + 'cc');
+    root.style.setProperty('--verde', novasConfig.corVerde);
+    root.style.setProperty('--verde-escuro', novasConfig.corVerde + 'cc');
+    root.style.setProperty('--amarelo', novasConfig.corAmarelo);
+    
+    // Mostrar mensagem
+    var msg = document.getElementById('msg-sucesso');
+    msg.style.display = 'block';
+    msg.textContent = '✅ Cores salvas! Recarregue a loja para ver as mudanças.';
+    
+    setTimeout(function() {
+        msg.style.display = 'none';
+    }, 4000);
+}
 
         function resetarConfiguracoes() {
             if (confirm('Tem certeza que deseja restaurar as cores padrão?\n\nRoxo: #8B5CF6\nVerde: #10B981\nAmarelo: #F59E0B')) {
