@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Produtos</title>
+    <title>Admin - Pedidos</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
         .admin-container {
@@ -46,164 +46,77 @@
             padding: 2rem;
         }
 
-        .btn-adicionar {
-            background: var(--verde);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
+        .filtros {
+            display: flex;
+            gap: 0.5rem;
             margin-bottom: 2rem;
-            transition: all 0.3s;
+            flex-wrap: wrap;
         }
 
-        .btn-adicionar:hover {
-            background: var(--verde-escuro);
-            transform: scale(1.05);
-        }
-
-        .form-produto {
+        .filtro-btn {
+            padding: 0.5rem 1rem;
             background: var(--card);
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .form-produto.ativo {
-            display: block;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: var(--texto);
-        }
-
-        .input-group input,
-        .input-group textarea,
-        .input-group select {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--fundo);
             border: 2px solid var(--roxo);
             border-radius: 8px;
             color: var(--texto);
-            font-size: 1rem;
-        }
-
-        .input-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .input-group small {
-            color: var(--texto-cinza);
-            display: block;
-            margin-top: 0.3rem;
-        }
-
-        /* Upload de imagem */
-        .upload-area {
-            border: 2px dashed var(--roxo);
-            border-radius: 10px;
-            padding: 2rem;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: var(--fundo);
         }
 
-        .upload-area:hover {
-            border-color: var(--amarelo);
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .upload-area .icone {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .preview-imagem {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .preview-imagem.ativo {
-            display: block;
-        }
-
-        .btn-remover-imagem {
-            background: #ef4444;
+        .filtro-btn:hover,
+        .filtro-btn.ativo {
+            background: var(--roxo);
             color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            display: none;
         }
 
-        .btn-remover-imagem.ativo {
-            display: inline-block;
-        }
-
-        /* Tabela */
-        .tabela-produtos {
+        .tabela-pedidos {
             background: var(--card);
             border-radius: 10px;
             padding: 1rem;
             overflow-x: auto;
         }
 
-        .tabela-produtos table {
+        .tabela-pedidos table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .tabela-produtos th {
+        .tabela-pedidos th {
             text-align: left;
             padding: 1rem;
             border-bottom: 2px solid var(--roxo);
             color: var(--amarelo);
         }
 
-        .tabela-produtos td {
+        .tabela-pedidos td {
             padding: 1rem;
             border-bottom: 1px solid #333;
         }
 
-        .mini-imagem {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: var(--fundo);
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
         }
 
-        .btn-editar {
-            background: var(--amarelo);
-            color: #000;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 0.5rem;
+        .status-pendente {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--amarelo);
         }
 
-        .btn-remover {
-            background: #ef4444;
+        .status-confirmado {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--verde);
+        }
+
+        .status-entregue {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--roxo);
+        }
+
+        .btn-confirmar {
+            background: var(--verde);
             color: white;
             padding: 0.5rem 1rem;
             border: none;
@@ -211,31 +124,14 @@
             cursor: pointer;
         }
 
-        .sem-produtos {
+        .btn-confirmar:hover {
+            background: var(--verde-escuro);
+        }
+
+        .sem-pedidos {
             text-align: center;
             padding: 3rem;
             color: var(--texto-cinza);
-        }
-
-        .btn-salvar {
-            background: var(--verde);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-right: 0.5rem;
-        }
-
-        .btn-cancelar-form {
-            background: #64748b;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
         }
 
         @media (max-width: 768px) {
@@ -266,8 +162,8 @@
             <h2>⚙️ Admin</h2>
             <nav>
                 <a href="dashboard.html">📊 Dashboard</a>
-                <a href="produtos.html" class="ativo">📦 Produtos</a>
-                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="produtos.html">📦 Produtos</a>
+                <a href="pedidos.html" class="ativo">📋 Pedidos</a>
                 <a href="cupons.html">🏷️ Cupons</a>
                 <a href="configuracoes.html">🎨 Configurações</a>
                 <a href="#" onclick="sair()">🚪 Sair</a>
@@ -275,69 +171,101 @@
         </aside>
 
         <main class="content">
-            <h1>📦 Gerenciar Produtos</h1>
+            <h1>📋 Gerenciar Pedidos</h1>
             
-            <button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
-            
-            <!-- FORMULÁRIO -->
-            <div class="form-produto" id="form-produto">
-                <h2 id="form-titulo" style="margin-bottom: 1.5rem;">➕ Novo Produto</h2>
-                
-                <div class="input-group">
-                    <label>🏷️ Nome do Produto</label>
-                    <input type="text" id="nome-produto" placeholder="Ex: VIP Mensal">
-                </div>
-                
-                <div class="input-group">
-                    <label>💰 Preço (R$)</label>
-                    <input type="number" id="preco-produto" placeholder="29.90" step="0.01">
-                </div>
-                
-                <div class="input-group">
-                    <label>😀 Emoji (opcional, aparece se não tiver imagem)</label>
-                    <input type="text" id="emoji-produto" placeholder="👑" maxlength="2">
-                </div>
-                
-                <div class="input-group">
-                    <label>🖼️ Imagem do Produto</label>
-                    <div class="upload-area" onclick="document.getElementById('input-imagem').click()">
-                        <div class="icone">📁</div>
-                        <p>Clique para escolher uma imagem</p>
-                        <small>Formatos: JPG, PNG, GIF. Máx: 5MB</small>
-                    </div>
-                    <input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
-                    <img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
-                    <button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
-                    <small>Ou cole uma URL de imagem:</small>
-                    <input type="url" id="url-imagem" placeholder="https://exemplo.com/imagem.jpg" oninput="previewUrl(this.value)">
-                </div>
-                
-                <div class="input-group">
-                    <label>📝 Descrição do Produto</label>
-                    <textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece em um painel ao clicar no botão de detalhes)"></textarea>
-                </div>
-                
-                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
-                <button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
+            <div class="filtros">
+                <button class="filtro-btn ativo" onclick="filtrarPedidos('todos')">📋 Todos</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('pendente')">⏳ Pendentes</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('confirmado')">✅ Confirmados</button>
+                <button class="filtro-btn" onclick="filtrarPedidos('entregue')">📦 Entregues</button>
             </div>
 
-            <!-- TABELA -->
-            <div class="tabela-produtos">
+            <div class="tabela-pedidos">
                 <table>
                     <thead>
                         <tr>
-                            <th>Imagem</th>
-                            <th>Produto</th>
-                            <th>Preço</th>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Data</th>
+                            <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="lista-produtos-admin"></tbody>
+                    <tbody id="lista-pedidos"></tbody>
                 </table>
             </div>
         </main>
     </div>
 
-    <script src="../js/admin.js"></script>
+    <script>
+        if (!localStorage.getItem('admin_logado')) {
+            window.location.href = 'login.html';
+        }
+
+        function sair() {
+            localStorage.removeItem('admin_logado');
+            window.location.href = 'login.html';
+        }
+
+        var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+        var filtroAtual = 'todos';
+
+        function salvarPedidos() {
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            renderizarPedidos();
+        }
+
+        function filtrarPedidos(status) {
+            filtroAtual = status;
+            document.querySelectorAll('.filtro-btn').forEach(function(btn) {
+                btn.classList.remove('ativo');
+            });
+            event.target.classList.add('ativo');
+            renderizarPedidos();
+        }
+
+        function confirmarPedido(id) {
+            var pedido = pedidos.find(function(p) { return p.id === id; });
+            if (pedido && pedido.status === 'pendente') {
+                if (confirm('Deseja confirmar o pedido #' + id + '?\nO cliente receberá uma DM no Discord.')) {
+                    pedido.status = 'confirmado';
+                    salvarPedidos();
+                    alert('✅ Pedido #' + id + ' confirmado!');
+                }
+            }
+        }
+
+        function renderizarPedidos() {
+            var tbody = document.getElementById('lista-pedidos');
+            if (!tbody) return;
+
+            var pedidosFiltrados = filtroAtual === 'todos' 
+                ? pedidos 
+                : pedidos.filter(function(p) { return p.status === filtroAtual; });
+
+            if (pedidosFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="sem-pedidos">📋 Nenhum pedido encontrado</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pedidosFiltrados.map(function(pedido) {
+                return '<tr>' +
+                    '<td>#' + pedido.id + '</td>' +
+                    '<td>' + pedido.cliente + '</td>' +
+                    '<td>R$ ' + parseFloat(pedido.valor).toFixed(2) + '</td>' +
+                    '<td>' + pedido.data + '</td>' +
+                    '<td><span class="status status-' + pedido.status + '">' + pedido.status + '</span></td>' +
+                    '<td>' +
+                        (pedido.status === 'pendente' 
+                            ? '<button class="btn-confirmar" onclick="confirmarPedido(' + pedido.id + ')">✅ Confirmar</button>'
+                            : '—') +
+                    '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        renderizarPedidos();
+    </script>
 </body>
 </html>
