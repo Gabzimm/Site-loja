@@ -442,23 +442,29 @@
         }
 
         function salvarConfiguracoes() {
-            const novasConfig = {
-                corRoxo: document.getElementById('cor-roxo').value,
-                corVerde: document.getElementById('cor-verde').value,
-                corAmarelo: document.getElementById('cor-amarelo').value,
-                favicon: document.getElementById('favicon-url').value,
-                bgImagem: document.getElementById('bg-imagem').value,
-                bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
-                bgModo: document.getElementById('bg-modo').value,
-                bgPosicao: document.getElementById('bg-posicao').value
-            };
+    var novasConfig = {
+        corRoxo: document.getElementById('cor-roxo').value,
+        corVerde: document.getElementById('cor-verde').value,
+        corAmarelo: document.getElementById('cor-amarelo').value,
+        favicon: document.getElementById('favicon-url').value,
+        bgImagem: document.getElementById('bg-imagem').value,
+        bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
+        bgModo: document.getElementById('bg-modo').value,
+        bgPosicao: document.getElementById('bg-posicao').value
+    };
 
-            localStorage.setItem('config_loja', JSON.stringify(novasConfig));
-
-            // Aplicar mudanças nas páginas que usam style.css
-            aplicarCoresGlobais(novasConfig);
-
-            alert('✅ Configurações salvas com sucesso!');
+    localStorage.setItem('config_loja', JSON.stringify(novasConfig));
+    
+    // Aplicar imediatamente na página atual
+    var root = document.documentElement;
+    root.style.setProperty('--roxo', novasConfig.corRoxo);
+    root.style.setProperty('--roxo-escuro', novasConfig.corRoxo + 'cc');
+    root.style.setProperty('--verde', novasConfig.corVerde);
+    root.style.setProperty('--verde-escuro', novasConfig.corVerde + 'cc');
+    root.style.setProperty('--amarelo', novasConfig.corAmarelo);
+    
+    alert('✅ Configurações salvas! As mudanças já estão visíveis na loja.');
+}
         }
 
         function aplicarCoresGlobais(cfg) {
