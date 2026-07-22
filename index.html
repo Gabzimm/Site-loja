@@ -100,6 +100,7 @@
                     nome: produto.nome,
                     preco: produto.preco,
                     emoji: produto.emoji,
+                    imagem: produto.imagem,
                     quantidade: 1 
                 });
             }
@@ -117,61 +118,69 @@
             if (contador) contador.textContent = '(' + total + ')';
         }
 
+        // ========== RENDERIZAR PRODUTOS ==========
         function renderizarProdutos() {
-    var container = document.getElementById('lista-produtos');
-    if (!container) return;
-    
-    if (produtos.length === 0) {
-        container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p><p style="margin-top: 0.5rem;">Volte em breve! 🚀</p></div>';
-        return;
-    }
-    
-    var html = '';
-    produtos.forEach(function(produto) {
-        var imagemContent = '';
-        if (produto.imagem) {
-            imagemContent = '<img src="' + produto.imagem + '" style="width:100%;height:200px;object-fit:cover;border-radius:10px;" alt="' + produto.nome + '">';
-        } else {
-            imagemContent = '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
+            var container = document.getElementById('lista-produtos');
+            if (!container) return;
+            
+            if (produtos.length === 0) {
+                container.innerHTML = '<div class="loja-vazia" style="grid-column: 1 / -1;"><div class="icone">📦</div><h2>Loja Vazia</h2><p>O administrador ainda não adicionou produtos.</p><p style="margin-top: 0.5rem;">Volte em breve! 🚀</p></div>';
+                return;
+            }
+            
+            var html = '';
+            produtos.forEach(function(produto) {
+                var imagemContent = '';
+                if (produto.imagem) {
+                    imagemContent = '<img src="' + produto.imagem + '" style="width:100%;height:200px;object-fit:cover;border-radius:10px;" alt="' + produto.nome + '">';
+                } else {
+                    imagemContent = '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
+                }
+                
+                html += '<div class="produto-card">';
+                html += imagemContent;
+                html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
+                html += '<div class="produto-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>';
+                html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
+                
+                if (produto.descricao) {
+                    html += '<button class="btn-detalhes" onclick="mostrarDetalhes(\'' + produto.nome.replace(/'/g, "\\'") + '\', \'' + (produto.descricao || '').replace(/'/g, "\\'") + '\', \'' + (produto.imagem || '') + '\', \'' + (produto.emoji || '') + '\')" style="width:100%;padding:0.6rem;background:transparent;border:1px solid var(--roxo);color:var(--texto);border-radius:8px;margin-top:0.5rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background=\'var(--roxo)\'" onmouseout="this.style.background=\'transparent\'">📋 Detalhes</button>';
+                }
+                
+                html += '</div>';
+            });
+            container.innerHTML = html;
         }
-        
-        html += '<div class="produto-card">';
-        html += imagemContent;
-        html += '<h3 class="produto-nome">' + produto.nome + '</h3>';
-        html += '<div class="produto-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>';
-        html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
-        
-        if (produto.descricao) {
-            html += '<button class="btn-detalhes" onclick="mostrarDetalhes(\'' + produto.nome + '\', \'' + (produto.descricao || '') + '\', \'' + (produto.imagem || '') + '\', \'' + (produto.emoji || '') + '\')" style="width:100%;padding:0.6rem;background:transparent;border:1px solid var(--roxo);color:var(--texto);border-radius:8px;margin-top:0.5rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background=\'var(--roxo)\'" onmouseout="this.style.background=\'transparent\'">📋 Detalhes</button>';
-        }
-        
-        html += '</div>';
-    });
-    container.innerHTML = html;
-}
 
-// Função para mostrar detalhes do produto
-function mostrarDetalhes(nome, descricao, imagem, emoji) {
-    var modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    
-    var imagemHtml = '';
-    if (imagem) {
-        imagemHtml = '<img src="' + imagem + '" style="width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:1rem;" alt="' + nome + '">';
-    } else if (emoji) {
-        imagemHtml = '<div style="font-size:5rem;margin-bottom:1rem;">' + emoji + '</div>';
-    }
-    
-    modal.innerHTML = '<div style="background:var(--card);padding:2rem;border-radius:15px;border:2px solid var(--roxo);max-width:500px;width:90%;text-align:center;">' +
-        imagemHtml +
-        '<h2 style="color:var(--amarelo);margin-bottom:1rem;">' + nome + '</h2>' +
-        '<p style="color:var(--texto);line-height:1.8;font-size:1.1rem;">' + descricao + '</p>' +
-        '<button onclick="this.parentElement.parentElement.remove()" style="background:var(--roxo);color:white;padding:0.8rem 2rem;border:none;border-radius:8px;margin-top:1.5rem;cursor:pointer;font-size:1rem;font-weight:bold;">Fechar</button>' +
-    '</div>';
-    
-    document.body.appendChild(modal);
-    
-    modal.onclick = function(e) {
-        if (e.target === modal) modal.remove();
-    };
-}
+        // Função para mostrar detalhes do produto
+        function mostrarDetalhes(nome, descricao, imagem, emoji) {
+            var modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;';
+            
+            var imagemHtml = '';
+            if (imagem && imagem !== '') {
+                imagemHtml = '<img src="' + imagem + '" style="width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:1rem;" alt="' + nome + '">';
+            } else if (emoji && emoji !== '') {
+                imagemHtml = '<div style="font-size:5rem;margin-bottom:1rem;">' + emoji + '</div>';
+            }
+            
+            modal.innerHTML = '<div style="background:var(--card);padding:2rem;border-radius:15px;border:2px solid var(--roxo);max-width:500px;width:90%;text-align:center;">' +
+                imagemHtml +
+                '<h2 style="color:var(--amarelo);margin-bottom:1rem;">' + nome + '</h2>' +
+                '<p style="color:var(--texto);line-height:1.8;font-size:1.1rem;">' + descricao + '</p>' +
+                '<button onclick="this.parentElement.parentElement.remove()" style="background:var(--roxo);color:white;padding:0.8rem 2rem;border:none;border-radius:8px;margin-top:1.5rem;cursor:pointer;font-size:1rem;font-weight:bold;">Fechar</button>' +
+            '</div>';
+            
+            document.body.appendChild(modal);
+            
+            modal.onclick = function(e) {
+                if (e.target === modal) modal.remove();
+            };
+        }
+
+        // ========== INICIAR ==========
+        renderizarProdutos();
+        atualizarContador();
+    </script>
+</body>
+</html>
