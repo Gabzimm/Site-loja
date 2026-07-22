@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho - ReyCraft Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .carrinho-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .carrinho-vazio {
+            text-align: center;
+            padding: 4rem;
+            background: var(--card);
+            border-radius: 15px;
+            border: 2px dashed var(--roxo);
+        }
+
+        .carrinho-vazio .icone {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .carrinho-item {
+            display: flex;
+            align-items: center;
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #333;
+        }
+
+        .carrinho-item-emoji {
+            font-size: 3rem;
+            margin-right: 1.5rem;
+        }
+
+        .carrinho-item-info {
+            flex: 1;
+        }
+
+        .carrinho-item-nome {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .carrinho-item-preco {
+            color: var(--verde);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .carrinho-item-quantidade {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 1rem;
+        }
+
+        .btn-qtd {
+            background: var(--roxo);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .btn-remover-item {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .carrinho-total {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: right;
+            border: 2px solid var(--roxo);
+        }
+
+        .carrinho-total h2 {
+            color: var(--amarelo);
+            margin-bottom: 1rem;
+        }
+
+        .total-valor {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--verde);
+        }
+
+        .btn-finalizar {
+            background: var(--verde);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-finalizar:hover {
+            background: var(--verde-escuro);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🛒 ReyCraft Shop</h1>
+        </div>
+        <nav class="nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
+        </nav>
+    </header>
+
+    <div class="carrinho-container">
+        <h1>🛒 Seu Carrinho</h1>
+        <div id="carrinho-content"></div>
+    </div>
+
+    <script>
+        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+        function salvarCarrinho() {
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            renderizarCarrinho();
+        }
+
+        function removerItem(id) {
+            carrinho = carrinho.filter(item => item.id !== id);
+            salvarCarrinho();
+        }
+
+        function alterarQuantidade(id, delta) {
+            const item = carrinho.find(item => item.id === id);
+            if (item) {
+                item.quantidade += delta;
+                if (item.quantidade <= 0) {
+                    removerItem(id);
+                    return;
+                }
+                salvarCarrinho();
+            }
+        }
+
+        function calcularTotal() {
+            return carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+        }
+
+        function renderizarCarrinho() {
+            const container = document.getElementById('carrinho-content');
+            const contador = document.getElementById('contador-carrinho');
+            const totalItens = carrinho.reduce((soma, item) => soma + item.quantidade, 0);
+            
+            if (contador) contador.textContent = `(${totalItens})`;
+            
+            if (carrinho.length === 0) {
+                container.innerHTML = `
+                    <div class="carrinho-vazio">
+                        <div class="icone">🛒</div>
+                        <h2>Seu carrinho está vazio</h2>
+                        <p>Volte para a loja e adicione produtos!</p>
+                        <a href="index.html" style="color: var(--amarelo); margin-top: 1rem; display: inline-block;">← Voltar para Loja</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                ${carrinho.map(item => `
+                    <div class="carrinho-item">
+                        <div class="carrinho-item-emoji">${item.emoji || '📦'}</div>
+                        <div class="carrinho-item-info">
+                            <div class="carrinho-item-nome">${item.nome}</div>
+                            <div class="carrinho-item-preco">R$ ${item.preco.toFixed(2)} cada</div>
+                        </div>
+                        <div class="carrinho-item-quantidade">
+                            <button class="btn-qtd" onclick="alterarQuantidade(${item.id}, -1)">-</button>
+                            <span>${item.quantidade}</span>
+                            <button class="btn-qtd" onclick="alterarQuantidade(${item.id}, 1)">+</button>
+                        </div>
+                        <div style="font-weight: bold; margin: 0 1rem;">
+                            R$ ${(item.preco * item.quantidade).toFixed(2)}
+                        </div>
+                        <button class="btn-remover-item" onclick="removerItem(${item.id})">🗑️</button>
+                    </div>
+                `).join('')}
+                
+                <div class="carrinho-total">
+                    <h2>Total do Carrinho</h2>
+                    <div class="total-valor">R$ ${calcularTotal().toFixed(2)}</div>
+                    <button class="btn-finalizar" onclick="finalizarCompra()">
+                        ✅ Finalizar Compra
+                    </button>
+                </div>
+            `;
+        }
+
+        function finalizarCompra() {
+            const discordId = prompt('📝 Digite seu ID do Discord (ex: 123456789):');
+            if (!discordId) return;
+            
+            alert('✅ Compra registrada! Aguarde a confirmação via DM no Discord.');
+            
+            // Salvar pedido (localStorage)
+            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            const novoPedido = {
+                id: Date.now(),
+                cliente: `User#${discordId}`,
+                discordId: discordId,
+                itens: [...carrinho],
+                valor: calcularTotal(),
+                status: 'pendente',
+                data: new Date().toLocaleDateString('pt-BR')
+            };
+            pedidos.push(novoPedido);
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+            
+            // Limpar carrinho
+            carrinho = [];
+            salvarCarrinho();
+        }
+
+        renderizarCarrinho();
+    </script>
+</body>
+</html>
