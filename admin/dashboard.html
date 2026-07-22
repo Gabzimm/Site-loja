@@ -22,6 +22,7 @@
             color: var(--roxo);
             margin-bottom: 2rem;
             text-align: center;
+            font-size: 1.3rem;
         }
 
         .sidebar nav a {
@@ -43,6 +44,11 @@
         .content {
             flex: 1;
             padding: 2rem;
+        }
+
+        .content h1 {
+            margin-bottom: 2rem;
+            color: var(--amarelo);
         }
 
         .stats-grid {
@@ -94,6 +100,27 @@
             background: var(--roxo);
             transform: scale(1.05);
         }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--roxo);
+            }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .sidebar nav a {
+                flex: 1;
+                text-align: center;
+                min-width: 120px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -120,12 +147,12 @@
                     <div class="valor" id="total-produtos">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>📋 Pedidos Hoje</h3>
-                    <div class="valor" id="pedidos-hoje">0</div>
+                    <h3>📋 Pedidos</h3>
+                    <div class="valor" id="total-pedidos">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>💰 Faturamento</h3>
-                    <div class="valor" id="faturamento">R$ 0</div>
+                    <h3>⏳ Pendentes</h3>
+                    <div class="valor" id="pedidos-pendentes">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>🏷️ Cupons Ativos</h3>
@@ -133,18 +160,17 @@
                 </div>
             </div>
 
-            <h2>⚡ Ações Rápidas</h2>
+            <h2 style="margin-bottom: 1rem;">⚡ Ações Rápidas</h2>
             <div class="acoes-rapidas">
-                <a href="produtos.html" class="acao-btn">➕ Novo Produto</a>
-                <a href="cupons.html" class="acao-btn">🏷️ Criar Cupom</a>
-                <a href="pedidos.html" class="acao-btn">📋 Ver Pedidos</a>
-                <a href="../index.html" class="acao-btn">🏪 Ver Loja</a>
+                <a href="produtos.html" class="acao-btn">➕<br>Novo Produto</a>
+                <a href="cupons.html" class="acao-btn">🏷️<br>Criar Cupom</a>
+                <a href="pedidos.html" class="acao-btn">📋<br>Ver Pedidos</a>
+                <a href="../index.html" class="acao-btn">🏪<br>Ver Loja</a>
             </div>
         </main>
     </div>
 
     <script>
-        // Verificar se está logado
         if (!localStorage.getItem('admin_logado')) {
             window.location.href = 'login.html';
         }
@@ -154,11 +180,15 @@
             window.location.href = 'login.html';
         }
 
-        // Dados mockados (depois conectamos na API)
-        document.getElementById('total-produtos').textContent = '6';
-        document.getElementById('pedidos-hoje').textContent = '3';
-        document.getElementById('faturamento').textContent = 'R$ 349,50';
-        document.getElementById('cupons-ativos').textContent = '2';
+        // Atualizar estatísticas
+        const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+        const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+        const cupons = JSON.parse(localStorage.getItem('cupons')) || [];
+
+        document.getElementById('total-produtos').textContent = produtos.length;
+        document.getElementById('total-pedidos').textContent = pedidos.length;
+        document.getElementById('pedidos-pendentes').textContent = pedidos.filter(p => p.status === 'pendente').length;
+        document.getElementById('cupons-ativos').textContent = cupons.filter(c => c.ativo).length;
     </script>
 </body>
 </html>
