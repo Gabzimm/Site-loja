@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Cores</title>
+    <style>
+        :root {
+            --roxo: #8B5CF6;
+            --verde: #10B981;
+            --amarelo: #F59E0B;
+        }
+        
+        body {
+            background: #0F0F1A;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .box {
+            display: inline-block;
+            padding: 20px 40px;
+            margin: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .cor-roxa { background: var(--roxo); }
+        .cor-verde { background: var(--verde); }
+        .cor-amarela { background: var(--amarelo); color: black; }
+    </style>
+</head>
+<body>
+    <h1>Teste de Cores</h1>
+    
+    <div class="box cor-roxa">Roxo</div>
+    <div class="box cor-verde">Verde</div>
+    <div class="box cor-amarela">Amarelo</div>
+    
+    <br><br>
+    
+    <button onclick="testar()">Testar Configurações Salvas</button>
+    
+    <div id="resultado" style="margin-top: 20px;"></div>
+    
+    <script>
+        function testar() {
+            var config = localStorage.getItem('config_loja');
+            var resultado = document.getElementById('resultado');
+            
+            if (config) {
+                resultado.innerHTML = '<p style="color: green;">✅ Config encontrada:</p><pre>' + config + '</pre>';
+            } else {
+                resultado.innerHTML = '<p style="color: red;">❌ Nenhuma configuração salva!</p>';
+            }
+        }
+        
+        // Testar automaticamente
+        testar();
+    </script>
+</body>
+</html>
