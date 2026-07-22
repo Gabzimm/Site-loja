@@ -6,13 +6,128 @@
     <title>ReyCraft Shop</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Estilo para imagem do produto se moldar ao card */
+        /* Imagem do produto no card */
         .produto-img {
             width: 100%;
             height: 200px;
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 1rem;
+        }
+        
+        /* Fundo escuro do modal */
+        .modal-detalhes-fundo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Caixa retangular do modal */
+        .modal-detalhes-box {
+            background: var(--card, #1A1A2E);
+            border: 2px solid var(--roxo, #8B5CF6);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 700px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        /* Título */
+        .modal-detalhes-titulo {
+            color: var(--amarelo, #F59E0B);
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Container da imagem + descrição lado a lado */
+        .modal-detalhes-conteudo {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        
+        /* Imagem à esquerda */
+        .modal-detalhes-imagem {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        
+        /* Placeholder se não tiver imagem */
+        .modal-detalhes-placeholder {
+            width: 250px;
+            height: 250px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--roxo, #8B5CF6), var(--verde, #10B981));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            flex-shrink: 0;
+        }
+        
+        /* Descrição à direita */
+        .modal-detalhes-texto {
+            color: var(--texto, #E2E8F0);
+            font-size: 1rem;
+            line-height: 1.8;
+            flex: 1;
+        }
+        
+        /* Preço e botão */
+        .modal-detalhes-rodape {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-detalhes-preco {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--verde, #10B981);
+        }
+        
+        .modal-detalhes-fechar {
+            background: var(--roxo, #8B5CF6);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-detalhes-fechar:hover {
+            background: var(--roxo-escuro, #6D28D9);
+        }
+        
+        /* Responsivo para celular */
+        @media (max-width: 600px) {
+            .modal-detalhes-conteudo {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .modal-detalhes-imagem,
+            .modal-detalhes-placeholder {
+                width: 100%;
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -98,7 +213,7 @@
             atualizarContador();
         }
 
-        function adicionarAoCarrinho(id) {
+        window.adicionarAoCarrinho = function(id) {
             var produto = produtos.find(function(p) { return p.id === id; });
             
             if (!produto) {
@@ -123,7 +238,7 @@
             
             salvarCarrinho();
             alert(produto.nome + ' adicionado ao carrinho! 🛒');
-        }
+        };
 
         function atualizarContador() {
             var total = 0;
@@ -133,6 +248,47 @@
             var contador = document.getElementById('contador-carrinho');
             if (contador) contador.textContent = '(' + total + ')';
         }
+
+        // ========== MOSTRAR DETALHES (Modal Retangular) ==========
+        window.mostrarDetalhes = function(id) {
+            var produto = produtos.find(function(p) { return p.id === id; });
+            if (!produto) return;
+            
+            // Remover modal antigo se existir
+            var modalAntigo = document.querySelector('.modal-detalhes-fundo');
+            if (modalAntigo) modalAntigo.remove();
+            
+            var modal = document.createElement('div');
+            modal.className = 'modal-detalhes-fundo';
+            
+            // Imagem ou placeholder
+            var imagemHtml = '';
+            if (produto.imagem) {
+                imagemHtml = '<img src="' + produto.imagem + '" class="modal-detalhes-imagem" alt="' + produto.nome + '">';
+            } else {
+                imagemHtml = '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
+            }
+            
+            modal.innerHTML = 
+                '<div class="modal-detalhes-box">' +
+                    '<div class="modal-detalhes-titulo">' + produto.nome + '</div>' +
+                    '<div class="modal-detalhes-conteudo">' +
+                        imagemHtml +
+                        '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição disponível.') + '</div>' +
+                    '</div>' +
+                    '<div class="modal-detalhes-rodape">' +
+                        '<div class="modal-detalhes-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>' +
+                        '<button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button>' +
+                    '</div>' +
+                '</div>';
+            
+            document.body.appendChild(modal);
+            
+            // Fechar ao clicar fora
+            modal.onclick = function(e) {
+                if (e.target === modal) modal.remove();
+            };
+        };
 
         // ========== RENDERIZAR PRODUTOS ==========
         function renderizarProdutos() {
@@ -148,10 +304,9 @@
             produtos.forEach(function(produto) {
                 html += '<div class="produto-card">';
                 
-                // Imagem do produto (se molda ao quadrado)
+                // Imagem ou placeholder
                 if (produto.imagem) {
-                    html += '<img src="' + produto.imagem + '" class="produto-img" alt="' + produto.nome + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">';
-                    html += '<div class="produto-imagem" style="display:none;">' + (produto.emoji || '📦') + '</div>';
+                    html += '<img src="' + produto.imagem + '" class="produto-img" alt="' + produto.nome + '">';
                 } else {
                     html += '<div class="produto-imagem">' + (produto.emoji || '📦') + '</div>';
                 }
@@ -160,7 +315,6 @@
                 html += '<div class="produto-preco">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>';
                 html += '<button class="btn-comprar" onclick="adicionarAoCarrinho(' + produto.id + ')">🛒 Comprar</button>';
                 
-                // Botão de detalhes
                 if (produto.descricao && produto.descricao.trim() !== '') {
                     html += '<button class="btn-detalhes" onclick="mostrarDetalhes(' + produto.id + ')" style="width:100%;padding:0.6rem;background:transparent;border:1px solid var(--roxo);color:var(--texto);border-radius:8px;margin-top:0.5rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background=\'var(--roxo)\'" onmouseout="this.style.background=\'transparent\'">📋 Detalhes</button>';
                 }
@@ -168,36 +322,6 @@
                 html += '</div>';
             });
             container.innerHTML = html;
-        }
-
-        // Função para mostrar detalhes
-        function mostrarDetalhes(id) {
-            var produto = produtos.find(function(p) { return p.id === id; });
-            if (!produto) return;
-            
-            var modal = document.createElement('div');
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;';
-            
-            var imagemHtml = '';
-            if (produto.imagem) {
-                imagemHtml = '<img src="' + produto.imagem + '" style="width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:1rem;" alt="' + produto.nome + '">';
-            } else if (produto.emoji) {
-                imagemHtml = '<div style="font-size:5rem;margin-bottom:1rem;">' + produto.emoji + '</div>';
-            }
-            
-            modal.innerHTML = '<div style="background:var(--card);padding:2rem;border-radius:15px;border:2px solid var(--roxo);max-width:500px;width:90%;text-align:center;max-height:90vh;overflow-y:auto;">' +
-                imagemHtml +
-                '<h2 style="color:var(--amarelo);margin-bottom:1rem;">' + produto.nome + '</h2>' +
-                '<p style="color:var(--texto);line-height:1.8;font-size:1.1rem;">' + (produto.descricao || 'Sem descrição') + '</p>' +
-                '<div style="color:var(--verde);font-size:1.5rem;font-weight:bold;margin-top:1rem;">R$ ' + parseFloat(produto.preco).toFixed(2) + '</div>' +
-                '<button onclick="this.parentElement.parentElement.remove()" style="background:var(--roxo);color:white;padding:0.8rem 2rem;border:none;border-radius:8px;margin-top:1.5rem;cursor:pointer;font-size:1rem;font-weight:bold;">Fechar</button>' +
-            '</div>';
-            
-            document.body.appendChild(modal);
-            
-            modal.onclick = function(e) {
-                if (e.target === modal) modal.remove();
-            };
         }
 
         // ========== INICIAR ==========
