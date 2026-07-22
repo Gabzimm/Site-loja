@@ -1,48 +1,51 @@
-// ========== APLICAR CONFIGURAÇÕES SALVAS ==========
+// ========== APLICAR CORES SALVAS ==========
 (function() {
-    var config = JSON.parse(localStorage.getItem('config_loja'));
-    
-    if (config) {
-        var root = document.documentElement;
+    try {
+        var config = JSON.parse(localStorage.getItem('config_loja'));
         
-        // Aplicar cores
-        root.style.setProperty('--roxo', config.corRoxo);
-        root.style.setProperty('--roxo-escuro', config.corRoxo + 'cc');
-        root.style.setProperty('--roxo-claro', config.corRoxo + '99');
-        root.style.setProperty('--verde', config.corVerde);
-        root.style.setProperty('--verde-escuro', config.corVerde + 'cc');
-        root.style.setProperty('--verde-claro', config.corVerde + '99');
-        root.style.setProperty('--amarelo', config.corAmarelo);
-        root.style.setProperty('--amarelo-escuro', config.corAmarelo + 'cc');
-        root.style.setProperty('--amarelo-claro', config.corAmarelo + '99');
-        
-        // Aplicar favicon
-        if (config.favicon) {
-            var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.rel = 'icon';
-            link.type = 'image/png';
-            link.href = config.favicon;
-            if (!document.querySelector("link[rel*='icon']")) {
-                document.head.appendChild(link);
-            }
-        }
-        
-        // Aplicar imagem de fundo
-        if (config.bgImagem) {
-            var fundoDiv = document.getElementById('fundo-personalizado');
-            if (!fundoDiv) {
-                fundoDiv = document.createElement('div');
-                fundoDiv.id = 'fundo-personalizado';
-                document.body.insertBefore(fundoDiv, document.body.firstChild);
+        if (config && config.corRoxo) {
+            var style = document.createElement('style');
+            style.id = 'cores-personalizadas';
+            style.textContent = 
+                ':root {' +
+                '--roxo: ' + config.corRoxo + ' !important;' +
+                '--roxo-escuro: ' + config.corRoxo + 'cc !important;' +
+                '--roxo-claro: ' + config.corRoxo + '99 !important;' +
+                '--verde: ' + config.corVerde + ' !important;' +
+                '--verde-escuro: ' + config.corVerde + 'cc !important;' +
+                '--verde-claro: ' + config.corVerde + '99 !important;' +
+                '--amarelo: ' + config.corAmarelo + ' !important;' +
+                '--amarelo-escuro: ' + config.corAmarelo + 'cc !important;' +
+                '--amarelo-claro: ' + config.corAmarelo + '99 !important;' +
+                '}';
+            document.head.appendChild(style);
+            
+            // Imagem de fundo
+            if (config.bgImagem) {
+                var fundo = document.createElement('div');
+                fundo.id = 'fundo-customizado';
+                fundo.style.cssText = 
+                    'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;' +
+                    'background-image:url(' + config.bgImagem + ');' +
+                    'background-size:' + (config.bgModo || 'cover') + ';' +
+                    'background-position:' + (config.bgPosicao || 'center') + ';' +
+                    'background-repeat:' + (config.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + ';' +
+                    'opacity:' + ((config.bgOpacidade || 50) / 100) + ';';
+                document.body.insertBefore(fundo, document.body.firstChild);
             }
             
-            var opacidade = (config.bgOpacidade || 50) / 100;
-            fundoDiv.style.backgroundImage = 'url(' + config.bgImagem + ')';
-            fundoDiv.style.backgroundSize = config.bgModo || 'cover';
-            fundoDiv.style.backgroundPosition = config.bgPosicao || 'center';
-            fundoDiv.style.backgroundRepeat = config.bgModo === 'repeat' ? 'repeat' : 'no-repeat';
-            fundoDiv.style.opacity = opacidade;
+            // Favicon
+            if (config.favicon) {
+                var link = document.createElement('link');
+                link.rel = 'icon';
+                link.href = config.favicon;
+                document.head.appendChild(link);
+            }
+            
+            console.log('✅ Cores aplicadas:', config.corRoxo, config.corVerde, config.corAmarelo);
         }
+    } catch(e) {
+        console.log('Sem configurações salvas');
     }
 })();
 
@@ -110,10 +113,3 @@ function renderizarProdutos() {
 
 renderizarProdutos();
 atualizarContador();
-
-window.addEventListener('storage', function(e) {
-    if (e.key === 'produtos') {
-        produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-        renderizarProdutos();
-    }
-});
