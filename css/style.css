@@ -1,5 +1,5 @@
 /* ============================================
-   🎨 LOJA - TEMA ROXO/VERDE/AMARELO
+   🎨 LOJA - TEMA DINÂMICO
    ============================================ */
 
 :root {
@@ -29,6 +29,18 @@ body {
     background: var(--fundo);
     color: var(--texto);
     min-height: 100vh;
+    position: relative;
+}
+
+/* ========== FUNDO PERSONALIZADO ========== */
+#fundo-personalizado {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-color: var(--fundo);
 }
 
 /* ========== HEADER ========== */
