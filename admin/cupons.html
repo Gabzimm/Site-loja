@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Cupons</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--card);
+            padding: 2rem 1rem;
+            border-right: 2px solid var(--roxo);
+        }
+
+        .sidebar h2 {
+            color: var(--roxo);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 1rem;
+            color: var(--texto);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.ativo {
+            background: var(--roxo);
+            color: white;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .btn-adicionar {
+            background: var(--verde);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .btn-adicionar:hover {
+            background: var(--verde-escuro);
+            transform: scale(1.05);
+        }
+
+        .form-cupom {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .form-cupom.ativo {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--fundo);
+            border: 2px solid var(--roxo);
+            border-radius: 8px;
+            color: var(--texto);
+            font-size: 1rem;
+        }
+
+        .grid-cupons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .cupom-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px solid var(--amarelo);
+            position: relative;
+        }
+
+        .cupom-codigo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--amarelo);
+            margin-bottom: 0.5rem;
+        }
+
+        .cupom-info {
+            color: var(--texto-cinza);
+            margin-bottom: 0.3rem;
+        }
+
+        .cupom-desconto {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--verde);
+        }
+
+        .btn-remover-cupom {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+        }
+
+        .cupom-ativo {
+            border-color: var(--verde);
+        }
+
+        .cupom-inativo {
+            border-color: #ff4444;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html">📦 Produtos</a>
+                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="cupons.html" class="ativo">🏷️ Cupons</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="content">
+            <h1>🏷️ Gerenciar Cupons</h1>
+            
+            <button class="btn-adicionar" onclick="mostrarFormCupom()">➕ Criar Cupom</button>
+            
+            <!-- FORMULÁRIO -->
+            <div class="form-cupom" id="form-cupom">
+                <h2>Novo Cupom</h2>
+                <div class="input-group">
+                    <label>🏷️ Código do Cupom</label>
+                    <input type="text" id="codigo-cupom" placeholder="Ex: WELCOME20">
+                </div>
+                <div class="input-group">
+                    <label>💰 Tipo de Desconto</label>
+                    <select id="tipo-desconto">
+                        <option value="porcentagem">Porcentagem (%)</option>
+                        <option value="fixo">Valor Fixo (R$)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>📊 Valor do Desconto</label>
+                    <input type="number" id="valor-desconto" placeholder="20" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>🔢 Limite de Usos</label>
+                    <input type="number" id="limite-usos" placeholder="100">
+                </div>
+                <button class="btn-adicionar" onclick="salvarCupom()">💾 Salvar Cupom</button>
+                <button style="background: #ff4444; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;" onclick="fecharFormCupom()">Cancelar</button>
+            </div>
+
+            <!-- LISTA DE CUPONS -->
+            <div class="grid-cupons" id="lista-cupons">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('admin_logado')) {
+            window.location.href = 'login.html';
+        }
+
+        function sair() {
+            localStorage.removeItem('admin_logado');
+            window.location.href = 'login.html';
+        }
+
+        let cupons = JSON.parse(localStorage.getItem('cupons')) || [
+            { codigo: "WELCOME20", tipo: "porcentagem", valor: 20, limite: 50, usos: 0, ativo: true },
+            { codigo: "VIP10", tipo: "fixo", valor: 10, limite: 100, usos: 25, ativo: true }
+        ];
+
+        function salvarCupons() {
+            localStorage.setItem('cupons', JSON.stringify(cupons));
+            renderizarCupons();
+        }
+
+        function mostrarFormCupom() {
+            document.getElementById('form-cupom').classList.add('ativo');
+        }
+
+        function fecharFormCupom() {
+            document.getElementById('form-cupom').classList.remove('ativo');
+            document.getElementById('codigo-cupom').value = '';
+            document.getElementById('valor-desconto').value = '';
+            document.getElementById('limite-usos').value = '';
+        }
+
+        function salvarCupom() {
+            const codigo = document.getElementById('codigo-cupom').value.toUpperCase();
+            const tipo = document.getElementById('tipo-desconto').value;
+            const valor = parseFloat(document.getElementById('valor-desconto').value);
+            const limite = parseInt(document.getElementById('limite-usos').value);
+
+            if (!codigo || !valor) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
+            if (cupons.find(c => c.codigo === codigo)) {
+                alert('Este cupom já existe!');
+                return;
+            }
+
+            cupons.push({ codigo, tipo, valor, limite, usos: 0, ativo: true });
+            salvarCupons();
+            fecharFormCupom();
+            alert(`Cupom ${codigo} criado com sucesso! 🎉`);
+        }
+
+        function removerCupom(codigo) {
+            if (confirm(`Remover cupom ${codigo}?`)) {
+                cupons = cupons.filter(c => c.codigo !== codigo);
+                salvarCupons();
+            }
+        }
+
+        function alternarCupom(codigo) {
+            const cupom = cupons.find(c => c.codigo === codigo);
+            if (cupom) {
+                cupom.ativo = !cupom.ativo;
+                salvarCupons();
+            }
+        }
+
+        function renderizarCupons() {
+            const container = document.getElementById('lista-cupons');
+            if (!container) return;
+
+            container.innerHTML = cupons.map(cupom => `
+                <div class="cupom-card ${cupom.ativo ? 'cupom-ativo' : 'cupom-inativo'}">
+                    <button class="btn-remover-cupom" onclick="removerCupom('${cupom.codigo}')">🗑️</button>
+                    <div class="cupom-codigo">${cupom.codigo}</div>
+                    <div class="cupom-desconto">
+                        ${cupom.tipo === 'porcentagem' ? `${cupom.valor}% OFF` : `R$ ${cupom.valor.toFixed(2)} OFF`}
+                    </div>
+                    <div class="cupom-info">📊 Usos: ${cupom.usos}/${cupom.limite}</div>
+                    <div class="cupom-info">📌 Status: ${cupom.ativo ? '✅ Ativo' : '❌ Inativo'}</div>
+                    <button class="btn-editar" onclick="alternarCupom('${cupom.codigo}')" style="margin-top: 0.5rem;">
+                        ${cupom.ativo ? '❌ Desativar' : '✅ Ativar'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        renderizarCupons();
+    </script>
+</body>
+</html>
