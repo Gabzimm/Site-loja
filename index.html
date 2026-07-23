@@ -49,7 +49,7 @@
             color: var(--texto-cinza);
             font-size: 0.85rem;
             transition: all 0.3s;
-            user-select: all;
+            position: relative;
         }
         .header-ip:hover {
             color: var(--amarelo);
@@ -470,7 +470,7 @@
 
     <!-- HEADER -->
     <header class="header">
-        <div class="header-ip" onclick="copiarIP()" title="Clique para copiar">
+        <div class="header-ip" onclick="copiarIP()" title="Clique para copiar o IP">
             🌐 <span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
             <span class="copiado-msg" id="copiado-msg">✅ IP Copiado!</span>
         </div>
@@ -494,7 +494,6 @@
     <div class="banner-ranks">
         <h2>🎯 Ranks do Servidor</h2>
         <div class="ranks-grid" id="ranks-grid">
-            <!-- Gerenciado pelo admin -->
             <div class="rank-item breve">EM BREVE</div>
             <div class="rank-item breve">EM BREVE</div>
             <div class="rank-item breve">EM BREVE</div>
@@ -504,13 +503,10 @@
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div class="main-container">
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar-categorias">
             <div class="sidebar-titulo">Categorias</div>
-            <!-- Categorias carregadas dinamicamente -->
         </aside>
         
-        <!-- PRODUTOS -->
         <div class="produtos-area">
             <h2 id="titulo-categoria">🔥 Produtos em Destaque</h2>
             <div class="grid-produtos" id="lista-produtos"></div>
@@ -520,6 +516,10 @@
     <a href="admin/login.html" style="position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
 
     <script>
+        // ========== CONFIGURAÇÃO DISCORD ==========
+        var DISCORD_CLIENT_ID = '1515464456719695952';
+        var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+
         // ========== COPIAR IP ==========
         function copiarIP() {
             navigator.clipboard.writeText('reycraft.blazebr.com:26813').then(function() {
@@ -527,6 +527,15 @@
                 msg.classList.add('mostrar');
                 setTimeout(function() { msg.classList.remove('mostrar'); }, 2000);
             });
+        }
+
+        // ========== LOGIN DISCORD ==========
+        function loginDiscord() {
+            var authUrl = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + 
+                '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + 
+                '&response_type=code&scope=identify';
+            localStorage.setItem('redirect_after_login', 'index.html');
+            window.location.href = authUrl;
         }
 
         // ========== CORES ==========
@@ -559,14 +568,23 @@
             } catch(e) {}
         })();
 
-        // ========== PERFIL ==========
+        // ========== PERFIL / LOGIN ==========
         (function() {
             var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var btnPerfil = document.getElementById('btn-perfil');
+            
             if (usuario) {
-                var btnPerfil = document.getElementById('btn-perfil');
-                var icon = document.getElementById('perfil-icon');
                 btnPerfil.style.background = 'transparent';
                 btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil">';
+                btnPerfil.href = 'perfil.html';
+                btnPerfil.title = (usuario.global_name || usuario.username);
+            } else {
+                btnPerfil.href = '#';
+                btnPerfil.onclick = function(e) {
+                    e.preventDefault();
+                    loginDiscord();
+                };
+                btnPerfil.title = 'Login com Discord';
             }
         })();
 
@@ -644,11 +662,9 @@
             var sidebar = document.getElementById('sidebar-categorias');
             if (!sidebar) return;
             
-            // Limpar mantendo o título
             var botoesAntigos = sidebar.querySelectorAll('.categoria-btn');
             botoesAntigos.forEach(function(b) { b.remove(); });
             
-            // Botão "Todas" só se houver categorias
             if (categorias.length > 0) {
                 var btnTodas = document.createElement('button');
                 btnTodas.className = 'categoria-btn' + (categoriaAtual === 'todas' ? ' ativo' : '');
@@ -762,7 +778,10 @@
             if (!grid) return;
             
             if (bannerData.length === 0) {
-                grid.innerHTML = '<div class="rank-item breve">EM BREVE</div>'.repeat(4);
+                grid.innerHTML = '';
+                for (var i = 0; i < 4; i++) {
+                    grid.innerHTML += '<div class="rank-item breve">EM BREVE</div>';
+                }
                 return;
             }
             
