@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - ReyCraft Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .perfil-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .perfil-header {
+            background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
+            border-radius: 15px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid var(--amarelo);
+        }
+        
+        .perfil-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--amarelo);
+            object-fit: cover;
+        }
+        
+        .perfil-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .perfil-info .discord-tag {
+            color: var(--amarelo);
+            font-size: 1rem;
+        }
+        
+        .perfil-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        
+        .stat-card .stat-icone {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .stat-valor {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--amarelo);
+        }
+        
+        .stat-card .stat-label {
+            color: var(--texto-cinza);
+            font-size: 0.9rem;
+        }
+        
+        .perfil-secao {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .perfil-secao h3 {
+            color: var(--amarelo);
+            margin-bottom: 1rem;
+        }
+        
+        .historico-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .historico-item:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-sair {
+            background: #ef4444;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-sair:hover {
+            background: #dc2626;
+        }
+        
+        .sem-login {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .sem-login .icone {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-login-discord {
+            background: #5865F2;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-login-discord:hover {
+            background: #4752C4;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>🛒 ReyCraft Shop</h1>
+        </div>
+        <nav class="nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
+            <a href="perfil.html" id="link-perfil" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span id="perfil-nome">👤 Perfil</span>
+            </a>
+        </nav>
+    </header>
+
+    <div class="perfil-container">
+        <div id="perfil-content"></div>
+    </div>
+
+    <script>
+        const DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
+        const REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+        
+        const usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+
+        function carregarPerfil() {
+            const container = document.getElementById('perfil-content');
+            
+            if (!usuario) {
+                container.innerHTML = `
+                    <div class="sem-login">
+                        <div class="icone">🔒</div>
+                        <h2>Faça login para ver seu perfil</h2>
+                        <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Conecte sua conta do Discord para acessar estatísticas e rankings</p>
+                        <button class="btn-login-discord" onclick="loginDiscord()">
+                            🔐 Login com Discord
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Pedidos do usuário
+            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            const meusPedidos = pedidos.filter(p => p.discordId === usuario.id);
+            const totalGasto = meusPedidos.reduce((total, p) => total + Number(p.valor), 0);
+            const totalCompras = meusPedidos.length;
+            
+            container.innerHTML = `
+                <div class="perfil-header">
+                    <img src="${usuario.avatar}" alt="Avatar" class="perfil-avatar">
+                    <div class="perfil-info">
+                        <h1>${usuario.global_name || usuario.username}</h1>
+                        <p class="discord-tag">@${usuario.username}</p>
+                        <p style="color: var(--texto-cinza);">ID: ${usuario.id}</p>
+                    </div>
+                </div>
+                
+                <div class="perfil-stats">
+                    <div class="stat-card">
+                        <div class="stat-icone">🛒</div>
+                        <div class="stat-valor">${totalCompras}</div>
+                        <div class="stat-label">Compras</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icone">💰</div>
+                        <div class="stat-valor">R$ ${totalGasto.toFixed(2)}</div>
+                        <div class="stat-label">Total Gasto</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icone">🏰</div>
+                        <div class="stat-valor">Em breve</div>
+                        <div class="stat-label">Clan (via Bot)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icone">🏆</div>
+                        <div class="stat-valor">Em breve</div>
+                        <div class="stat-label">Rank (via Bot)</div>
+                    </div>
+                </div>
+                
+                <div class="perfil-secao">
+                    <h3>📋 Histórico de Compras</h3>
+                    ${meusPedidos.length > 0 
+                        ? meusPedidos.map(p => `
+                            <div class="historico-item">
+                                <span>🛒 Pedido #${p.id}</span>
+                                <span>R$ ${Number(p.valor).toFixed(2)}</span>
+                                <span class="status status-${p.status}">${p.status}</span>
+                                <span style="color: var(--texto-cinza);">${p.data}</span>
+                            </div>
+                        `).join('')
+                        : '<p style="color: var(--texto-cinza);">Nenhuma compra ainda.</p>'
+                    }
+                </div>
+                
+                <div class="perfil-secao">
+                    <h3>🏆 Rankings (Em breve)</h3>
+                    <p style="color: var(--texto-cinza);">Top compradores e clans serão exibidos aqui após conectar com o bot.</p>
+                </div>
+                
+                <button class="btn-sair" onclick="sair()">🚪 Sair da Conta</button>
+            `;
+        }
+        
+        function loginDiscord() {
+            const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify`;
+            window.location.href = authUrl;
+        }
+        
+        function sair() {
+            localStorage.removeItem('usuario_discord');
+            window.location.reload();
+        }
+        
+        // Atualizar link do perfil no header
+        function atualizarHeader() {
+            const perfilNome = document.getElementById('perfil-nome');
+            if (usuario && perfilNome) {
+                perfilNome.innerHTML = `<img src="${usuario.avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;"> ${usuario.global_name || usuario.username}`;
+            }
+        }
+        
+        carregarPerfil();
+        atualizarHeader();
+    </script>
+</body>
+</html>
