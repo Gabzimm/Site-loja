@@ -113,3 +113,12 @@ function renderizarProdutos() {
 
 renderizarProdutos();
 atualizarContador();
+
+// Atualizar perfil no header
+(function() {
+    var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+    var perfilNome = document.getElementById('perfil-nome');
+    if (usuario && perfilNome) {
+        perfilNome.innerHTML = '<img src="' + usuario.avatar + '" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;"> ' + (usuario.global_name || usuario.username);
+    }
+})();
