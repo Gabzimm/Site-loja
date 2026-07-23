@@ -27,11 +27,20 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .callback-box {
+            background: var(--card);
+            padding: 3rem;
+            border-radius: 15px;
+            border: 2px solid var(--roxo);
+            max-width: 500px;
+            width: 90%;
+        }
     </style>
 </head>
 <body>
     <div class="callback-container">
-        <div>
+        <div class="callback-box">
             <div class="loader"></div>
             <h2 style="color: var(--amarelo);">Conectando ao Discord...</h2>
             <p id="status" style="color: var(--texto-cinza);">Aguarde um momento</p>
@@ -39,11 +48,10 @@
     </div>
 
     <script>
-        // Configuração - PREENCHA DEPOIS
+        // ========== CONFIGURAÇÃO - PREENCHA AQUI ==========
         const DISCORD_CLIENT_ID = '1515464456719695952';
         const DISCORD_CLIENT_SECRET = 'jLc1P6yIT3xpM2BqPmK2qQs1OwSFL75u';
         const REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
-        const API_URL = 'http://SEU_IP:5000/api'; // URL da API do seu bot
 
         async function handleCallback() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -51,13 +59,14 @@
             
             if (!code) {
                 document.getElementById('status').textContent = '❌ Erro: Código não encontrado';
+                document.getElementById('status').style.color = '#ef4444';
                 return;
             }
 
             try {
-                document.getElementById('status').textContent = '🔄 Trocando código por token...';
+                document.getElementById('status').textContent = '🔄 Verificando identidade...';
                 
-                // Trocar code por token
+                // Trocar código por token de acesso
                 const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
                     method: 'POST',
                     headers: {
@@ -78,7 +87,7 @@
                     throw new Error(tokenData.error_description || 'Erro ao obter token');
                 }
 
-                document.getElementById('status').textContent = '📡 Buscando dados do usuário...';
+                document.getElementById('status').textContent = '📡 Buscando seus dados...';
 
                 // Buscar dados do usuário
                 const userResponse = await fetch('https://discord.com/api/users/@me', {
@@ -89,28 +98,45 @@
 
                 const userData = await userResponse.json();
 
+                if (userData.error) {
+                    throw new Error(userData.error_description || 'Erro ao buscar usuário');
+                }
+
                 // Salvar dados do usuário
                 const usuario = {
                     id: userData.id,
                     username: userData.username,
-                    discriminator: userData.discriminator,
-                    avatar: userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png',
+                    discriminator: userData.discriminator || '0',
+                    avatar: userData.avatar 
+                        ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=256`
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png?size=256',
                     global_name: userData.global_name || userData.username,
                     loggedAt: new Date().toISOString(),
                 };
 
                 localStorage.setItem('usuario_discord', JSON.stringify(usuario));
                 
-                document.getElementById('status').textContent = '✅ Login realizado com sucesso!';
+                document.getElementById('status').textContent = '✅ Login realizado com sucesso! Redirecionando...';
+                document.getElementById('status').style.color = '#10B981';
                 
-                // Redirecionar para a loja
+                // Redirecionar de volta para a página anterior
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    var redirect = localStorage.getItem('redirect_after_login') || 'perfil.html';
+                    localStorage.removeItem('redirect_after_login');
+                    window.location.href = redirect;
                 }, 1500);
 
             } catch (error) {
                 console.error('Erro:', error);
                 document.getElementById('status').textContent = '❌ Erro: ' + error.message;
+                document.getElementById('status').style.color = '#ef4444';
+                
+                // Botão para tentar novamente
+                setTimeout(() => {
+                    document.getElementById('status').innerHTML = 
+                        '❌ Erro: ' + error.message + 
+                        '<br><br><a href="perfil.html" style="color: var(--amarelo);">← Voltar e tentar novamente</a>';
+                }, 2000);
             }
         }
 
