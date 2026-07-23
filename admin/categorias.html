@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Categorias</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
+        .sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; font-size: 1.3rem; }
+        .sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s; }
+        .sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
+        .content { flex: 1; padding: 2rem; max-width: 800px; }
+        
+        .btn-add { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 1.5rem; }
+        .btn-add:hover { background: var(--verde-escuro); }
+        
+        .form-box { background: var(--card); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; display: none; }
+        .form-box.ativo { display: block; }
+        
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .input-group input { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
+        
+        .btn-salvar { background: var(--verde); color: white; padding: 0.7rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; margin-right: 0.5rem; }
+        .btn-cancelar { background: #64748b; color: white; padding: 0.7rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-remover { background: #ef4444; color: white; padding: 0.4rem 0.8rem; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        .btn-editar { background: var(--amarelo); color: #000; padding: 0.4rem 0.8rem; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-right: 0.3rem; }
+        
+        .categoria-card { background: var(--card); padding: 1rem 1.5rem; border-radius: 10px; margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .categoria-nome { font-weight: bold; font-size: 1.1rem; }
+        .categoria-emoji { font-size: 1.5rem; margin-right: 0.5rem; }
+        
+        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--roxo); } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html">📦 Produtos</a>
+                <a href="categorias.html" class="ativo">📂 Categorias</a>
+                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="cupons.html">🏷️ Cupons</a>
+                <a href="configuracoes.html">🎨 Configurações</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <h1>📂 Gerenciar Categorias</h1>
+            <p style="color: var(--texto-cinza); margin-bottom: 1.5rem;">Organize seus produtos em categorias</p>
+            
+            <button class="btn-add" onclick="mostrarForm()">➕ Nova Categoria</button>
+            
+            <div class="form-box" id="form-categoria">
+                <h3 id="form-titulo" style="margin-bottom: 1rem;">➕ Nova Categoria</h3>
+                <div class="input-group">
+                    <label>😀 Emoji</label>
+                    <input type="text" id="cat-emoji" placeholder="👑" maxlength="2">
+                </div>
+                <div class="input-group">
+                    <label>📂 Nome da Categoria</label>
+                    <input type="text" id="cat-nome" placeholder="Ex: VIPs">
+                </div>
+                <div class="input-group">
+                    <label>📝 Descrição (opcional)</label>
+                    <input type="text" id="cat-descricao" placeholder="Produtos VIP do servidor">
+                </div>
+                <button class="btn-salvar" onclick="salvarCategoria()">💾 Salvar</button>
+                <button class="btn-cancelar" onclick="fecharForm()">Cancelar</button>
+            </div>
+            
+            <div id="lista-categorias"></div>
+        </main>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('admin_logado')) { window.location.href = 'login.html'; }
+        function sair() { localStorage.removeItem('admin_logado'); window.location.href = 'login.html'; }
+
+        var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+
+        function salvar() { localStorage.setItem('categorias', JSON.stringify(categorias)); renderizar(); }
+        
+        function mostrarForm(id) {
+            document.getElementById('form-categoria').classList.add('ativo');
+            if (id) {
+                var cat = categorias.find(function(c) { return c.id === id; });
+                document.getElementById('cat-emoji').value = cat.emoji;
+                document.getElementById('cat-nome').value = cat.nome;
+                document.getElementById('cat-descricao').value = cat.descricao || '';
+                document.getElementById('form-categoria').dataset.editId = id;
+                document.getElementById('form-titulo').textContent = '✏️ Editar Categoria';
+            } else {
+                document.getElementById('form-titulo').textContent = '➕ Nova Categoria';
+            }
+        }
+        
+        function fecharForm() {
+            document.getElementById('form-categoria').classList.remove('ativo');
+            document.getElementById('cat-emoji').value = '';
+            document.getElementById('cat-nome').value = '';
+            document.getElementById('cat-descricao').value = '';
+            delete document.getElementById('form-categoria').dataset.editId;
+        }
+        
+        function salvarCategoria() {
+            var emoji = document.getElementById('cat-emoji').value.trim();
+            var nome = document.getElementById('cat-nome').value.trim();
+            var descricao = document.getElementById('cat-descricao').value.trim();
+            
+            if (!nome) { alert('⚠️ Preencha o nome!'); return; }
+            
+            var editId = document.getElementById('form-categoria').dataset.editId;
+            if (editId) {
+                var idx = categorias.findIndex(function(c) { return c.id === parseInt(editId); });
+                categorias[idx] = { id: categorias[idx].id, emoji, nome, descricao };
+            } else {
+                var novoId = categorias.length > 0 ? Math.max.apply(null, categorias.map(function(c) { return c.id; })) + 1 : 1;
+                categorias.push({ id: novoId, emoji, nome, descricao });
+            }
+            salvar();
+            fecharForm();
+        }
+        
+        function removerCategoria(id) {
+            if (confirm('Remover esta categoria?')) {
+                categorias = categorias.filter(function(c) { return c.id !== id; });
+                salvar();
+            }
+        }
+        
+        function renderizar() {
+            var container = document.getElementById('lista-categorias');
+            if (!container) return;
+            
+            if (categorias.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--texto-cinza);padding:2rem;">📂 Nenhuma categoria criada</p>';
+                return;
+            }
+            
+            container.innerHTML = categorias.map(function(cat) {
+                return '<div class="categoria-card">' +
+                    '<div><span class="categoria-emoji">' + (cat.emoji || '📂') + '</span><span class="categoria-nome">' + cat.nome + '</span></div>' +
+                    '<div>' +
+                        '<button class="btn-editar" onclick="mostrarForm(' + cat.id + ')">✏️</button>' +
+                        '<button class="btn-remover" onclick="removerCategoria(' + cat.id + ')">🗑️</button>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+        
+        renderizar();
+    </script>
+</body>
+</html>
