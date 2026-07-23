@@ -35,6 +35,21 @@
             color: white !important;
         }
         
+        /* ========== LINK PERFIL ========== */
+        #link-perfil {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #link-perfil img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--amarelo);
+        }
+        
         /* ========== MODAL FUNDO ========== */
         .modal-detalhes-fundo {
             position: fixed;
@@ -162,15 +177,16 @@
 
     <header class="header">
         <div class="logo">
-            <h1>🛒 ReyCraft HC</h1>
+            <h1>🛒 ReyCraft Shop</h1>
         </div>
         <nav class="nav">
-    <a href="index.html">🏠 Home</a>
-    <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
-    <a href="perfil.html" id="link-perfil" style="display: flex; align-items: center; gap: 0.5rem;">
-        <span id="perfil-nome">👤 Perfil</span>
-    </a>
+            <a href="index.html">🏠 Home</a>
+            <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
+            <a href="perfil.html" id="link-perfil">
+                <span id="perfil-nome">👤 Perfil</span>
+            </a>
         </nav>
+    </header>
 
     <div class="container">
         <h2>🔥 Produtos em Destaque</h2>
@@ -219,16 +235,32 @@
             } catch(e) {}
         })();
 
+        // ========== ATUALIZAR PERFIL NO HEADER ==========
+        (function() {
+            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var perfilNome = document.getElementById('perfil-nome');
+            if (usuario && perfilNome) {
+                perfilNome.innerHTML = '<img src="' + usuario.avatar + '" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;"> ' + (usuario.global_name || usuario.username);
+            }
+        })();
+
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
         var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-        // ADICIONE ESTA LINHA:
-        if (!carrinho || typeof carrinho === 'string') { carrinho = []; localStorage.setItem('carrinho', '[]'); }
+        // Corrigir carrinho null
+        if (!carrinho || typeof carrinho === 'string') { 
+            carrinho = []; 
+            localStorage.setItem('carrinho', '[]'); 
+        }
 
         function salvarCarrinho() {
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
-            atualizarContador();
+            try {
+                localStorage.setItem('carrinho', JSON.stringify(carrinho));
+                atualizarContador();
+            } catch(e) {
+                alert('⚠️ Erro ao salvar carrinho! O armazenamento está cheio. Tente limpar alguns dados.');
+            }
         }
 
         function adicionarAoCarrinho(id) {
