@@ -227,6 +227,62 @@ function editarProduto(id) {
     mostrarForm(id);
 }
 
+// ========== MUDAR CATEGORIA RÁPIDO ==========
+function mudarCategoria(produtoId) {
+    var produto = produtos.find(function(p) { return p.id === produtoId; });
+    if (!produto) return;
+    
+    var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+    
+    if (categorias.length === 0) {
+        alert('⚠️ Nenhuma categoria cadastrada!\nVá em 📂 Categorias primeiro.');
+        return;
+    }
+    
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    
+    var opcoes = categorias.map(function(cat) {
+        var selecionado = produto.categoria === cat.nome ? 'style="border-color:var(--verde);background:rgba(16,185,129,0.1);"' : '';
+        return '<div ' + selecionado + ' onclick="selecionarCategoria(' + produtoId + ', \'' + cat.nome.replace(/'/g, "\\'") + '\')" style="background:var(--fundo);padding:1rem;border-radius:8px;cursor:pointer;margin-bottom:0.5rem;border:2px solid #333;transition:all 0.3s;">' +
+            (cat.emoji || '📂') + ' <strong>' + cat.nome + '</strong>' +
+            (cat.descricao ? '<br><small style="color:var(--texto-cinza);">' + cat.descricao + '</small>' : '') +
+        '</div>';
+    }).join('');
+    
+    modal.innerHTML = 
+        '<div style="background:var(--card);padding:2rem;border-radius:15px;border:2px solid var(--roxo);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">' +
+            '<h3 style="color:var(--amarelo);margin-bottom:1rem;">📂 Categoria para: ' + produto.nome + '</h3>' +
+            '<p style="color:var(--texto-cinza);margin-bottom:1rem;">Selecione uma categoria:</p>' +
+            '<div onclick="selecionarCategoria(' + produtoId + ', \'\')" style="background:var(--fundo);padding:1rem;border-radius:8px;cursor:pointer;margin-bottom:0.5rem;border:2px solid #333;text-align:center;color:var(--texto-cinza);">🗑️ Remover categoria</div>' +
+            opcoes +
+            '<button onclick="fecharModalCat()" style="background:#64748b;color:white;padding:0.8rem;border:none;border-radius:8px;width:100%;margin-top:1rem;cursor:pointer;">Cancelar</button>' +
+        '</div>';
+    
+    modal.id = 'modal-categoria-rapido';
+    document.body.appendChild(modal);
+    modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+}
+
+function selecionarCategoria(produtoId, categoriaNome) {
+    var produto = produtos.find(function(p) { return p.id === produtoId; });
+    if (produto) {
+        produto.categoria = categoriaNome || '';
+        salvarProdutos();
+        
+        var txt = document.getElementById('cat-txt-' + produtoId);
+        if (txt) txt.textContent = categoriaNome || '—';
+        
+        fecharModalCat();
+    }
+}
+
+function fecharModalCat() {
+    var modal = document.getElementById('modal-categoria-rapido');
+    if (modal) modal.remove();
+}
+
+// ========== RENDERIZAR TABELA ==========
 function renderizarTabela() {
     var tbody = document.getElementById('lista-produtos-admin');
     if (!tbody) return;
@@ -246,11 +302,16 @@ function renderizarTabela() {
             precoCell = '<span style="text-decoration:line-through;color:var(--texto-cinza);">R$ ' + Number(produto.preco).toFixed(2) + '</span> <span style="color:#ef4444;font-weight:bold;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
         }
         
+        var catAtual = produto.categoria || '—';
+        
         return '<tr>' +
             '<td>' + imgCell + '</td>' +
-            '<td>' + produto.nome + (produto.categoria ? '<br><small style="color:var(--roxo);">' + produto.categoria + '</small>' : '') + '</td>' +
+            '<td>' + produto.nome + '</td>' +
             '<td>' + precoCell + '</td>' +
-            '<td>' + (produto.categoria || '—') + '</td>' +
+            '<td>' +
+                '<span id="cat-txt-' + produto.id + '">' + catAtual + '</span>' +
+                ' <button onclick="mudarCategoria(' + produto.id + ')" style="background:var(--roxo);color:white;border:none;padding:0.2rem 0.5rem;border-radius:5px;cursor:pointer;font-size:0.8rem;" title="Alterar categoria">📂</button>' +
+            '</td>' +
             '<td>' +
                 '<button class="btn-editar" onclick="editarProduto(' + produto.id + ')">✏️ Editar</button>' +
                 '<button class="btn-remover" onclick="removerProduto(' + produto.id + ')">🗑️ Remover</button>' +
