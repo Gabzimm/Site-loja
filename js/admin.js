@@ -51,17 +51,32 @@ function salvarProdutos() {
     renderizarTabela();
 }
 
+// Carregar categorias no select
+function carregarCategoriasNoSelect() {
+    var select = document.getElementById('categoria-produto');
+    if (!select) return;
+    
+    var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+    select.innerHTML = '<option value="">Nenhuma</option>';
+    categorias.forEach(function(cat) {
+        select.innerHTML += '<option value="' + cat.nome + '">' + (cat.emoji || '📂') + ' ' + cat.nome + '</option>';
+    });
+}
+
 function mostrarForm(id) {
     document.getElementById('form-produto').classList.add('ativo');
     limparForm();
+    carregarCategoriasNoSelect();
     
     if (id) {
         var produto = produtos.find(function(p) { return p.id === id; });
         document.getElementById('nome-produto').value = produto.nome;
         document.getElementById('preco-produto').value = produto.preco;
+        document.getElementById('preco-promo').value = produto.precoPromo || '';
         document.getElementById('emoji-produto').value = produto.emoji || '';
         document.getElementById('descricao-produto').value = produto.descricao || '';
         document.getElementById('url-imagem').value = produto.imagem || '';
+        document.getElementById('categoria-produto').value = produto.categoria || '';
         document.getElementById('form-produto').dataset.editId = id;
         document.getElementById('form-titulo').textContent = '✏️ Editar Produto';
         
@@ -85,9 +100,11 @@ function fecharForm() {
 function limparForm() {
     document.getElementById('nome-produto').value = '';
     document.getElementById('preco-produto').value = '';
+    document.getElementById('preco-promo').value = '';
     document.getElementById('emoji-produto').value = '';
     document.getElementById('descricao-produto').value = '';
     document.getElementById('url-imagem').value = '';
+    document.getElementById('categoria-produto').value = '';
     document.getElementById('preview-imagem').classList.remove('ativo');
     document.getElementById('btn-remover-imagem').classList.remove('ativo');
     document.getElementById('input-imagem').value = '';
@@ -98,8 +115,9 @@ function limparForm() {
 function previewImagem(input) {
     var file = input.files[0];
     if (file) {
-        if (file.size > 5 * 1024 * 1024) {
-            alert('⚠️ Imagem muito grande! Máximo 5MB.');
+        if (file.size > 200 * 1024) {
+            alert('⚠️ Imagem muito grande! Use URL externa (Imgur, ImgBB).');
+            input.value = '';
             return;
         }
         
@@ -140,9 +158,11 @@ function removerImagem() {
 function salvarProduto() {
     var nome = document.getElementById('nome-produto').value.trim();
     var preco = parseFloat(document.getElementById('preco-produto').value);
+    var precoPromo = parseFloat(document.getElementById('preco-promo').value) || null;
     var emoji = document.getElementById('emoji-produto').value.trim();
     var descricao = document.getElementById('descricao-produto').value.trim();
     var urlImagem = document.getElementById('url-imagem').value.trim();
+    var categoria = document.getElementById('categoria-produto').value;
     var imagem = imagemTemporaria || urlImagem || '';
     
     if (!nome || !preco) {
@@ -161,20 +181,24 @@ function salvarProduto() {
                 produtos[index] = { 
                     id: produtos[index].id, 
                     nome: nome, 
-                    preco: preco, 
+                    preco: preco,
+                    precoPromo: precoPromo,
                     emoji: emoji, 
                     descricao: descricao,
-                    imagem: imagem
+                    imagem: imagem,
+                    categoria: categoria
                 };
             } else {
                 var novoId = produtos.length > 0 ? Math.max.apply(null, produtos.map(function(p) { return p.id; })) + 1 : 1;
                 produtos.push({ 
                     id: novoId, 
                     nome: nome, 
-                    preco: preco, 
+                    preco: preco,
+                    precoPromo: precoPromo,
                     emoji: emoji, 
                     descricao: descricao,
-                    imagem: imagem
+                    imagem: imagem,
+                    categoria: categoria
                 });
             }
             salvarProdutos();
@@ -208,19 +232,25 @@ function renderizarTabela() {
     if (!tbody) return;
     
     if (produtos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 3rem; color: var(--texto-cinza);">📦 Nenhum produto cadastrado</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 3rem; color: var(--texto-cinza);">📦 Nenhum produto cadastrado</td></tr>';
         return;
     }
     
     tbody.innerHTML = produtos.map(function(produto) {
         var imgCell = produto.imagem 
-            ? '<img src="' + produto.imagem + '" class="mini-imagem" alt="' + produto.nome + '">'
-            : '<div class="mini-imagem" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">' + (produto.emoji || '📦') + '</div>';
+            ? '<img src="' + produto.imagem + '" style="width:50px;height:50px;object-fit:cover;border-radius:8px;" alt="">'
+            : '<div style="width:50px;height:50px;background:var(--fundo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">' + (produto.emoji || '📦') + '</div>';
+        
+        var precoCell = 'R$ ' + Number(produto.preco).toFixed(2);
+        if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+            precoCell = '<span style="text-decoration:line-through;color:var(--texto-cinza);">R$ ' + Number(produto.preco).toFixed(2) + '</span> <span style="color:#ef4444;font-weight:bold;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
+        }
         
         return '<tr>' +
             '<td>' + imgCell + '</td>' +
-            '<td>' + produto.nome + '</td>' +
-            '<td>R$ ' + parseFloat(produto.preco).toFixed(2) + '</td>' +
+            '<td>' + produto.nome + (produto.categoria ? '<br><small style="color:var(--roxo);">' + produto.categoria + '</small>' : '') + '</td>' +
+            '<td>' + precoCell + '</td>' +
+            '<td>' + (produto.categoria || '—') + '</td>' +
             '<td>' +
                 '<button class="btn-editar" onclick="editarProduto(' + produto.id + ')">✏️ Editar</button>' +
                 '<button class="btn-remover" onclick="removerProduto(' + produto.id + ')">🗑️ Remover</button>' +
