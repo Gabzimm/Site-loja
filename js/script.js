@@ -89,6 +89,19 @@ function atualizarContador() {
     if (contador) contador.textContent = '(' + total + ')';
 }
 
+// Carregar categorias no select
+function carregarCategoriasNoSelect() {
+    var select = document.getElementById('categoria-produto');
+    if (!select) return;
+    
+    var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+    select.innerHTML = '<option value="">Nenhuma</option>';
+    categorias.forEach(function(cat) {
+        select.innerHTML += '<option value="' + cat.nome + '">' + (cat.emoji || '') + ' ' + cat.nome + '</option>';
+    });
+}
+carregarCategoriasNoSelect();
+
 function renderizarProdutos() {
     var container = document.getElementById('lista-produtos');
     if (!container) return;
