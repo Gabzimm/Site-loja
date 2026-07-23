@@ -110,7 +110,6 @@
             margin-top: 0.3rem;
         }
 
-        /* Upload de imagem */
         .upload-area {
             border: 2px dashed var(--roxo);
             border-radius: 10px;
@@ -159,7 +158,6 @@
             display: inline-block;
         }
 
-        /* Tabela */
         .tabela-produtos {
             background: var(--card);
             border-radius: 10px;
@@ -182,14 +180,6 @@
         .tabela-produtos td {
             padding: 1rem;
             border-bottom: 1px solid #333;
-        }
-
-        .mini-imagem {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: var(--fundo);
         }
 
         .btn-editar {
@@ -267,6 +257,7 @@
             <nav>
                 <a href="dashboard.html">📊 Dashboard</a>
                 <a href="produtos.html" class="ativo">📦 Produtos</a>
+                <a href="categorias.html">📂 Categorias</a>
                 <a href="pedidos.html">📋 Pedidos</a>
                 <a href="cupons.html">🏷️ Cupons</a>
                 <a href="configuracoes.html">🎨 Configurações</a>
@@ -289,25 +280,26 @@
                 </div>
                 
                 <div class="input-group">
-                    <label>💰 Preço (R$)</label>
+                    <label>💰 Preço Original (R$)</label>
                     <input type="number" id="preco-produto" placeholder="29.90" step="0.01">
-                </div>
-
-                <div class="input-group">
-                    <label>📂 Categoria</label>
-                    <select id="categoria-produto">
-                    <option value="">Nenhuma</option>
-               </select>
-               </div>
-
-                <div class="input-group">
-                    <label>💥 Preço Promocional (opcional)</label>
-                    <input type="number" id="preco-promo" placeholder="Deixe vazio se não tiver promoção" step="0.01">
-                    <small>Se preenchido, o preço original aparece riscado</small>
                 </div>
                 
                 <div class="input-group">
-                    <label>😀 Emoji (opcional, aparece se não tiver imagem)</label>
+                    <label>💥 Preço Promocional (opcional)</label>
+                    <input type="number" id="preco-promo" placeholder="Deixe vazio se não tiver promoção" step="0.01">
+                    <small>Se preenchido com valor menor que o original, aparece RISCADO na loja</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>📂 Categoria</label>
+                    <select id="categoria-produto">
+                        <option value="">Nenhuma</option>
+                    </select>
+                    <small>Cadastre categorias na página 📂 Categorias</small>
+                </div>
+                
+                <div class="input-group">
+                    <label>😀 Emoji (aparece se não tiver imagem)</label>
                     <input type="text" id="emoji-produto" placeholder="👑" maxlength="2">
                 </div>
                 
@@ -315,19 +307,19 @@
                     <label>🖼️ Imagem do Produto</label>
                     <div class="upload-area" onclick="document.getElementById('input-imagem').click()">
                         <div class="icone">📁</div>
-                        <p>Clique para escolher uma imagem</p>
-                        <small>Formatos: JPG, PNG, GIF. Máx: 5MB</small>
+                        <p>Clique para escolher uma imagem (máx 200KB)</p>
+                        <small>Para imagens maiores, cole a URL abaixo</small>
                     </div>
                     <input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
                     <img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
                     <button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
-                    <small>Ou cole uma URL de imagem:</small>
-                    <input type="url" id="url-imagem" placeholder="https://exemplo.com/imagem.jpg" oninput="previewUrl(this.value)">
+                    <small style="margin-top: 0.5rem;">Ou cole uma URL de imagem (recomendado):</small>
+                    <input type="url" id="url-imagem" placeholder="https://imgur.com/seu-link.png" oninput="previewUrl(this.value)">
                 </div>
                 
                 <div class="input-group">
                     <label>📝 Descrição do Produto</label>
-                    <textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece em um painel ao clicar no botão de detalhes)"></textarea>
+                    <textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece ao clicar em Detalhes)"></textarea>
                 </div>
                 
                 <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
@@ -339,9 +331,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Imagem</th>
+                            <th>Img</th>
                             <th>Produto</th>
                             <th>Preço</th>
+                            <th>Categoria</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
