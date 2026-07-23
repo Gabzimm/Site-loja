@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectando...</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .callback-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--roxo);
+            border-top-color: var(--amarelo);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div>
+            <div class="loader"></div>
+            <h2 style="color: var(--amarelo);">Conectando ao Discord...</h2>
+            <p id="status" style="color: var(--texto-cinza);">Aguarde um momento</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração - PREENCHA DEPOIS
+        const DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
+        const DISCORD_CLIENT_SECRET = '';
+        const REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+        const API_URL = 'http://SEU_IP:5000/api'; // URL da API do seu bot
+
+        async function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (!code) {
+                document.getElementById('status').textContent = '❌ Erro: Código não encontrado';
+                return;
+            }
+
+            try {
+                document.getElementById('status').textContent = '🔄 Trocando código por token...';
+                
+                // Trocar code por token
+                const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        client_id: DISCORD_CLIENT_ID,
+                        client_secret: DISCORD_CLIENT_SECRET,
+                        grant_type: 'authorization_code',
+                        code: code,
+                        redirect_uri: REDIRECT_URI,
+                    }),
+                });
+
+                const tokenData = await tokenResponse.json();
+                
+                if (tokenData.error) {
+                    throw new Error(tokenData.error_description || 'Erro ao obter token');
+                }
+
+                document.getElementById('status').textContent = '📡 Buscando dados do usuário...';
+
+                // Buscar dados do usuário
+                const userResponse = await fetch('https://discord.com/api/users/@me', {
+                    headers: {
+                        'Authorization': `Bearer ${tokenData.access_token}`,
+                    },
+                });
+
+                const userData = await userResponse.json();
+
+                // Salvar dados do usuário
+                const usuario = {
+                    id: userData.id,
+                    username: userData.username,
+                    discriminator: userData.discriminator,
+                    avatar: userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png',
+                    global_name: userData.global_name || userData.username,
+                    loggedAt: new Date().toISOString(),
+                };
+
+                localStorage.setItem('usuario_discord', JSON.stringify(usuario));
+                
+                document.getElementById('status').textContent = '✅ Login realizado com sucesso!';
+                
+                // Redirecionar para a loja
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('status').textContent = '❌ Erro: ' + error.message;
+            }
+        }
+
+        handleCallback();
+    </script>
+</body>
+</html>
