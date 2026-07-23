@@ -105,6 +105,73 @@
             background: var(--verde-escuro);
             transform: scale(1.02);
         }
+        .btn-finalizar:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ========== AVISO LOGIN ========== */
+        .aviso-login {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--amarelo);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .aviso-login p {
+            margin-bottom: 1rem;
+            color: var(--amarelo);
+        }
+        
+        .btn-login-carrinho {
+            background: #5865F2;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-login-carrinho:hover {
+            background: #4752C4;
+            transform: scale(1.05);
+        }
+        
+        .usuario-logado-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .usuario-logado-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--verde);
+        }
+        
+        /* ========== LINK PERFIL ========== */
+        #link-perfil {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #link-perfil img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--amarelo);
+        }
     </style>
 </head>
 <body>
@@ -115,6 +182,9 @@
         <nav class="nav">
             <a href="index.html">🏠 Home</a>
             <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
+            <a href="perfil.html" id="link-perfil">
+                <span id="perfil-nome">👤 Perfil</span>
+            </a>
         </nav>
     </header>
 
@@ -123,8 +193,24 @@
         <div id="carrinho-content"></div>
     </div>
 
+    <script src="js/api.js"></script>
     <script>
-        let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        // ========== CONFIGURAÇÃO LOGIN DISCORD ==========
+        const DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
+        const REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+        
+        // ========== ATUALIZAR PERFIL NO HEADER ==========
+        (function() {
+            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var perfilNome = document.getElementById('perfil-nome');
+            if (usuario && perfilNome) {
+                perfilNome.innerHTML = '<img src="' + usuario.avatar + '" style="width:30px;height:30px;border-radius:50%;object-fit:cover;vertical-align:middle;"> ' + (usuario.global_name || usuario.username);
+            }
+        })();
+
+        // ========== DADOS ==========
+        var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
 
         function salvarCarrinho() {
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
@@ -154,6 +240,52 @@
             }, 0);
         }
 
+        function loginDiscord() {
+            var authUrl = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&response_type=code&scope=identify';
+            localStorage.setItem('redirect_after_login', 'carrinho.html');
+            window.location.href = authUrl;
+        }
+
+        function finalizarCompra() {
+            usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            
+            if (!usuario) {
+                alert('⚠️ Faça login com Discord primeiro!');
+                return;
+            }
+            
+            if (carrinho.length === 0) {
+                alert('⚠️ Seu carrinho está vazio!');
+                return;
+            }
+            
+            var total = calcularTotal();
+            var produtosNomes = carrinho.map(function(item) { 
+                return item.quantidade + 'x ' + item.nome; 
+            }).join(', ');
+            
+            var btnFinalizar = document.querySelector('.btn-finalizar');
+            btnFinalizar.disabled = true;
+            btnFinalizar.textContent = '⏳ Processando...';
+            
+            enviarRegistroCompra({
+                discord_id: usuario.id,
+                valor: total,
+                produto: produtosNomes,
+                nome: usuario.global_name || usuario.username,
+                clan: "Sem Clan"
+            }).then(function() {
+                alert('✅ Compra registrada com sucesso!\n\nVocê receberá uma DM no Discord quando for confirmada.');
+                carrinho = [];
+                salvarCarrinho();
+            }).catch(function() {
+                alert('❌ Erro ao registrar compra. Tente novamente.');
+            }).finally(function() {
+                btnFinalizar.disabled = false;
+                btnFinalizar.textContent = '✅ Finalizar Compra';
+            });
+        }
+
         function renderizarCarrinho() {
             var container = document.getElementById('carrinho-content');
             var contador = document.getElementById('contador-carrinho');
@@ -162,58 +294,70 @@
             if (contador) contador.textContent = '(' + totalItens + ')';
             
             if (carrinho.length === 0) {
-                container.innerHTML = '<div class="carrinho-vazio"><div class="icone">🛒</div><h2>Seu carrinho está vazio</h2><p>Volte para a loja e adicione produtos!</p><a href="index.html" style="color: var(--amarelo); margin-top: 1rem; display: inline-block;">← Voltar para Loja</a></div>';
+                container.innerHTML = 
+                    '<div class="carrinho-vazio">' +
+                        '<div class="icone">🛒</div>' +
+                        '<h2>Seu carrinho está vazio</h2>' +
+                        '<p>Volte para a loja e adicione produtos!</p>' +
+                        '<a href="index.html" style="color: var(--amarelo); margin-top: 1rem; display: inline-block;">← Voltar para Loja</a>' +
+                    '</div>';
                 return;
             }
             
+            // Verificar login
+            usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            
             var html = '';
+            
+            // Itens do carrinho
             carrinho.forEach(function(item) {
                 html += '<div class="carrinho-item">';
-                html += '<div class="carrinho-item-emoji">' + (item.emoji || '📦') + '</div>';
+                
+                if (item.imagem) {
+                    html += '<img src="' + item.imagem + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:1.5rem;">';
+                } else {
+                    html += '<div class="carrinho-item-emoji">' + (item.emoji || '📦') + '</div>';
+                }
+                
                 html += '<div class="carrinho-item-info">';
                 html += '<div class="carrinho-item-nome">' + item.nome + '</div>';
-                html += '<div class="carrinho-item-preco">R$ ' + item.preco.toFixed(2) + ' cada</div>';
+                html += '<div class="carrinho-item-preco">R$ ' + parseFloat(item.preco).toFixed(2) + ' cada</div>';
                 html += '</div>';
+                
                 html += '<div class="carrinho-item-quantidade">';
                 html += '<button class="btn-qtd" onclick="alterarQuantidade(' + item.id + ', -1)">-</button>';
                 html += '<span>' + item.quantidade + '</span>';
                 html += '<button class="btn-qtd" onclick="alterarQuantidade(' + item.id + ', 1)">+</button>';
                 html += '</div>';
+                
                 html += '<div style="font-weight: bold; margin: 0 1rem;">R$ ' + (item.preco * item.quantidade).toFixed(2) + '</div>';
                 html += '<button class="btn-remover-item" onclick="removerItem(' + item.id + ')">🗑️</button>';
                 html += '</div>';
             });
             
+            // Total e finalizar
             html += '<div class="carrinho-total">';
             html += '<h2>Total do Carrinho</h2>';
             html += '<div class="total-valor">R$ ' + calcularTotal().toFixed(2) + '</div>';
-            html += '<button class="btn-finalizar" onclick="finalizarCompra()">✅ Finalizar Compra</button>';
+            
+            // Verificar se está logado
+            if (!usuario) {
+                html += '<div class="aviso-login">';
+                html += '<p>🔐 <strong>Faça login com Discord para finalizar a compra!</strong></p>';
+                html += '<button class="btn-login-carrinho" onclick="loginDiscord()">🔑 Login com Discord</button>';
+                html += '</div>';
+            } else {
+                html += '<div class="usuario-logado-info">';
+                html += '<img src="' + usuario.avatar + '" alt="Avatar">';
+                html += '<span style="color: var(--texto);"><strong>' + (usuario.global_name || usuario.username) + '</strong></span>';
+                html += '<span style="color: var(--verde);">✅ Logado</span>';
+                html += '</div>';
+                html += '<button class="btn-finalizar" onclick="finalizarCompra()">✅ Finalizar Compra</button>';
+            }
+            
             html += '</div>';
             
             container.innerHTML = html;
-        }
-
-        function finalizarCompra() {
-            var discordId = prompt('📝 Digite seu ID do Discord (ex: 123456789):');
-            if (!discordId) return;
-            
-            alert('✅ Compra registrada! Aguarde a confirmação via DM no Discord.');
-            
-            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
-            var novoPedido = {
-                id: Date.now(),
-                cliente: 'User#' + discordId,
-                discordId: discordId,
-                itens: carrinho.slice(),
-                valor: calcularTotal(),
-                status: 'pendente',
-                data: new Date().toLocaleDateString('pt-BR')
-            };
-            pedidos.push(novoPedido);
-            localStorage.setItem('pedidos', JSON.stringify(pedidos));
-            
-            carrinho = [];
-            salvarCarrinho();
         }
 
         renderizarCarrinho();
