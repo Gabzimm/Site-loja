@@ -6,7 +6,6 @@
     <title>ReyCraft Shop</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ========== IMAGEM DO PRODUTO NO CARD ========== */
         .produto-card img {
             width: 100% !important;
             height: 200px !important;
@@ -16,7 +15,6 @@
             display: block !important;
         }
         
-        /* ========== BOTÃO DETALHES ========== */
         .btn-detalhes {
             width: 100%;
             padding: 0.6rem;
@@ -29,19 +27,16 @@
             transition: all 0.3s;
             font-size: 0.9rem;
         }
-        
         .btn-detalhes:hover {
             background: var(--roxo, #8B5CF6) !important;
             color: white !important;
         }
         
-        /* ========== LINK PERFIL ========== */
         #link-perfil {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
         #link-perfil img {
             width: 30px;
             height: 30px;
@@ -50,13 +45,43 @@
             border: 2px solid var(--amarelo);
         }
         
-        /* ========== MODAL FUNDO ========== */
+        .produto-preco-original {
+            text-decoration: line-through;
+            color: var(--texto-cinza);
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        .produto-preco-promo {
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .produto-categoria {
+            display: inline-block;
+            background: var(--roxo);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .badge-promo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* Modal detalhes */
         .modal-detalhes-fundo {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             display: flex;
@@ -64,8 +89,6 @@
             justify-content: center;
             padding: 2rem;
         }
-        
-        /* ========== MODAL BOX ========== */
         .modal-detalhes-box {
             background: var(--card, #1A1A2E);
             border: 2px solid var(--roxo, #8B5CF6);
@@ -76,7 +99,6 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-        
         .modal-detalhes-titulo {
             color: var(--amarelo, #F59E0B);
             font-size: 2rem;
@@ -84,13 +106,11 @@
             text-align: center;
             margin-bottom: 2rem;
         }
-        
         .modal-detalhes-conteudo {
             display: flex;
             gap: 2rem;
             align-items: flex-start;
         }
-        
         .modal-detalhes-imagem {
             width: 350px;
             height: 350px;
@@ -98,7 +118,6 @@
             border-radius: 10px;
             flex-shrink: 0;
         }
-        
         .modal-detalhes-placeholder {
             width: 350px;
             height: 350px;
@@ -110,7 +129,6 @@
             font-size: 6rem;
             flex-shrink: 0;
         }
-        
         .modal-detalhes-texto {
             color: var(--texto, #E2E8F0);
             font-size: 1.1rem;
@@ -118,7 +136,6 @@
             flex: 1;
             white-space: pre-line;
         }
-        
         .modal-detalhes-rodape {
             display: flex;
             justify-content: space-between;
@@ -127,13 +144,11 @@
             padding-top: 1.5rem;
             border-top: 1px solid #333;
         }
-        
         .modal-detalhes-preco {
             font-size: 2.2rem;
             font-weight: bold;
             color: var(--verde, #10B981);
         }
-        
         .modal-detalhes-fechar {
             background: var(--roxo, #8B5CF6);
             color: white;
@@ -145,31 +160,16 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
         .modal-detalhes-fechar:hover {
             background: var(--roxo-escuro, #6D28D9);
             transform: scale(1.05);
         }
         
         @media (max-width: 700px) {
-            .modal-detalhes-fundo {
-                padding: 1rem;
-            }
-            
-            .modal-detalhes-box {
-                padding: 1.5rem;
-            }
-            
-            .modal-detalhes-conteudo {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .modal-detalhes-imagem,
-            .modal-detalhes-placeholder {
-                width: 100%;
-                height: 250px;
-            }
+            .modal-detalhes-fundo { padding: 1rem; }
+            .modal-detalhes-box { padding: 1.5rem; }
+            .modal-detalhes-conteudo { flex-direction: column; align-items: center; }
+            .modal-detalhes-imagem, .modal-detalhes-placeholder { width: 100%; height: 250px; }
         }
     </style>
 </head>
@@ -190,7 +190,6 @@
 
     <div class="container">
         <h2>🔥 Produtos em Destaque</h2>
-        
         <div class="grid-produtos" id="lista-produtos"></div>
     </div>
 
@@ -235,7 +234,7 @@
             } catch(e) {}
         })();
 
-        // ========== ATUALIZAR PERFIL NO HEADER ==========
+        // ========== PERFIL NO HEADER ==========
         (function() {
             var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
             var perfilNome = document.getElementById('perfil-nome');
@@ -247,28 +246,25 @@
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
         var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-        // Corrigir carrinho null
-        if (!carrinho || typeof carrinho === 'string') { 
-            carrinho = []; 
-            localStorage.setItem('carrinho', '[]'); 
-        }
+        if (!carrinho || typeof carrinho === 'string') { carrinho = []; localStorage.setItem('carrinho', '[]'); }
 
         function salvarCarrinho() {
             try {
                 localStorage.setItem('carrinho', JSON.stringify(carrinho));
                 atualizarContador();
             } catch(e) {
-                alert('⚠️ Erro ao salvar carrinho! O armazenamento está cheio. Tente limpar alguns dados.');
+                alert('⚠️ Erro ao salvar carrinho! Armazenamento cheio.');
             }
         }
 
         function adicionarAoCarrinho(id) {
             var produto = produtos.find(function(p) { return p.id === id; });
-            if (!produto) {
-                alert('Erro: produto não encontrado!');
-                return;
-            }
+            if (!produto) { alert('Erro: produto não encontrado!'); return; }
+            
+            // Usar preço promocional se existir
+            var precoFinal = produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco) 
+                ? Number(produto.precoPromo) 
+                : Number(produto.preco);
             
             var item = carrinho.find(function(i) { return i.id === id; });
             if (item) {
@@ -277,9 +273,10 @@
                 carrinho.push({
                     id: produto.id,
                     nome: produto.nome,
-                    preco: Number(produto.preco),
+                    preco: precoFinal,
                     emoji: produto.emoji || '',
                     imagem: produto.imagem || '',
+                    categoria: produto.categoria || '',
                     quantidade: 1
                 });
             }
@@ -290,9 +287,7 @@
 
         function atualizarContador() {
             var total = 0;
-            carrinho.forEach(function(item) {
-                total += item.quantidade;
-            });
+            carrinho.forEach(function(item) { total += item.quantidade; });
             var contador = document.getElementById('contador-carrinho');
             if (contador) contador.textContent = '(' + total + ')';
         }
@@ -311,6 +306,14 @@
                 ? '<img src="' + produto.imagem + '" class="modal-detalhes-imagem" alt="' + produto.nome + '">'
                 : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
             
+            var precoHtml = '';
+            if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+                precoHtml = '<span style="text-decoration:line-through;color:var(--texto-cinza);font-size:1.2rem;">R$ ' + Number(produto.preco).toFixed(2) + '</span> ' +
+                            '<span style="color:#ef4444;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
+            } else {
+                precoHtml = 'R$ ' + Number(produto.preco).toFixed(2);
+            }
+            
             modal.innerHTML = 
                 '<div class="modal-detalhes-box">' +
                     '<div class="modal-detalhes-titulo">' + produto.nome + '</div>' +
@@ -319,7 +322,7 @@
                         '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição disponível.') + '</div>' +
                     '</div>' +
                     '<div class="modal-detalhes-rodape">' +
-                        '<div class="modal-detalhes-preco">R$ ' + Number(produto.preco).toFixed(2) + '</div>' +
+                        '<div class="modal-detalhes-preco">' + precoHtml + '</div>' +
                         '<button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button>' +
                     '</div>' +
                 '</div>';
@@ -342,6 +345,16 @@
             produtos.forEach(function(produto) {
                 var card = document.createElement('div');
                 card.className = 'produto-card';
+                card.style.position = 'relative';
+                
+                // Badge de promoção
+                if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+                    var badge = document.createElement('div');
+                    badge.className = 'badge-promo';
+                    var desconto = Math.round((1 - Number(produto.precoPromo) / Number(produto.preco)) * 100);
+                    badge.textContent = '-' + desconto + '%';
+                    card.appendChild(badge);
+                }
                 
                 // Imagem
                 if (produto.imagem) {
@@ -362,6 +375,14 @@
                     card.appendChild(placeholder);
                 }
                 
+                // Categoria
+                if (produto.categoria) {
+                    var cat = document.createElement('div');
+                    cat.className = 'produto-categoria';
+                    cat.textContent = produto.categoria;
+                    card.appendChild(cat);
+                }
+                
                 // Nome
                 var nome = document.createElement('h3');
                 nome.className = 'produto-nome';
@@ -369,19 +390,23 @@
                 card.appendChild(nome);
                 
                 // Preço
-                var preco = document.createElement('div');
-                preco.className = 'produto-preco';
-                preco.textContent = 'R$ ' + Number(produto.preco).toFixed(2);
-                card.appendChild(preco);
+                var precoDiv = document.createElement('div');
+                precoDiv.className = 'produto-preco';
+                
+                if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+                    precoDiv.innerHTML = '<span class="produto-preco-original">R$ ' + Number(produto.preco).toFixed(2) + '</span>' +
+                                        '<span class="produto-preco-promo">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
+                } else {
+                    precoDiv.textContent = 'R$ ' + Number(produto.preco).toFixed(2);
+                }
+                card.appendChild(precoDiv);
                 
                 // Botão Comprar
                 var btnComprar = document.createElement('button');
                 btnComprar.className = 'btn-comprar';
                 btnComprar.textContent = '🛒 Comprar';
                 btnComprar.onclick = (function(produtoId) {
-                    return function() {
-                        adicionarAoCarrinho(produtoId);
-                    };
+                    return function() { adicionarAoCarrinho(produtoId); };
                 })(produto.id);
                 card.appendChild(btnComprar);
                 
@@ -391,9 +416,7 @@
                     btnDetalhes.className = 'btn-detalhes';
                     btnDetalhes.textContent = '📋 Detalhes';
                     btnDetalhes.onclick = (function(produtoId) {
-                        return function() {
-                            mostrarDetalhes(produtoId);
-                        };
+                        return function() { mostrarDetalhes(produtoId); };
                     })(produto.id);
                     card.appendChild(btnDetalhes);
                 }
@@ -402,7 +425,6 @@
             });
         }
 
-        // ========== INICIAR ==========
         renderizarProdutos();
         atualizarContador();
     </script>
