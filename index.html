@@ -42,7 +42,7 @@
         .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
         .produto-card { background: var(--card); border-radius: 12px; padding: 1.2rem; border: 1px solid #1e1e2e; transition: all 0.3s; text-align: center; position: relative; }
         .produto-card:hover { border-color: var(--roxo); transform: translateY(-3px); }
-        .produto-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 0.8rem; display: block; }
+        .produto-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 0.8rem; display: block; background: #0a0a0f; }
         .produto-imagem { width: 100%; height: 180px; background: linear-gradient(45deg, #1a1a2e, #14141f); border-radius: 8px; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
         .badge-promo { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 0.3rem 0.7rem; border-radius: 15px; font-size: 0.75rem; font-weight: bold; z-index: 1; }
         .produto-nome { font-size: 1rem; font-weight: bold; margin-bottom: 0.3rem; }
@@ -51,6 +51,7 @@
         .produto-preco-promo { color: #ef4444; font-weight: bold; }
         .btn-comprar { width: 100%; padding: 0.7rem; background: var(--roxo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
         .btn-detalhes { width: 100%; padding: 0.5rem; background: transparent; border: 1px solid #1e1e2e; color: var(--texto-cinza); border-radius: 8px; margin-top: 0.5rem; cursor: pointer; font-size: 0.8rem; }
+        .btn-detalhes:hover { border-color: var(--roxo); color: var(--texto); }
         .loja-vazia { text-align: center; padding: 4rem; color: var(--texto-cinza); }
         .toast-aviso { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: bold; z-index: 9999; animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards; }
         @keyframes slideUp { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
@@ -116,6 +117,16 @@
         }
         function atualizarContador(){ var t=0; carrinho.forEach(function(i){t+=i.quantidade}); var c=document.getElementById('contador-carrinho'); if(c){c.textContent=t;c.style.display=t>0?'flex':'none';} }
 
+        function mostrarDetalhes(id) {
+            var p = produtos.find(function(x) { return x.id === id; }); if (!p) return;
+            var antigo = document.querySelector('.modal-detalhes-fundo'); if (antigo) antigo.remove();
+            var m = document.createElement('div'); m.className = 'modal-detalhes-fundo';
+            var img = p.imagem ? '<img src="' + p.imagem + '" class="modal-detalhes-img" style="object-fit:contain;background:#0a0a0f;">' : '<div class="modal-detalhes-placeholder">' + (p.emoji || '📦') + '</div>';
+            var pr = ''; if (p.precoPromo && Number(p.precoPromo) < Number(p.preco)) pr = '<span style="text-decoration:line-through;color:#666;font-size:1rem;">R$ ' + Number(p.preco).toFixed(2) + '</span> <span style="color:#ef4444;">R$ ' + Number(p.precoPromo).toFixed(2) + '</span>'; else pr = 'R$ ' + Number(p.preco).toFixed(2);
+            m.innerHTML = '<div class="modal-detalhes-box"><div class="modal-detalhes-titulo">' + p.nome + '</div><div class="modal-detalhes-conteudo">' + img + '<div class="modal-detalhes-texto">' + (p.descricao || 'Sem descrição.') + '</div></div><div class="modal-detalhes-rodape"><div class="modal-detalhes-preco">' + pr + '</div><button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button></div></div>';
+            document.body.appendChild(m); m.onclick = function(e) { if (e.target === m) m.remove(); };
+        }
+
         function carregarSidebar(){
             var s=document.getElementById('sidebar-categorias'); if(!s)return;
             var olds=s.querySelectorAll('.categoria-btn'); olds.forEach(function(b){b.remove()});
@@ -127,25 +138,14 @@
         }
 
         function renderizarTodasSecoes(){
-           var c = document.getElementById('produtos-area');
-            if(!c) return;
-            if(produtos.length === 0) {
-                c.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>';
-                return;
-            }
-            
-            c.innerHTML = '';
-    
-    // Seção "Produtos em Destaque" (TODOS os produtos)
-            c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
-    
-    // Seções por categoria
-            if(categorias && categorias.length > 0) {
+            var c=document.getElementById('produtos-area'); if(!c)return;
+            if(produtos.length===0){c.innerHTML='<div class="loja-vazia">📦<br>Loja Vazia</div>';return;}
+            c.innerHTML='';
+            c.appendChild(criarSecao('🔥 Produtos em Destaque','destaque',produtos));
+            if(categorias.length > 0){
                 categorias.forEach(function(cat){
-                    var produtosDaCat = produtos.filter(function(x){ return x.categoria === cat.nome; });
-                    if(produtosDaCat.length > 0) {
-                        c.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), produtosDaCat));
-                    }
+                    var p=produtos.filter(function(x){return x.categoria===cat.nome});
+                    if(p.length>0)c.appendChild(criarSecao(cat.nome,'cat-'+cat.nome.replace(/\s+/g,'-'),p));
                 });
             }
         }
@@ -157,7 +157,7 @@
             lista.forEach(function(produto){
                 var card=document.createElement('div'); card.className='produto-card';
                 if(produto.precoPromo&&Number(produto.precoPromo)<Number(produto.preco)){var badge=document.createElement('div'); badge.className='badge-promo'; badge.textContent='-'+Math.round((1-Number(produto.precoPromo)/Number(produto.preco))*100)+'%'; card.appendChild(badge);}
-                if(produto.imagem){var img=document.createElement('img'); img.src=produto.imagem; img.alt=produto.nome; img.style.objectFit='cover'; card.appendChild(img);}
+                if(produto.imagem){var img=document.createElement('img'); img.src=produto.imagem; img.alt=produto.nome; img.style.objectFit='contain'; img.style.background='#0a0a0f'; card.appendChild(img);}
                 else{var ph=document.createElement('div'); ph.className='produto-imagem'; ph.textContent=produto.emoji||'📦'; card.appendChild(ph);}
                 var nome=document.createElement('div'); nome.className='produto-nome'; nome.textContent=produto.nome; card.appendChild(nome);
                 var preco=document.createElement('div'); preco.className='produto-preco';
@@ -165,6 +165,10 @@
                 else preco.textContent='R$ '+Number(produto.preco).toFixed(2); card.appendChild(preco);
                 var btnC=document.createElement('button'); btnC.className='btn-comprar'; btnC.textContent='🛒 Comprar';
                 btnC.onclick=(function(id){return function(){adicionarAoCarrinho(id);};})(produto.id); card.appendChild(btnC);
+                if(produto.descricao && produto.descricao.trim()) {
+                    var btnD=document.createElement('button'); btnD.className='btn-detalhes'; btnD.textContent='📋 Detalhes';
+                    btnD.onclick=(function(id){return function(){mostrarDetalhes(id);};})(produto.id); card.appendChild(btnD);
+                }
                 grid.appendChild(card);
             });
             sec.appendChild(grid); return sec;
@@ -206,7 +210,6 @@
             atualizarPerfilHeader();
             aplicarConfigLogo();
         }).catch(function() {
-            // Fallback se a Bin falhar
             produtos = JSON.parse(localStorage.getItem('produtos')) || [];
             categorias = JSON.parse(localStorage.getItem('categorias')) || [];
             carregarSidebar();
