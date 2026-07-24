@@ -12,6 +12,7 @@
         .sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; font-size: 1.3rem; }
         .sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s; }
         .sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
+        .sidebar nav a.ver-loja { background: var(--verde); color: white; text-align: center; font-weight: bold; margin-top: 1rem; }
         .content { flex: 1; padding: 2rem; }
         .btn-adicionar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 2rem; }
         .form-produto { background: var(--card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem; display: none; }
@@ -19,7 +20,11 @@
         .input-group { margin-bottom: 1.5rem; }
         .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
         .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
+        .input-group textarea { resize: vertical; min-height: 100px; }
+        .input-group small { color: var(--texto-cinza); display: block; margin-top: 0.3rem; }
         .upload-area { border: 2px dashed var(--roxo); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; background: var(--fundo); }
+        .upload-area:hover { border-color: var(--amarelo); background: rgba(139,92,246,0.1); }
+        .upload-area .icone { font-size: 3rem; margin-bottom: 0.5rem; }
         .preview-imagem { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-top: 1rem; display: none; }
         .preview-imagem.ativo { display: block; }
         .btn-remover-imagem { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; display: none; }
@@ -32,7 +37,9 @@
         .btn-remover { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
         .btn-salvar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 0.5rem; }
         .btn-cancelar-form { background: #64748b; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
+        .sem-produtos { text-align: center; padding: 3rem; color: var(--texto-cinza); }
+        .badge-destaque { display: inline-block; background: #F59E0B; color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--roxo); } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
     </style>
 </head>
 <body>
@@ -58,20 +65,39 @@
             
             <div class="form-produto" id="form-produto">
                 <h2 id="form-titulo">➕ Novo Produto</h2>
-                <div class="input-group"><label>🏷️ Nome</label><input type="text" id="nome-produto" placeholder="Ex: VIP Mensal"></div>
+                
+                <div class="input-group"><label>🏷️ Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: VIP Mensal"></div>
                 <div class="input-group"><label>💰 Preço Original (R$)</label><input type="number" id="preco-produto" placeholder="29.90" step="0.01"></div>
-                <div class="input-group"><label>💥 Preço Promocional</label><input type="number" id="preco-promo" placeholder="Opcional" step="0.01"></div>
-                <div class="input-group"><label>📂 Categoria</label><select id="categoria-produto"><option value="">Nenhuma</option></select></div>
-                <div class="input-group"><label>😀 Emoji</label><input type="text" id="emoji-produto" placeholder="👑" maxlength="2"></div>
-                <div class="input-group"><label>🖼️ Imagem</label><div class="upload-area" onclick="document.getElementById('input-imagem').click()"><div style="font-size:3rem;">📁</div><p>Clique para upload (máx 200KB)</p></div><input type="file" id="input-imagem" accept="image/*" style="display:none;" onchange="previewImagem(this)"><img id="preview-imagem" class="preview-imagem"><button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover</button><small>Ou URL:</small><input type="url" id="url-imagem" placeholder="https://imgur.com/..." oninput="previewUrl(this.value)"></div>
-                <div class="input-group"><label>📝 Descrição</label><textarea id="descricao-produto" placeholder="Descreva o produto..."></textarea></div>
-                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar</button>
+                <div class="input-group"><label>💥 Preço Promocional (opcional)</label><input type="number" id="preco-promo" placeholder="Deixe vazio se não tiver promoção" step="0.01"><small>Se preenchido, o preço original aparece riscado na loja</small></div>
+                <div class="input-group"><label>📂 Categoria</label><select id="categoria-produto"><option value="">Nenhuma</option></select><small>Cadastre categorias na página 📂 Categorias</small></div>
+                <div class="input-group"><label>🏆 Em Destaque</label><select id="destaque-produto"><option value="sim">Sim - Mostrar nos Destaques</option><option value="nao">Não - Apenas na categoria</option></select><small>Produtos em destaque aparecem no topo da loja</small></div>
+                <div class="input-group"><label>😀 Emoji (aparece se não tiver imagem)</label><input type="text" id="emoji-produto" placeholder="👑" maxlength="2"></div>
+                <div class="input-group">
+                    <label>🖼️ Imagem do Produto</label>
+                    <div class="upload-area" onclick="document.getElementById('input-imagem').click()"><div class="icone">📁</div><p>Clique para escolher uma imagem (máx 200KB)</p><small>Para imagens maiores, cole a URL abaixo</small></div>
+                    <input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
+                    <img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
+                    <button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
+                    <small style="margin-top: 0.5rem;">Ou cole uma URL de imagem (recomendado):</small>
+                    <input type="url" id="url-imagem" placeholder="https://imgur.com/seu-link.png" oninput="previewUrl(this.value)">
+                </div>
+                <div class="input-group"><label>📝 Descrição do Produto</label><textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece ao clicar em Detalhes)"></textarea></div>
+                
+                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
                 <button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
             </div>
 
-            <div class="tabela-produtos"><table><thead><tr><th>Img</th><th>Produto</th><th>Preço</th><th>Categoria</th><th>Ações</th></tr></thead><tbody id="lista-produtos-admin"></tbody></table></div>
+            <div class="tabela-produtos">
+                <table>
+                    <thead>
+                        <tr><th>Img</th><th>Produto</th><th>Preço</th><th>Categoria</th><th>Destaque</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="lista-produtos-admin"></tbody>
+                </table>
+            </div>
         </main>
     </div>
+
     <script src="../js/admin.js"></script>
 </body>
 </html>
