@@ -78,12 +78,11 @@
 
         function sair() {
             localStorage.removeItem('usuario_discord');
-            localStorage.removeItem('meu_clan_' + (usuario ? usuario.id : ''));
+            localStorage.removeItem('meu_clan_1213819385576300595');
             window.location.reload();
         }
 
         function atualizarClan() {
-            // Reenviar webhook para verificar clan
             var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
             fetch(WEBHOOK_URL, {
                 method: 'POST',
@@ -98,39 +97,16 @@
                     }] 
                 })
             }).then(function() {
-                alert('✅ Clan verificado! Faça login novamente para atualizar.');
+                document.getElementById('status-clan').textContent = '✅ Verificado! O bot encontrou seu clan.';
+                document.getElementById('status-clan').style.color = '#10B981';
+                // Salvar localmente o clan verificado
+                localStorage.setItem('clan_verificado', 'true');
+                localStorage.setItem('clan_atualizado_em', new Date().toISOString());
+            }).catch(function() {
+                document.getElementById('status-clan').textContent = '❌ Erro ao verificar.';
             });
         }
 
-        // ========== BUSCAR CLAN ==========
-        function buscarClanUsuario(discordId, callback) {
-            // Verificar localStorage
-            var clanSalvo = localStorage.getItem('meu_clan_' + discordId);
-            if (clanSalvo) { callback(clanSalvo); return; }
-            
-            // Verificar nos pedidos confirmados
-            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
-            var meusPedidos = pedidos.filter(function(p) { return p.discordId === discordId && p.status === 'confirmado'; });
-            if (meusPedidos.length > 0) {
-                var clan = meusPedidos[meusPedidos.length - 1].clan;
-                if (clan && clan !== 'Sem Clan') {
-                    localStorage.setItem('meu_clan_' + discordId, clan);
-                    callback(clan);
-                    return;
-                }
-            }
-            
-            // Clan verificado recentemente?
-            var verificado = localStorage.getItem('clan_verificado');
-            if (verificado === 'true') {
-                callback('Verificado! Faça login novamente.');
-                return;
-            }
-            
-            callback(null);
-        }
-
-        // ========== CARREGAR PERFIL ==========
         function carregarPerfil() {
             if (!usuario) {
                 document.getElementById('perfil-content').innerHTML = '<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
@@ -141,29 +117,36 @@
             var meusPedidos = pedidos.filter(function(p) { return p.discordId === usuario.id && p.status === 'confirmado'; });
             var totalGasto = meusPedidos.reduce(function(t, p) { return t + Number(p.valor); }, 0);
             
-            buscarClanUsuario(usuario.id, function(meuClan) {
-                var clanMostrado = meuClan || '—';
-                var clanHtml = meuClan && meuClan !== 'Verificado! Faça login novamente.'
-                    ? '<span class="clan-badge">🏰 ' + meuClan + '</span>'
-                    : '<span class="clan-badge" style="background:#333;">🏰 ' + clanMostrado + '</span>';
-                
-                if (!meuClan || meuClan === 'Verificado! Faça login novamente.') {
-                    clanHtml += '<br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clan</button>';
+            // Buscar clan
+            var meuClan = localStorage.getItem('meu_clan_' + usuario.id);
+            if (!meuClan && meusPedidos.length > 0) {
+                meuClan = meusPedidos[meusPedidos.length - 1].clan;
+                if (meuClan && meuClan !== 'Sem Clan') {
+                    localStorage.setItem('meu_clan_' + usuario.id, meuClan);
+                } else {
+                    meuClan = null;
                 }
-                
-                document.getElementById('perfil-content').innerHTML = 
-                    '<div class="perfil-header"><img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>' + (usuario.global_name || usuario.username) + '</h1><p class="tag">@' + usuario.username + '</p>' + clanHtml + '</div></div>' +
-                    '<div class="stats-grid">' +
-                        '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras</div></div>' +
-                        '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
-                        '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + clanMostrado + '</div><div class="label">Seu Clan</div></div>' +
-                        '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank</div></div>' +
-                    '</div>' +
-                    '<div class="perfil-secao"><h3>📋 Histórico</h3>' + (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
-                        return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
-                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>') + '</div>' +
-                    '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
-            });
+            }
+            
+            var clanMostrado = meuClan || 'Não definido';
+            var clanHtml = meuClan 
+                ? '<span class="clan-badge">🏰 ' + meuClan + '</span>' 
+                : '<span class="clan-badge" style="background:#333;">🏰 ' + clanMostrado + '</span>' +
+                  '<br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clan</button>' +
+                  '<br><small id="status-clan" style="color:var(--texto-cinza);"></small>';
+            
+            document.getElementById('perfil-content').innerHTML = 
+                '<div class="perfil-header"><img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>' + (usuario.global_name || usuario.username) + '</h1><p class="tag">@' + usuario.username + '</p>' + clanHtml + '</div></div>' +
+                '<div class="stats-grid">' +
+                    '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras</div></div>' +
+                    '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
+                    '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + clanMostrado + '</div><div class="label">Seu Clan</div></div>' +
+                    '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank</div></div>' +
+                '</div>' +
+                '<div class="perfil-secao"><h3>📋 Histórico</h3>' + (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
+                    return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
+                }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>') + '</div>' +
+                '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
         }
 
         carregarPerfil();
