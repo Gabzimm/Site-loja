@@ -18,7 +18,7 @@
         
         .input-group { margin-bottom: 1.5rem; }
         .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--texto); }
-        .input-group input[type="text"], .input-group input[type="url"] {
+        .input-group input[type="text"], .input-group input[type="url"], .input-group input[type="password"] {
             width: 100%; padding: 0.8rem; background: var(--fundo);
             border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem;
         }
@@ -69,7 +69,7 @@
 
         <main class="content">
             <h1>🎨 Configurações da Loja</h1>
-            <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize cores, logo, favicon e aparência da sua loja</p>
+            <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize cores, logo, favicon e token do bot</p>
             <div class="mensagem-sucesso" id="msg-sucesso">✅ Configurações salvas com sucesso!</div>
 
             <!-- NOME DO SITE -->
@@ -85,20 +85,18 @@
             <!-- LOGO -->
             <div class="config-section">
                 <h3>🖼️ Logo Principal</h3>
+                <div class="input-group"><label>URL da Logo</label><input type="url" id="logo-url" placeholder="https://i.imgur.com/TneGRwW.png"></div>
+                <div class="input-group"><label>Tamanho: <span class="range-value" id="logo-tamanho-valor">40px</span></label><input type="range" id="logo-tamanho" min="25" max="80" value="40" oninput="document.getElementById('logo-tamanho-valor').textContent=this.value+'px'"></div>
+                <div class="input-group"><label>Posição Horizontal</label><input type="range" id="logo-posicao" min="-150" max="150" value="0" oninput="document.getElementById('logo-posicao-valor').textContent=this.value+'px'"><small>Esquerda (-) | Centro (0) | Direita (+) → <span id="logo-posicao-valor">0px</span></small></div>
+            </div>
+
+            <!-- TOKEN DO BOT -->
+            <div class="config-section" style="border-color: var(--amarelo);">
+                <h3>🤖 Token do Bot Discord</h3>
                 <div class="input-group">
-                    <label>URL da Logo</label>
-                    <input type="url" id="logo-url" placeholder="https://i.imgur.com/TneGRwW.png">
-                    <small>Imagem da logo no centro do header</small>
-                </div>
-                <div class="input-group">
-                    <label>Tamanho da Logo: <span class="range-value" id="logo-tamanho-valor">40px</span></label>
-                    <input type="range" id="logo-tamanho" min="25" max="80" value="40" oninput="atualizarLogoTamanho()">
-                    <small>Aumenta/diminui a logo, carrinho, perfil e IP proporcionalmente</small>
-                </div>
-                <div class="input-group">
-                    <label>Posição Horizontal da Logo</label>
-                    <input type="range" id="logo-posicao" min="-150" max="150" value="0" oninput="document.getElementById('logo-posicao-valor').textContent = document.getElementById('logo-posicao').value + 'px'">
-                    <small>Esquerda (-) | Centro (0) | Direita (+) → <span id="logo-posicao-valor">0px</span></small>
+                    <label>Token do Bot</label>
+                    <input type="password" id="bot-token" placeholder="Cole o token do seu bot aqui">
+                    <small>⚠️ Usado para verificar clans dos usuários. Salvo apenas no seu navegador.</small>
                 </div>
             </div>
 
@@ -106,65 +104,26 @@
             <div class="config-section">
                 <h3>🎨 Cores do Tema</h3>
                 <div class="color-grid">
-                    <div class="color-item">
-                        <input type="color" id="cor-roxo" value="#8B5CF6" onchange="atualizarPreview()">
-                        <div class="color-info"><strong>Roxo Principal</strong><small>Headers, botões</small></div>
-                    </div>
-                    <div class="color-item">
-                        <input type="color" id="cor-verde" value="#10B981" onchange="atualizarPreview()">
-                        <div class="color-info"><strong>Verde Secundário</strong><small>Preços, confirmações</small></div>
-                    </div>
-                    <div class="color-item">
-                        <input type="color" id="cor-amarelo" value="#F59E0B" onchange="atualizarPreview()">
-                        <div class="color-info"><strong>Amarelo Terciário</strong><small>Títulos, destaques</small></div>
-                    </div>
+                    <div class="color-item"><input type="color" id="cor-roxo" value="#8B5CF6"><div class="color-info"><strong>Roxo</strong><small>Principal</small></div></div>
+                    <div class="color-item"><input type="color" id="cor-verde" value="#10B981"><div class="color-info"><strong>Verde</strong><small>Secundário</small></div></div>
+                    <div class="color-item"><input type="color" id="cor-amarelo" value="#F59E0B"><div class="color-info"><strong>Amarelo</strong><small>Terciário</small></div></div>
                 </div>
             </div>
 
             <!-- FAVICON -->
             <div class="config-section">
                 <h3>🖼️ Favicon</h3>
-                <div class="input-group">
-                    <label>URL do Favicon</label>
-                    <input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png" oninput="atualizarPreview()">
-                </div>
-                <div class="favicon-preview-container">
-                    <span>Preview:</span>
-                    <img id="favicon-preview-img" class="favicon-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%231A1A2E' width='48' height='48'/%3E%3Ctext fill='%238B5CF6' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='24'%3E🛒%3C/text%3E%3C/svg%3E">
-                    <span style="color: var(--texto-cinza);" id="favicon-status">Nenhuma imagem</span>
-                </div>
+                <div class="input-group"><label>URL do Favicon</label><input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png"></div>
+                <div class="favicon-preview-container"><span>Preview:</span><img id="favicon-preview-img" class="favicon-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect fill='%231A1A2E' width='48' height='48'/%3E%3Ctext fill='%238B5CF6' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='24'%3E🛒%3C/text%3E%3C/svg%3E"><span style="color:var(--texto-cinza);" id="favicon-status">Nenhuma</span></div>
             </div>
 
             <!-- IMAGEM DE FUNDO -->
             <div class="config-section">
                 <h3>🌄 Imagem de Fundo</h3>
-                <div class="input-group">
-                    <label>URL da Imagem de Fundo</label>
-                    <input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg" oninput="atualizarPreview()">
-                </div>
-                <div class="input-group">
-                    <label>Opacidade: <span class="range-value" id="opacidade-valor">50%</span></label>
-                    <input type="range" id="bg-opacidade" min="0" max="100" value="50" oninput="atualizarOpacidade()">
-                </div>
-                <div class="input-group">
-                    <label>Modo de Exibição</label>
-                    <select id="bg-modo" onchange="atualizarPreview()">
-                        <option value="cover">📐 Cobrir tela</option>
-                        <option value="contain">📏 Imagem completa</option>
-                        <option value="repeat">🔁 Repetir</option>
-                        <option value="no-repeat">📌 Não repetir</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Posição</label>
-                    <select id="bg-posicao" onchange="atualizarPreview()">
-                        <option value="center">🎯 Centro</option>
-                        <option value="top">⬆️ Topo</option>
-                        <option value="bottom">⬇️ Embaixo</option>
-                        <option value="left">⬅️ Esquerda</option>
-                        <option value="right">➡️ Direita</option>
-                    </select>
-                </div>
+                <div class="input-group"><label>URL</label><input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg"></div>
+                <div class="input-group"><label>Opacidade: <span class="range-value" id="opacidade-valor">50%</span></label><input type="range" id="bg-opacidade" min="0" max="100" value="50" oninput="document.getElementById('opacidade-valor').textContent=this.value+'%'"></div>
+                <div class="input-group"><label>Modo</label><select id="bg-modo"><option value="cover">Cobrir</option><option value="contain">Completa</option><option value="repeat">Repetir</option><option value="no-repeat">Não repetir</option></select></div>
+                <div class="input-group"><label>Posição</label><select id="bg-posicao"><option value="center">Centro</option><option value="top">Topo</option><option value="bottom">Embaixo</option><option value="left">Esquerda</option><option value="right">Direita</option></select></div>
             </div>
 
             <button class="btn-salvar-config" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
@@ -178,23 +137,18 @@
 
         var config = JSON.parse(localStorage.getItem('config_loja')) || {
             nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0,
+            botToken: '',
             corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B',
             favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center'
         };
 
-        function aplicarCores() {
-            var root = document.documentElement;
-            root.style.setProperty('--roxo', config.corRoxo);
-            root.style.setProperty('--verde', config.corVerde);
-            root.style.setProperty('--amarelo', config.corAmarelo);
-        }
-
         function carregarConfig() {
-            document.getElementById('nome-site').value = config.nomeSite || 'ReyCraft Shop';
-            document.getElementById('logo-url').value = config.logoUrl || 'https://i.imgur.com/TneGRwW.png';
+            document.getElementById('nome-site').value = config.nomeSite || '';
+            document.getElementById('logo-url').value = config.logoUrl || '';
             document.getElementById('logo-tamanho').value = config.logoTamanho || 40;
             document.getElementById('logo-posicao').value = config.logoPosicao || 0;
             document.getElementById('logo-tamanho-valor').textContent = (config.logoTamanho || 40) + 'px';
+            document.getElementById('bot-token').value = config.botToken || '';
             document.getElementById('cor-roxo').value = config.corRoxo;
             document.getElementById('cor-verde').value = config.corVerde;
             document.getElementById('cor-amarelo').value = config.corAmarelo;
@@ -204,49 +158,15 @@
             document.getElementById('bg-modo').value = config.bgModo;
             document.getElementById('bg-posicao').value = config.bgPosicao;
             document.getElementById('opacidade-valor').textContent = config.bgOpacidade + '%';
-            aplicarCores();
-            atualizarPreview();
-        }
-
-        function atualizarLogoTamanho() {
-            document.getElementById('logo-tamanho-valor').textContent = document.getElementById('logo-tamanho').value + 'px';
-        }
-        function atualizarOpacidade() {
-            document.getElementById('opacidade-valor').textContent = document.getElementById('bg-opacidade').value + '%';
-            atualizarPreview();
-        }
-
-        function atualizarPreview() {
-            var roxo = document.getElementById('cor-roxo').value;
-            var verde = document.getElementById('cor-verde').value;
-            document.getElementById('preview-header').style.background = 'linear-gradient(135deg, ' + roxo + 'cc, ' + roxo + ')';
-            document.getElementById('preview-btn-comprar').style.background = verde;
-            var previewBox = document.getElementById('preview-box');
-            var overlayAntigo = previewBox.querySelector('.bg-overlay');
-            if (overlayAntigo) overlayAntigo.remove();
-            var bgImagem = document.getElementById('bg-imagem').value;
-            if (bgImagem) {
-                previewBox.style.backgroundImage = 'url(' + bgImagem + ')';
-                previewBox.style.backgroundSize = document.getElementById('bg-modo').value;
-                previewBox.style.backgroundPosition = document.getElementById('bg-posicao').value;
-                var overlay = document.createElement('div');
-                overlay.className = 'bg-overlay';
-                overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(15,15,26,' + (1 - document.getElementById('bg-opacidade').value / 100) + ');border-radius:10px;pointer-events:none;z-index:0;';
-                previewBox.appendChild(overlay);
-            } else { previewBox.style.backgroundImage = 'none'; }
-            var faviconUrl = document.getElementById('favicon-url').value;
-            var faviconImg = document.getElementById('favicon-preview-img');
-            var faviconStatus = document.getElementById('favicon-status');
-            if (faviconUrl) { faviconImg.src = faviconUrl; faviconStatus.textContent = '✅'; faviconStatus.style.color = '#10B981'; }
-            else { faviconImg.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\'%3E%3Crect fill=\'%231A1A2E\' width=\'48\' height=\'48\'/%3E%3Ctext fill=\'%238B5CF6\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' font-size=\'24\'%3E🛒%3C/text%3E%3C/svg%3E'; faviconStatus.textContent = 'Nenhuma'; faviconStatus.style.color = '#94A3B8'; }
         }
 
         function salvarConfiguracoes() {
             config = {
-                nomeSite: document.getElementById('nome-site').value || 'ReyCraft Shop',
+                nomeSite: document.getElementById('nome-site').value,
                 logoUrl: document.getElementById('logo-url').value,
                 logoTamanho: parseInt(document.getElementById('logo-tamanho').value),
                 logoPosicao: parseInt(document.getElementById('logo-posicao').value),
+                botToken: document.getElementById('bot-token').value,
                 corRoxo: document.getElementById('cor-roxo').value,
                 corVerde: document.getElementById('cor-verde').value,
                 corAmarelo: document.getElementById('cor-amarelo').value,
@@ -257,16 +177,15 @@
                 bgPosicao: document.getElementById('bg-posicao').value
             };
             localStorage.setItem('config_loja', JSON.stringify(config));
-            aplicarCores();
             var msg = document.getElementById('msg-sucesso');
             msg.style.display = 'block';
             setTimeout(function() { msg.style.display = 'none'; }, 3000);
         }
 
         function resetarConfiguracoes() {
-            if (confirm('Restaurar configurações padrão?')) {
+            if (confirm('Restaurar padrão?')) {
                 localStorage.removeItem('config_loja');
-                config = { nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0, corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B', favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center' };
+                config = { nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0, botToken: '', corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B', favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center' };
                 carregarConfig();
                 alert('✅ Restaurado!');
             }
