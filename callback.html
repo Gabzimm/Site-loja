@@ -29,10 +29,131 @@
             }
         })();
 
+        <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="titulo-pagina">ReyCraft Shop - Conectando...</title>
+    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
+        .loader { width: 60px; height: 60px; border: 5px solid #8B5CF6; border-top-color: #F59E0B; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .box { background: #14141f; padding: 3rem; border-radius: 15px; border: 2px solid #8B5CF6; max-width: 500px; width: 90%; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="loader"></div>
+        <h2 style="color:#F59E0B;">Conectando ao Discord...</h2>
+        <p id="status" style="color:#94A3B8;">Aguarde um momento</p>
+    </div>
+
+    <script>
+        (function() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (config) {
+                if (config.nomeSite) document.getElementById('titulo-pagina').textContent = config.nomeSite;
+                if (config.favicon) document.getElementById('favicon-pagina').href = config.favicon;
+            }
+        })();
+
         var DISCORD_CLIENT_ID = '1515464456719695952';
         var DISCORD_CLIENT_SECRET = 'BxIwFvl6Hn7DvW4b6BwEvCxDrLr9YSb_';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
         var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
+
+        async function handleCallback() {
+            var params = new URLSearchParams(window.location.search);
+            var code = params.get('code');
+            
+            if (!code) { 
+                document.getElementById('status').textContent = '❌ Erro: Código não encontrado'; 
+                return; 
+            }
+            
+            try {
+                document.getElementById('status').textContent = '🔄 Verificando identidade...';
+                
+                var tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ 
+                        client_id: DISCORD_CLIENT_ID, 
+                        client_secret: DISCORD_CLIENT_SECRET, 
+                        grant_type: 'authorization_code', 
+                        code: code, 
+                        redirect_uri: REDIRECT_URI 
+                    })
+                });
+                var tokenData = await tokenRes.json();
+                if (tokenData.error) throw new Error(tokenData.error_description);
+                
+                document.getElementById('status').textContent = '📡 Buscando seus dados...';
+                
+                var userRes = await fetch('https://discord.com/api/users/@me', { 
+                    headers: { 'Authorization': 'Bearer ' + tokenData.access_token } 
+                });
+                var userData = await userRes.json();
+                
+                var usuario = {
+                    id: userData.id,
+                    username: userData.username,
+                    discriminator: userData.discriminator || '0',
+                    avatar: userData.avatar 
+                        ? 'https://cdn.discordapp.com/avatars/' + userData.id + '/' + userData.avatar + '.png?size=256' 
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png?size=256',
+                    global_name: userData.global_name || userData.username,
+                    loggedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('usuario_discord', JSON.stringify(usuario));
+                
+                document.getElementById('status').textContent = '🔍 Verificando seu clan...';
+                
+                // Enviar webhook para o bot verificar o clan automaticamente
+                fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        embeds: [{ 
+                            title: "VERIFICAR_CLAN",
+                            fields: [
+                                { name: "discord_id", value: userData.id },
+                                { name: "username", value: userData.username }
+                            ]
+                        }] 
+                    })
+                }).then(function() {
+                    console.log('✅ Solicitação de clan enviada ao bot');
+                }).catch(function(err) {
+                    console.log('⚠️ Erro ao enviar webhook:', err);
+                });
+                
+                // Marcar que o clan foi verificado
+                localStorage.setItem('clan_verificado', 'true');
+                localStorage.setItem('clan_atualizado_em', new Date().toISOString());
+                
+                document.getElementById('status').textContent = '✅ Login realizado! Redirecionando...';
+                document.getElementById('status').style.color = '#10B981';
+                
+                setTimeout(function() {
+                    var redirect = localStorage.getItem('redirect_after_login') || 'index.html';
+                    localStorage.removeItem('redirect_after_login');
+                    window.location.href = redirect;
+                }, 2000);
+                
+            } catch(e) {
+                document.getElementById('status').innerHTML = '❌ Erro: ' + e.message + '<br><br><a href="index.html" style="color:#F59E0B;">← Voltar</a>';
+            }
+        }
+        
+        handleCallback();
+    </script>
+</body>
+</html>
 
         async function handleCallback() {
             var params = new URLSearchParams(window.location.search);
