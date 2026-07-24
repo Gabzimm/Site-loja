@@ -11,139 +11,135 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background: #0a0a0f;
         }
-
-        .login-container {
-            background: var(--card);
+        .login-box {
+            background: #14141f;
             padding: 2.5rem;
             border-radius: 15px;
-            border: 2px solid var(--roxo);
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-container h2 {
+            border: 2px solid #8B5CF6;
             text-align: center;
-            margin-bottom: 0.5rem;
-            color: var(--roxo);
-            font-size: 2rem;
+            max-width: 450px;
+            width: 90%;
         }
-
-        .login-container .subtitulo {
-            text-align: center;
-            color: var(--texto-cinza);
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: var(--texto);
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--fundo);
-            border: 2px solid var(--roxo);
-            border-radius: 8px;
-            color: var(--texto);
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--amarelo);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 1rem;
-            background: var(--roxo);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
+        .login-box h2 { color: #F59E0B; margin-bottom: 0.5rem; font-size: 1.8rem; }
+        .login-box .subtitulo { color: #94A3B8; margin-bottom: 2rem; }
+        .login-box .erro { color: #ef4444; margin-top: 1rem; display: none; }
+        .btn-discord {
+            background: #5865F2; color: white; border: none;
+            padding: 1rem 2rem; border-radius: 8px; font-size: 1.1rem;
+            cursor: pointer; font-weight: bold; width: 100%;
             transition: all 0.3s;
         }
-
-        .btn-login:hover {
-            background: var(--roxo-escuro);
+        .btn-discord:hover { background: #4752C4; }
+        .btn-voltar {
+            display: block; margin-top: 1rem; color: #F59E0B; text-decoration: none;
         }
-
-        .erro-msg {
-            color: #ef4444;
-            text-align: center;
-            margin-top: 1rem;
-            display: none;
-            font-weight: bold;
+        .loader {
+            width: 40px; height: 40px; border: 4px solid #8B5CF6;
+            border-top-color: #F59E0B; border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 1rem auto;
         }
-
-        .voltar {
-            display: block;
-            text-align: center;
-            margin-top: 1.5rem;
-            color: var(--amarelo);
-            text-decoration: none;
-        }
-
-        .voltar:hover {
-            text-decoration: underline;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="login-box">
         <h2>🔐 Painel Admin</h2>
-        <p class="subtitulo">Acesso restrito à administração</p>
-        
-        <form id="login-form">
-            <div class="input-group">
-                <label>👤 Usuário</label>
-                <input type="text" id="usuario" placeholder="Digite o usuário" required autocomplete="off">
-            </div>
-            
-            <div class="input-group">
-                <label>🔒 Senha</label>
-                <input type="password" id="senha" placeholder="Digite a senha" required>
-            </div>
-            
-            <button type="submit" class="btn-login">🚀 Entrar</button>
-        </form>
-        
-        <div class="erro-msg" id="erro-msg">❌ Usuário ou senha incorretos!</div>
-        <a href="../index.html" class="voltar">← Voltar para loja</a>
+        <p class="subtitulo" id="subtitulo">Faça login com Discord para acessar</p>
+        <div id="login-content">
+            <button class="btn-discord" onclick="loginDiscord()">🔑 Login com Discord</button>
+        </div>
+        <p class="erro" id="erro-msg">❌ Você não tem permissão de administrador!</p>
+        <a href="../index.html" class="btn-voltar">← Voltar para Loja</a>
     </div>
 
     <script>
-        // ⚙️ CONFIGURE AQUI SUAS CREDENCIAIS
-        const ADMIN_USER = 'admin';
-        const ADMIN_PASS = 'reycraft2024';
+        var DISCORD_CLIENT_ID = '1515464456719695952';
+        var REDIRECT_URI = 'https://reycraft-hc.shop/admin/login.html';
         
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Admin Master e lista de staffs
+        var ADMINS = JSON.parse(localStorage.getItem('admins')) || ['1213819385576300595'];
+        
+        function loginDiscord() {
+            var authUrl = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + 
+                '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + 
+                '&response_type=code&scope=identify';
+            window.location.href = authUrl;
+        }
+
+        function verificarAdmin() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var code = urlParams.get('code');
             
-            const usuario = document.getElementById('usuario').value;
-            const senha = document.getElementById('senha').value;
-            const erroMsg = document.getElementById('erro-msg');
-            
-            if (usuario === ADMIN_USER && senha === ADMIN_PASS) {
-                localStorage.setItem('admin_logado', 'true');
-                window.location.href = 'dashboard.html';
-            } else {
-                erroMsg.style.display = 'block';
-                setTimeout(() => erroMsg.style.display = 'none', 3000);
+            if (!code) {
+                // Sem código, verificar se já está logado
+                var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+                if (usuario && ADMINS.indexOf(usuario.id) !== -1) {
+                    localStorage.setItem('admin_logado', 'true');
+                    window.location.href = 'dashboard.html';
+                }
+                return;
             }
-        });
+            
+            // Mostrar loader
+            document.getElementById('login-content').innerHTML = '<div class="loader"></div><p style="color:#94A3B8;">Verificando...</p>';
+            document.getElementById('subtitulo').textContent = 'Aguarde...';
+            
+            // Trocar código por token
+            fetch('https://discord.com/api/oauth2/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    client_id: DISCORD_CLIENT_ID,
+                    client_secret: 'SEU_CLIENT_SECRET_AQUI',
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: REDIRECT_URI
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(tokenData) {
+                if (tokenData.error) throw new Error(tokenData.error_description);
+                
+                return fetch('https://discord.com/api/users/@me', {
+                    headers: { 'Authorization': 'Bearer ' + tokenData.access_token }
+                });
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(userData) {
+                // Salvar dados do usuário
+                var usuario = {
+                    id: userData.id,
+                    username: userData.username,
+                    discriminator: userData.discriminator || '0',
+                    avatar: userData.avatar 
+                        ? 'https://cdn.discordapp.com/avatars/' + userData.id + '/' + userData.avatar + '.png?size=256'
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png?size=256',
+                    global_name: userData.global_name || userData.username,
+                    loggedAt: new Date().toISOString()
+                };
+                localStorage.setItem('usuario_discord', JSON.stringify(usuario));
+                
+                // Verificar se é admin
+                if (ADMINS.indexOf(userData.id) !== -1) {
+                    localStorage.setItem('admin_logado', 'true');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    document.getElementById('login-content').innerHTML = '<button class="btn-discord" onclick="loginDiscord()">🔑 Login com Discord</button>';
+                    document.getElementById('erro-msg').style.display = 'block';
+                    document.getElementById('subtitulo').textContent = 'Faça login com Discord para acessar';
+                }
+            })
+            .catch(function(err) {
+                document.getElementById('login-content').innerHTML = '<button class="btn-discord" onclick="loginDiscord()">🔑 Login com Discord</button>';
+                document.getElementById('erro-msg').textContent = '❌ Erro: ' + err.message;
+                document.getElementById('erro-msg').style.display = 'block';
+                document.getElementById('subtitulo').textContent = 'Faça login com Discord para acessar';
+            });
+        }
+
+        verificarAdmin();
     </script>
 </body>
 </html>
