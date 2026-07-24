@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="titulo-pagina">ReyCraft Shop - Rankings</title>
+    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
+        
+        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e1e2e; }
+        .header-logo img { height: 40px; }
+        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; }
+        .header-link { color: var(--texto); text-decoration: none; font-size: 0.85rem; transition: all 0.3s; }
+        .header-link:hover { color: var(--amarelo); }
+        
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+        .tab-btn { padding: 0.8rem 1.5rem; background: var(--card); border: none; color: var(--texto-cinza); border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .tab-btn:hover { background: var(--roxo); color: white; }
+        .tab-btn.ativo { background: var(--roxo); color: white; }
+        
+        .ranking-card { background: var(--card); padding: 1.2rem 1.5rem; border-radius: 10px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1rem; border: 1px solid #1e1e2e; }
+        .ranking-pos { font-size: 1.5rem; font-weight: bold; width: 50px; text-align: center; }
+        .ranking-info { flex: 1; }
+        .ranking-nome { font-weight: bold; font-size: 1.1rem; }
+        .ranking-sub { color: var(--texto-cinza); font-size: 0.85rem; }
+        .ranking-valor { font-weight: bold; color: var(--verde); font-size: 1.2rem; }
+        
+        .medalha-1 { color: #FFD700; } .medalha-2 { color: #C0C0C0; } .medalha-3 { color: #CD7F32; }
+        
+        .info-box { background: rgba(245,158,11,0.1); border: 1px solid var(--amarelo); border-radius: 10px; padding: 2rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="header-voltar">← Voltar</a>
+        <div style="display:flex;gap:2rem;">
+            <a href="index.html" class="header-link">🏠 Loja</a>
+            <a href="rankings.html" class="header-link" style="color:var(--amarelo);">🏆 Rankings</a>
+        </div>
+        <a href="index.html" class="header-logo"><img src="https://i.imgur.com/TneGRwW.png" alt="ReyCraft" id="logo-img"></a>
+    </header>
+
+    <div class="container">
+        <h1 style="color:var(--amarelo);margin-bottom:1.5rem;">🏆 Rankings</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn ativo" onclick="mostrarRanking('clans')">🏰 Clãs</button>
+            <button class="tab-btn" onclick="mostrarRanking('jogadores')">👤 Jogadores</button>
+            <button class="tab-btn" onclick="mostrarRanking('donaters')">💎 Donaters</button>
+        </div>
+        
+        <div id="ranking-content">
+            <div class="info-box">
+                <p style="font-size:1.2rem;">📡 Clique em um ranking acima para solicitar ao bot!</p>
+                <p style="color:var(--texto-cinza);margin-top:0.5rem;">Os resultados aparecerão no canal do Discord.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        (function() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (config) {
+                if (config.nomeSite) document.getElementById('titulo-pagina').textContent = config.nomeSite + ' - Rankings';
+                if (config.favicon) document.getElementById('favicon-pagina').href = config.favicon;
+                if (config.logoUrl) { var logo = document.getElementById('logo-img'); if (logo) logo.src = config.logoUrl; }
+                if (config.logoTamanho) { var logo = document.getElementById('logo-img'); if (logo) logo.style.height = config.logoTamanho + 'px'; }
+            }
+        })();
+
+        var rankingAtual = '';
+
+        function mostrarRanking(tipo) {
+            rankingAtual = tipo;
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('ativo'); });
+            event.target.classList.add('ativo');
+            carregarRanking();
+        }
+
+        function carregarRanking() {
+            var container = document.getElementById('ranking-content');
+            container.innerHTML = '<div class="info-box"><p style="font-size:1.2rem;">📡 Solicitando ranking ao bot...</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Os resultados aparecerão no canal #📡・webhook-loja do Discord</p></div>';
+            
+            solicitarRanking(rankingAtual).then(function() {
+                container.innerHTML = '<div class="info-box" style="border-color:var(--verde);background:rgba(16,185,129,0.1);"><p style="font-size:1.2rem;color:var(--verde);">✅ Ranking de <strong>' + rankingAtual + '</strong> solicitado!</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Verifique o canal do Discord para ver o resultado.</p></div>';
+            }).catch(function() {
+                container.innerHTML = '<div class="info-box" style="border-color:#ef4444;background:rgba(239,68,68,0.1);"><p style="font-size:1.2rem;color:#ef4444;">❌ Erro ao solicitar</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Verifique se o webhook está configurado.</p></div>';
+            });
+        }
+    </script>
+</body>
+</html>
