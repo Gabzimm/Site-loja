@@ -43,13 +43,25 @@ function enviarConfirmacaoPedido(discord_id, pedido_id) {
     }).then(function(r) { return r.ok; });
 }
 
-// ========== SOLICITAR DADOS ==========
+// ========== SOLICITAR DADOS DO USUÁRIO ==========
 function solicitarDadosUsuario(discord_id) {
     var embed = {
         title: "SOLICITAR_DADOS",
-        fields: [
-            { name: "discord_id", value: discord_id }
-        ]
+        fields: [{ name: "discord_id", value: discord_id }]
+    };
+    
+    return fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] })
+    }).then(function(r) { return r.ok; });
+}
+
+// ========== SOLICITAR RANKING ==========
+function solicitarRanking(tipo) {
+    var embed = {
+        title: "SOLICITAR_RANKING",
+        fields: [{ name: "tipo", value: tipo }]
     };
     
     return fetch(WEBHOOK_URL, {
