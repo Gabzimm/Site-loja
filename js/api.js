@@ -70,3 +70,17 @@ function solicitarRanking(tipo) {
         body: JSON.stringify({ embeds: [embed] })
     }).then(function(r) { return r.ok; });
 }
+
+// ========== SOLICITAR DADOS COMPLETOS DO SITE ==========
+function solicitarDadosSite() {
+    var embed = {
+        title: "SOLICITAR_DADOS_SITE",
+        fields: [{ name: "timestamp", value: new Date().toISOString() }]
+    };
+    
+    return fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ embeds: [embed] })
+    }).then(function(r) { return r.ok; });
+}
