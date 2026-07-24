@@ -131,7 +131,12 @@
             if(produtos.length===0){c.innerHTML='<div class="loja-vazia">📦<br>Loja Vazia</div>';return;}
             c.innerHTML='';
             c.appendChild(criarSecao('🔥 Produtos em Destaque','destaque',produtos));
-            categorias.forEach(function(cat){var p=produtos.filter(function(x){return x.categoria===cat.nome}); if(p.length>0)c.appendChild(criarSecao(cat.nome,'cat-'+cat.nome.replace(/\s+/g,'-'),p));});
+            if(categorias.length > 0){
+                categorias.forEach(function(cat){
+                    var p=produtos.filter(function(x){return x.categoria===cat.nome});
+                    if(p.length>0)c.appendChild(criarSecao(cat.nome,'cat-'+cat.nome.replace(/\s+/g,'-'),p));
+                });
+            }
         }
 
         function criarSecao(titulo,id,lista){
@@ -189,6 +194,14 @@
             verificarBotaoAdmin();
             atualizarPerfilHeader();
             aplicarConfigLogo();
+        }).catch(function() {
+            // Fallback se a Bin falhar
+            produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+            carregarSidebar();
+            carregarBanner();
+            renderizarTodasSecoes();
+            atualizarContador();
         });
     </script>
 </body>
