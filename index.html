@@ -549,19 +549,38 @@
         }
 
         function carregarBanner() {
-            var bannerData = JSON.parse(localStorage.getItem('banner_ranks')) || [];
-            var grid = document.getElementById('ranks-grid');
-            if (!grid) return;
-            if (bannerData.length === 0) {
-                grid.innerHTML = '';
-                for (var i = 0; i < 4; i++) { grid.innerHTML += '<div class="rank-item breve">EM BREVE</div>'; }
-                return;
-            }
-            grid.innerHTML = bannerData.map(function(rank) {
-                if (rank.ativo && rank.imagem) return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + rank.nome + '" style="object-fit:cover;"></div>';
-                return '<div class="rank-item breve">' + (rank.nome || 'EM BREVE') + '</div>';
-            }).join('');
+    var bannerData = localStorage.getItem('banner_ranks');
+    
+    // Corrigir null/undefined
+    if (!bannerData || bannerData === 'null') {
+        bannerData = [];
+    } else {
+        try {
+            bannerData = JSON.parse(bannerData);
+        } catch(e) {
+            bannerData = [];
         }
+    }
+    
+    var grid = document.getElementById('ranks-grid');
+    if (!grid) return;
+    
+    if (!bannerData || bannerData.length === 0) {
+        grid.innerHTML = '';
+        for (var i = 0; i < 4; i++) { 
+            grid.innerHTML += '<div class="rank-item breve">EM BREVE</div>'; 
+        }
+        return;
+    }
+    
+    grid.innerHTML = bannerData.map(function(rank) {
+        if (rank.ativo && rank.imagem) {
+            return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + (rank.nome || '') + '" style="object-fit:cover;"></div>';
+        } else {
+            return '<div class="rank-item breve">' + (rank.nome || 'EM BREVE') + '</div>';
+        }
+    }).join('');
+}
 
         // ========== INICIAR ==========
         carregarSidebar();
