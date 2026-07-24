@@ -52,11 +52,9 @@ function salvarProdutos() {
     renderizarTabela();
 }
 
-// Carregar categorias no select
 function carregarCategoriasNoSelect() {
     var select = document.getElementById('categoria-produto');
     if (!select) return;
-    
     var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
     select.innerHTML = '<option value="">Nenhuma</option>';
     categorias.forEach(function(cat) {
@@ -78,6 +76,7 @@ function mostrarForm(id) {
         document.getElementById('descricao-produto').value = produto.descricao || '';
         document.getElementById('url-imagem').value = produto.imagem || '';
         document.getElementById('categoria-produto').value = produto.categoria || '';
+        document.getElementById('destaque-produto').value = produto.destaque === false ? 'nao' : 'sim';
         document.getElementById('form-produto').dataset.editId = id;
         document.getElementById('form-titulo').textContent = '✏️ Editar Produto';
         
@@ -87,6 +86,7 @@ function mostrarForm(id) {
             document.getElementById('btn-remover-imagem').classList.add('ativo');
         }
     } else {
+        document.getElementById('destaque-produto').value = 'sim';
         document.getElementById('form-titulo').textContent = '➕ Novo Produto';
     }
     
@@ -106,6 +106,7 @@ function limparForm() {
     document.getElementById('descricao-produto').value = '';
     document.getElementById('url-imagem').value = '';
     document.getElementById('categoria-produto').value = '';
+    document.getElementById('destaque-produto').value = 'sim';
     document.getElementById('preview-imagem').classList.remove('ativo');
     document.getElementById('btn-remover-imagem').classList.remove('ativo');
     document.getElementById('input-imagem').value = '';
@@ -121,7 +122,6 @@ function previewImagem(input) {
             input.value = '';
             return;
         }
-        
         var reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('preview-imagem').src = e.target.result;
@@ -164,6 +164,7 @@ function salvarProduto() {
     var descricao = document.getElementById('descricao-produto').value.trim();
     var urlImagem = document.getElementById('url-imagem').value.trim();
     var categoria = document.getElementById('categoria-produto').value;
+    var destaque = document.getElementById('destaque-produto').value === 'sim';
     var imagem = imagemTemporaria || urlImagem || '';
     
     if (!nome || !preco) {
@@ -187,7 +188,8 @@ function salvarProduto() {
                     emoji: emoji, 
                     descricao: descricao,
                     imagem: imagem,
-                    categoria: categoria
+                    categoria: categoria,
+                    destaque: destaque
                 };
             } else {
                 var novoId = produtos.length > 0 ? Math.max.apply(null, produtos.map(function(p) { return p.id; })) + 1 : 1;
@@ -199,7 +201,8 @@ function salvarProduto() {
                     emoji: emoji, 
                     descricao: descricao,
                     imagem: imagem,
-                    categoria: categoria
+                    categoria: categoria,
+                    destaque: destaque
                 });
             }
             salvarProdutos();
@@ -234,7 +237,6 @@ function mudarCategoria(produtoId) {
     if (!produto) return;
     
     var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
-    
     if (categorias.length === 0) {
         alert('⚠️ Nenhuma categoria cadastrada!\nVá em 📂 Categorias primeiro.');
         return;
@@ -271,10 +273,8 @@ function selecionarCategoria(produtoId, categoriaNome) {
         produto.categoria = categoriaNome || '';
         localStorage.setItem('produtos', JSON.stringify(produtos));
         enviarParaBin();
-        
         var txt = document.getElementById('cat-txt-' + produtoId);
         if (txt) txt.textContent = categoriaNome || '—';
-        
         fecharModalCat();
     }
 }
@@ -290,7 +290,7 @@ function renderizarTabela() {
     if (!tbody) return;
     
     if (produtos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 3rem; color: var(--texto-cinza);">📦 Nenhum produto cadastrado</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 3rem; color: var(--texto-cinza);">📦 Nenhum produto cadastrado</td></tr>';
         return;
     }
     
@@ -305,15 +305,14 @@ function renderizarTabela() {
         }
         
         var catAtual = produto.categoria || '—';
+        var destaqueBadge = produto.destaque !== false ? ' <span class="badge-destaque">⭐</span>' : '—';
         
         return '<tr>' +
             '<td>' + imgCell + '</td>' +
             '<td>' + produto.nome + '</td>' +
             '<td>' + precoCell + '</td>' +
-            '<td>' +
-                '<span id="cat-txt-' + produto.id + '">' + catAtual + '</span>' +
-                ' <button onclick="mudarCategoria(' + produto.id + ')" style="background:var(--roxo);color:white;border:none;padding:0.2rem 0.5rem;border-radius:5px;cursor:pointer;font-size:0.8rem;" title="Alterar categoria">📂</button>' +
-            '</td>' +
+            '<td><span id="cat-txt-' + produto.id + '">' + catAtual + '</span> <button onclick="mudarCategoria(' + produto.id + ')" style="background:var(--roxo);color:white;border:none;padding:0.2rem 0.5rem;border-radius:5px;cursor:pointer;font-size:0.8rem;">📂</button></td>' +
+            '<td>' + destaqueBadge + '</td>' +
             '<td>' +
                 '<button class="btn-editar" onclick="editarProduto(' + produto.id + ')">✏️ Editar</button>' +
                 '<button class="btn-remover" onclick="removerProduto(' + produto.id + ')">🗑️ Remover</button>' +
