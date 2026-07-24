@@ -55,12 +55,10 @@
             font-size: 0.75rem; display: none; white-space: nowrap;
         }
         .copiado-msg.mostrar { display: block; animation: fadeOut 2s forwards; }
-        @keyframes fadeOut {
-            0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
-        }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
         
-        .header-logo { text-align: center; cursor: pointer; }
-        .header-logo img { height: 40px; transition: opacity 0.3s; }
+        .header-logo { position: relative; }
+        .header-logo img { height: 40px; transition: all 0.3s; }
         .header-logo img:hover { opacity: 0.8; }
         
         .header-icones { display: flex; gap: 0.8rem; align-items: center; }
@@ -240,19 +238,14 @@
             from { transform: translateX(-50%) translateY(100px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
-        @keyframes fadeOutToast {
-            0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
-        }
+        @keyframes fadeOutToast { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
         
         @media (max-width: 768px) {
             .header { padding: 0.8rem 1rem; }
             .header-ip { font-size: 0.7rem; }
             .header-logo img { height: 30px; }
             .main-container { flex-direction: column; padding: 1rem; }
-            .sidebar {
-                position: static; width: 100%; display: flex;
-                gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;
-            }
+            .sidebar { position: static; width: 100%; display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
             .sidebar-titulo { display: none; }
             .categoria-btn { white-space: nowrap; width: auto; }
             .modal-detalhes-conteudo { flex-direction: column; }
@@ -268,8 +261,8 @@
             <span class="copiado-msg" id="copiado-msg">✅ IP Copiado!</span>
         </div>
         
-        <a href="index.html" class="header-logo">
-            <img src="https://i.imgur.com/TneGRwW.png" alt="ReyCraft">
+        <a href="index.html" class="header-logo" id="header-logo-link" style="position:relative;">
+            <img src="https://i.imgur.com/TneGRwW.png" alt="ReyCraft" id="logo-img">
         </a>
         
         <div class="header-icones">
@@ -307,18 +300,49 @@
         var DISCORD_CLIENT_ID = '1515464456719695952';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
 
-        // ========== APLICAR CONFIGURAÇÕES (NOME E FAVICON) ==========
+        // ========== APLICAR CONFIGURAÇÕES (NOME, FAVICON, LOGO) ==========
         (function() {
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (config) {
-                if (config.nomeSite) {
-                    document.getElementById('titulo-pagina').textContent = config.nomeSite;
-                }
-                if (config.favicon) {
-                    document.getElementById('favicon-pagina').href = config.favicon;
-                }
+                if (config.nomeSite) document.getElementById('titulo-pagina').textContent = config.nomeSite;
+                if (config.favicon) document.getElementById('favicon-pagina').href = config.favicon;
             }
+            aplicarConfigLogo();
         })();
+
+        function aplicarConfigLogo() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (!config) return;
+            
+            var logoImg = document.getElementById('logo-img');
+            var iconBtns = document.querySelectorAll('.icon-btn');
+            var iconAvatar = document.querySelector('.icon-avatar');
+            var headerIp = document.querySelector('.header-ip');
+            var headerLogoLink = document.getElementById('header-logo-link');
+            
+            if (config.logoUrl && logoImg) logoImg.src = config.logoUrl;
+            
+            var tamanho = config.logoTamanho || 40;
+            var posicao = config.logoPosicao || 0;
+            
+            if (logoImg) logoImg.style.height = tamanho + 'px';
+            
+            var iconSize = Math.round(tamanho * 1.0);
+            if (iconBtns) {
+                iconBtns.forEach(function(btn) {
+                    btn.style.width = iconSize + 'px';
+                    btn.style.height = iconSize + 'px';
+                });
+            }
+            if (iconAvatar) {
+                iconAvatar.style.width = iconSize + 'px';
+                iconAvatar.style.height = iconSize + 'px';
+            }
+            
+            var fontSize = Math.round(tamanho * 0.55);
+            if (headerIp) headerIp.style.fontSize = fontSize + 'px';
+            if (headerLogoLink) headerLogoLink.style.left = posicao + 'px';
+        }
 
         // ========== COPIAR IP ==========
         function copiarIP() {
@@ -372,7 +396,7 @@
             if (usuario && usuario.avatar) {
                 btnPerfil.style.background = 'transparent';
                 perfilImg.src = usuario.avatar;
-                perfilImg.style.width = '40px'; perfilImg.style.height = '40px';
+                perfilImg.style.width = '100%'; perfilImg.style.height = '100%';
                 perfilImg.style.borderRadius = '8px'; perfilImg.style.filter = 'none';
                 perfilImg.style.border = '2px solid var(--amarelo)'; perfilImg.style.objectFit = 'cover';
                 btnPerfil.href = 'perfil.html'; btnPerfil.onclick = null;
@@ -380,7 +404,7 @@
             } else {
                 btnPerfil.style.background = 'var(--amarelo)';
                 perfilImg.src = 'https://cdn-icons-png.flaticon.com/512/3106/3106921.png';
-                perfilImg.style.width = '20px'; perfilImg.style.height = '20px';
+                perfilImg.style.width = '50%'; perfilImg.style.height = '50%';
                 perfilImg.style.borderRadius = '0'; perfilImg.style.filter = 'brightness(0)';
                 perfilImg.style.border = 'none'; perfilImg.style.objectFit = 'contain';
                 btnPerfil.href = '#'; btnPerfil.onclick = function(e) { e.preventDefault(); loginDiscord(); };
@@ -443,7 +467,7 @@
             var antigo = document.querySelector('.modal-detalhes-fundo');
             if (antigo) antigo.remove();
             var modal = document.createElement('div'); modal.className = 'modal-detalhes-fundo';
-            var imgHtml = produto.imagem ? '<img src="' + produto.imagem + '" class="modal-detalhes-img" alt="' + produto.nome + '">' : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
+            var imgHtml = produto.imagem ? '<img src="' + produto.imagem + '" class="modal-detalhes-img" alt="' + produto.nome + '" style="object-fit:cover;">' : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
             var precoHtml = '';
             if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
                 precoHtml = '<span style="text-decoration:line-through;color:#666;font-size:1rem;">R$ ' + Number(produto.preco).toFixed(2) + '</span> <span style="color:#ef4444;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
@@ -495,7 +519,9 @@
                     card.appendChild(badge);
                 }
                 if (produto.imagem) {
-                    var img = document.createElement('img'); img.src = produto.imagem; img.alt = produto.nome; card.appendChild(img);
+                    var img = document.createElement('img'); img.src = produto.imagem; img.alt = produto.nome;
+                    img.style.objectFit = 'cover';
+                    card.appendChild(img);
                 } else {
                     var ph = document.createElement('div'); ph.className = 'produto-imagem'; ph.textContent = produto.emoji || '📦'; card.appendChild(ph);
                 }
@@ -532,7 +558,7 @@
                 return;
             }
             grid.innerHTML = bannerData.map(function(rank) {
-                if (rank.ativo && rank.imagem) return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + rank.nome + '"></div>';
+                if (rank.ativo && rank.imagem) return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + rank.nome + '" style="object-fit:cover;"></div>';
                 return '<div class="rank-item breve">' + (rank.nome || 'EM BREVE') + '</div>';
             }).join('');
         }
