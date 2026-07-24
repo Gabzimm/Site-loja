@@ -119,11 +119,14 @@
         
         /* ========== CONTEÚDO PRINCIPAL ========== */
         .main-container {
-            display: flex; max-width: 1300px; margin: 0 auto;
-            padding: 1.5rem 2rem; gap: 2rem;
+            display: flex;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem 2rem 1.5rem 1rem;
+            gap: 2rem;
         }
         
-        /* ========== SIDEBAR FIXA ========== */
+        /* ========== SIDEBAR COM FUNDO AMARELO ========== */
         .sidebar {
             width: 200px;
             flex-shrink: 0;
@@ -132,25 +135,43 @@
             height: fit-content;
             max-height: calc(100vh - 150px);
             overflow-y: auto;
-            padding-left: 0;
-            margin-left: -10px;
+            background: var(--amarelo);
+            border-radius: 12px;
+            padding: 1.2rem;
         }
+        
         .sidebar-titulo {
-            color: var(--texto-cinza); font-size: 0.75rem;
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 0.8rem; padding-bottom: 0.5rem;
-            border-bottom: 1px solid #1e1e2e;
+            color: #000;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0,0,0,0.2);
+            font-weight: bold;
         }
+        
         .categoria-btn {
-            display: block; width: 100%; padding: 0.7rem 1rem;
-            background: transparent; border: none;
-            color: var(--texto-cinza); text-align: left;
-            cursor: pointer; border-radius: 8px;
-            transition: all 0.3s; font-size: 0.9rem; margin-bottom: 0.2rem;
+            display: block;
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: transparent;
+            border: none;
+            color: #000;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+            font-weight: 500;
         }
-        .categoria-btn:hover { background: var(--card); color: var(--texto); }
+        .categoria-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
         .categoria-btn.ativo {
-            background: rgba(139, 92, 246, 0.15); color: var(--roxo); font-weight: bold;
+            background: rgba(0,0,0,0.2);
+            font-weight: bold;
         }
         
         /* ========== ÁREA DE PRODUTOS ========== */
@@ -333,7 +354,7 @@
 
     <script>
         // ========== CONFIGURAÇÃO ==========
-        var DISCORD_CLIENT_ID = '1515464456719695952';
+        var DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
 
         // ========== COPIAR IP ==========
@@ -385,16 +406,20 @@
         })();
 
         // ========== PERFIL / LOGIN ==========
-        (function() {
+        function atualizarPerfilHeader() {
             var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
             var btnPerfil = document.getElementById('btn-perfil');
+            if (!btnPerfil) return;
             
             if (usuario) {
                 btnPerfil.style.background = 'transparent';
-                btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil">';
+                btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/3106/3106921.png\';this.style.border=\'none\';">';
                 btnPerfil.href = 'perfil.html';
+                btnPerfil.onclick = null;
                 btnPerfil.title = (usuario.global_name || usuario.username);
             } else {
+                btnPerfil.style.background = 'var(--amarelo)';
+                btnPerfil.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil" id="perfil-icon">';
                 btnPerfil.href = '#';
                 btnPerfil.onclick = function(e) {
                     e.preventDefault();
@@ -402,7 +427,8 @@
                 };
                 btnPerfil.title = 'Login com Discord';
             }
-        })();
+        }
+        atualizarPerfilHeader();
 
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
@@ -505,11 +531,9 @@
             
             container.innerHTML = '';
             
-            // Seção "Todos" primeiro (Produtos em Destaque)
             var secaoDestaque = criarSecao('🔥 Produtos em Destaque', 'destaque', produtos);
             container.appendChild(secaoDestaque);
             
-            // Depois cada categoria
             categorias.forEach(function(cat) {
                 var produtosDaCat = produtos.filter(function(p) { return p.categoria === cat.nome; });
                 if (produtosDaCat.length > 0) {
