@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReyCraft Shop</title>
     <style>
@@ -166,13 +167,8 @@
             margin-bottom: 0.2rem;
             font-weight: 500;
         }
-        .categoria-btn:hover {
-            background: rgba(0,0,0,0.1);
-        }
-        .categoria-btn.ativo {
-            background: rgba(0,0,0,0.2);
-            font-weight: bold;
-        }
+        .categoria-btn:hover { background: rgba(0,0,0,0.1); }
+        .categoria-btn.ativo { background: rgba(0,0,0,0.2); font-weight: bold; }
         
         /* ========== ÁREA DE PRODUTOS ========== */
         .produtos-area { flex: 1; min-width: 0; }
@@ -324,8 +320,8 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/4/4295.png" alt="Carrinho">
                 <span class="icon-contador" id="contador-carrinho" style="display:none;">0</span>
             </a>
-            <a href="perfil.html" id="btn-perfil" class="icon-btn" title="Perfil">
-                <img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil" id="perfil-icon">
+            <a href="#" id="btn-perfil" class="icon-btn" title="Perfil">
+                <img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);">
             </a>
         </div>
     </header>
@@ -354,7 +350,7 @@
 
     <script>
         // ========== CONFIGURAÇÃO ==========
-        var DISCORD_CLIENT_ID = '1515464456719695952';
+        var DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
 
         // ========== COPIAR IP ==========
@@ -407,27 +403,42 @@
 
         // ========== PERFIL / LOGIN ==========
         function atualizarPerfilHeader() {
-    var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
-    var btnPerfil = document.getElementById('btn-perfil');
-    if (!btnPerfil) return;
-    
-    if (usuario && usuario.avatar) {
-        btnPerfil.style.background = 'transparent';
-        btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil" crossorigin="anonymous">';
-        btnPerfil.href = 'perfil.html';
-        btnPerfil.onclick = null;
-        btnPerfil.title = (usuario.global_name || usuario.username);
-    } else {
-        btnPerfil.style.background = 'var(--amarelo)';
-        btnPerfil.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil">';
-        btnPerfil.href = '#';
-        btnPerfil.onclick = function(e) {
-            e.preventDefault();
-            loginDiscord();
-        };
-        btnPerfil.title = 'Login com Discord';
-    }
-}
+            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var btnPerfil = document.getElementById('btn-perfil');
+            var perfilImg = document.getElementById('perfil-img');
+            
+            if (!btnPerfil || !perfilImg) return;
+            
+            if (usuario && usuario.avatar) {
+                btnPerfil.style.background = 'transparent';
+                perfilImg.src = usuario.avatar;
+                perfilImg.style.width = '40px';
+                perfilImg.style.height = '40px';
+                perfilImg.style.borderRadius = '8px';
+                perfilImg.style.filter = 'none';
+                perfilImg.style.border = '2px solid var(--amarelo)';
+                perfilImg.style.objectFit = 'cover';
+                btnPerfil.href = 'perfil.html';
+                btnPerfil.onclick = null;
+                btnPerfil.title = (usuario.global_name || usuario.username);
+            } else {
+                btnPerfil.style.background = 'var(--amarelo)';
+                perfilImg.src = 'https://cdn-icons-png.flaticon.com/512/3106/3106921.png';
+                perfilImg.style.width = '20px';
+                perfilImg.style.height = '20px';
+                perfilImg.style.borderRadius = '0';
+                perfilImg.style.filter = 'brightness(0)';
+                perfilImg.style.border = 'none';
+                perfilImg.style.objectFit = 'contain';
+                btnPerfil.href = '#';
+                btnPerfil.onclick = function(e) {
+                    e.preventDefault();
+                    loginDiscord();
+                };
+                btnPerfil.title = 'Login com Discord';
+            }
+        }
+        atualizarPerfilHeader();
 
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
