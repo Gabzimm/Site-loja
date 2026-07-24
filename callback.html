@@ -32,40 +32,89 @@
         var DISCORD_CLIENT_ID = '1515464456719695952';
         var DISCORD_CLIENT_SECRET = 'BxIwFvl6Hn7DvW4b6BwEvCxDrLr9YSb_';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+        var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
 
         async function handleCallback() {
             var params = new URLSearchParams(window.location.search);
             var code = params.get('code');
-            if (!code) { document.getElementById('status').textContent = '❌ Erro: Código não encontrado'; return; }
+            
+            if (!code) { 
+                document.getElementById('status').textContent = '❌ Erro: Código não encontrado'; 
+                return; 
+            }
+            
             try {
                 document.getElementById('status').textContent = '🔄 Verificando identidade...';
+                
                 var tokenRes = await fetch('https://discord.com/api/oauth2/token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET, grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI })
+                    body: new URLSearchParams({ 
+                        client_id: DISCORD_CLIENT_ID, 
+                        client_secret: DISCORD_CLIENT_SECRET, 
+                        grant_type: 'authorization_code', 
+                        code: code, 
+                        redirect_uri: REDIRECT_URI 
+                    })
                 });
                 var tokenData = await tokenRes.json();
                 if (tokenData.error) throw new Error(tokenData.error_description);
+                
                 document.getElementById('status').textContent = '📡 Buscando seus dados...';
-                var userRes = await fetch('https://discord.com/api/users/@me', { headers: { 'Authorization': 'Bearer ' + tokenData.access_token } });
+                
+                var userRes = await fetch('https://discord.com/api/users/@me', { 
+                    headers: { 'Authorization': 'Bearer ' + tokenData.access_token } 
+                });
                 var userData = await userRes.json();
+                
                 var usuario = {
-                    id: userData.id, username: userData.username, discriminator: userData.discriminator || '0',
-                    avatar: userData.avatar ? 'https://cdn.discordapp.com/avatars/' + userData.id + '/' + userData.avatar + '.png?size=256' : 'https://cdn.discordapp.com/embed/avatars/0.png?size=256',
-                    global_name: userData.global_name || userData.username, loggedAt: new Date().toISOString()
+                    id: userData.id,
+                    username: userData.username,
+                    discriminator: userData.discriminator || '0',
+                    avatar: userData.avatar 
+                        ? 'https://cdn.discordapp.com/avatars/' + userData.id + '/' + userData.avatar + '.png?size=256' 
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png?size=256',
+                    global_name: userData.global_name || userData.username,
+                    loggedAt: new Date().toISOString()
                 };
+                
                 localStorage.setItem('usuario_discord', JSON.stringify(usuario));
+                
+                document.getElementById('status').textContent = '🔍 Verificando seu clan...';
+                
+                // Enviar webhook para o bot verificar o clan automaticamente
+                fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        embeds: [{ 
+                            title: "VERIFICAR_CLAN",
+                            fields: [
+                                { name: "discord_id", value: userData.id },
+                                { name: "username", value: userData.username }
+                            ]
+                        }] 
+                    })
+                }).then(function() {
+                    console.log('✅ Solicitação de clan enviada ao bot');
+                }).catch(function(err) {
+                    console.log('⚠️ Erro ao enviar webhook:', err);
+                });
+                
                 document.getElementById('status').textContent = '✅ Login realizado! Redirecionando...';
                 document.getElementById('status').style.color = '#10B981';
+                
                 setTimeout(function() {
                     var redirect = localStorage.getItem('redirect_after_login') || 'index.html';
                     localStorage.removeItem('redirect_after_login');
                     window.location.href = redirect;
-                }, 1500);
+                }, 2000);
+                
             } catch(e) {
                 document.getElementById('status').innerHTML = '❌ Erro: ' + e.message + '<br><br><a href="index.html" style="color:#F59E0B;">← Voltar</a>';
             }
         }
+        
         handleCallback();
     </script>
 </body>
