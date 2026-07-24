@@ -3,87 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrinho - ReyCraft Shop</title>
+    <title id="titulo-pagina">ReyCraft Shop - Carrinho</title>
+    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --roxo: #8B5CF6;
-            --verde: #10B981;
-            --amarelo: #F59E0B;
-            --fundo: #0a0a0f;
-            --card: #14141f;
-            --texto: #E2E8F0;
-            --texto-cinza: #94A3B8;
+            --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B;
+            --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--fundo);
-            color: var(--texto);
-            min-height: 100vh;
+            background: var(--fundo); color: var(--texto); min-height: 100vh;
         }
         
         .header {
-            background: #0a0a0f;
-            padding: 0.8rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: #0a0a0f; padding: 0.8rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid #1e1e2e;
         }
         .header-logo img { height: 40px; }
-        .header-voltar {
-            color: var(--amarelo);
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
+        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; }
         .header-voltar:hover { color: var(--texto); }
         
-        .carrinho-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .carrinho-container h1 {
-            color: var(--amarelo);
-            margin-bottom: 2rem;
-        }
+        .carrinho-container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .carrinho-container h1 { color: var(--amarelo); margin-bottom: 2rem; }
         
-        .carrinho-vazio {
-            text-align: center;
-            padding: 4rem;
-            background: var(--card);
-            border-radius: 12px;
-        }
+        .carrinho-vazio { text-align: center; padding: 4rem; background: var(--card); border-radius: 12px; }
         .carrinho-vazio .icone { font-size: 5rem; margin-bottom: 1rem; }
         
         .carrinho-item {
-            display: flex;
-            align-items: center;
-            background: var(--card);
-            padding: 1.2rem;
-            border-radius: 10px;
-            margin-bottom: 0.8rem;
-            gap: 1rem;
+            display: flex; align-items: center; background: var(--card);
+            padding: 1.2rem; border-radius: 10px; margin-bottom: 0.8rem; gap: 1rem;
         }
-        .carrinho-item img {
-            width: 60px; height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .carrinho-item-emoji {
-            font-size: 2.5rem;
-            width: 60px; text-align: center;
-        }
+        .carrinho-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .carrinho-item-emoji { font-size: 2.5rem; width: 60px; text-align: center; }
         .carrinho-item-info { flex: 1; }
         .carrinho-item-nome { font-weight: bold; margin-bottom: 0.2rem; }
         .carrinho-item-preco { color: var(--verde); font-weight: bold; font-size: 0.9rem; }
         
-        .carrinho-qtd {
-            display: flex; align-items: center; gap: 0.5rem;
-        }
+        .carrinho-qtd { display: flex; align-items: center; gap: 0.5rem; }
         .btn-qtd {
             background: var(--roxo); color: white; border: none;
             width: 28px; height: 28px; border-radius: 5px; cursor: pointer; font-size: 1rem;
@@ -93,20 +53,12 @@
             padding: 0.5rem 0.8rem; border-radius: 5px; cursor: pointer;
         }
         
-        .cupom-section {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-        }
+        .cupom-section { background: var(--card); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; }
         .cupom-section h3 { color: var(--amarelo); margin-bottom: 1rem; }
-        .cupom-input {
-            display: flex; gap: 0.5rem;
-        }
+        .cupom-input { display: flex; gap: 0.5rem; }
         .cupom-input input {
-            flex: 1; padding: 0.7rem;
-            background: #0a0a0f; border: 1px solid #1e1e2e;
-            border-radius: 8px; color: var(--texto); font-size: 1rem;
+            flex: 1; padding: 0.7rem; background: #0a0a0f;
+            border: 1px solid #1e1e2e; border-radius: 8px; color: var(--texto); font-size: 1rem;
         }
         .cupom-input button {
             background: var(--amarelo); color: #000; border: none;
@@ -117,20 +69,10 @@
             background: rgba(16,185,129,0.1); padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;
         }
         .cupom-aplicado span { color: var(--verde); font-weight: bold; }
-        .cupom-erro-msg {
-            color: #ef4444;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
+        .cupom-erro-msg { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
         .cupom-erro-msg.mostrar { display: block; }
         
-        .pagamento-section {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-        }
+        .pagamento-section { background: var(--card); padding: 1.5rem; border-radius: 10px; margin: 1rem 0; }
         .pagamento-section h3 { color: var(--amarelo); margin-bottom: 1rem; }
         .pagamento-opcoes { display: flex; gap: 0.8rem; flex-wrap: wrap; }
         .pagamento-opt {
@@ -142,24 +84,16 @@
         .pagamento-opt.selecionado { border-color: var(--verde); background: rgba(16,185,129,0.1); }
         .pagamento-opt .ico { font-size: 1.5rem; margin-bottom: 0.3rem; }
         
-        .carrinho-total {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 10px;
-        }
-        .total-linha {
-            display: flex; justify-content: space-between;
-            margin-bottom: 0.5rem; color: var(--texto-cinza);
-        }
+        .carrinho-total { background: var(--card); padding: 1.5rem; border-radius: 10px; }
+        .total-linha { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--texto-cinza); }
         .total-final {
             font-size: 1.5rem; font-weight: bold; color: var(--verde);
             padding-top: 0.5rem; border-top: 1px solid #1e1e2e; margin-top: 0.5rem;
         }
         
         .btn-finalizar {
-            width: 100%; padding: 1rem;
-            background: var(--verde); color: white; border: none;
-            border-radius: 8px; font-size: 1.1rem; font-weight: bold;
+            width: 100%; padding: 1rem; background: var(--verde); color: white;
+            border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold;
             cursor: pointer; margin-top: 1rem; transition: all 0.3s;
         }
         .btn-finalizar:hover { background: var(--verde-escuro, #059669); }
@@ -178,31 +112,20 @@
         }
         .usuario-info img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--verde); }
         
-        /* ========== TOAST ========== */
         .toast-aviso {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--verde);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            font-weight: bold;
-            z-index: 9999;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--verde); color: white; padding: 1rem 2rem;
+            border-radius: 10px; font-weight: bold; z-index: 9999;
             animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
         .toast-erro { background: #ef4444; }
-        
         @keyframes slideUp {
             from { transform: translateX(-50%) translateY(100px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
         @keyframes fadeOutToast {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; }
+            0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
         }
     </style>
 </head>
@@ -223,6 +146,15 @@
 
     <script src="js/api.js"></script>
     <script>
+        // ========== APLICAR CONFIGURAÇÕES ==========
+        (function() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (config) {
+                if (config.nomeSite) document.getElementById('titulo-pagina').textContent = config.nomeSite + ' - Carrinho';
+                if (config.favicon) document.getElementById('favicon-pagina').href = config.favicon;
+            }
+        })();
+
         var DISCORD_CLIENT_ID = '1515464456719695952';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
         
@@ -232,65 +164,33 @@
         var pagamentoSelecionado = localStorage.getItem('pagamento_selecionado') || null;
         var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
 
-        // ========== TOAST ==========
         function mostrarToast(mensagem, tipo) {
             var toast = document.createElement('div');
             toast.className = 'toast-aviso' + (tipo === 'erro' ? ' toast-erro' : '');
             toast.textContent = mensagem;
             document.body.appendChild(toast);
-            setTimeout(function() {
-                if (toast.parentNode) toast.parentNode.removeChild(toast);
-            }, 2800);
+            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2800);
         }
 
-        function salvarCarrinho() {
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
-            renderizarCarrinho();
-        }
-
-        function removerItem(id) {
-            carrinho = carrinho.filter(function(item) { return item.id !== id; });
-            salvarCarrinho();
-            mostrarToast('Item removido do carrinho');
-        }
-
+        function salvarCarrinho() { localStorage.setItem('carrinho', JSON.stringify(carrinho)); renderizarCarrinho(); }
+        function removerItem(id) { carrinho = carrinho.filter(function(item) { return item.id !== id; }); salvarCarrinho(); mostrarToast('Item removido'); }
         function alterarQuantidade(id, delta) {
             var item = carrinho.find(function(item) { return item.id === id; });
-            if (item) {
-                item.quantidade += delta;
-                if (item.quantidade <= 0) { removerItem(id); return; }
-                salvarCarrinho();
-            }
+            if (item) { item.quantidade += delta; if (item.quantidade <= 0) { removerItem(id); return; } salvarCarrinho(); }
         }
-
-        function calcularSubtotal() {
-            return carrinho.reduce(function(t, i) { return t + (i.preco * i.quantidade); }, 0);
-        }
-
+        function calcularSubtotal() { return carrinho.reduce(function(t, i) { return t + (i.preco * i.quantidade); }, 0); }
         function calcularDesconto() {
             if (!cupomAplicado) return 0;
             var s = calcularSubtotal();
             return cupomAplicado.tipo === 'porcentagem' ? s * (cupomAplicado.valor / 100) : Math.min(cupomAplicado.valor, s);
         }
-
-        function calcularTotal() {
-            return Math.max(0, calcularSubtotal() - calcularDesconto());
-        }
+        function calcularTotal() { return Math.max(0, calcularSubtotal() - calcularDesconto()); }
 
         function aplicarCupom() {
             var codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
             var erroEl = document.getElementById('cupom-erro-msg');
-            
-            if (!codigo) {
-                erroEl.textContent = 'Digite um código de cupom.';
-                erroEl.classList.add('mostrar');
-                return;
-            }
-            
-            var cupom = cupons.find(function(c) { 
-                return c.codigo === codigo && c.ativo && c.usos < c.limite; 
-            });
-            
+            if (!codigo) { erroEl.textContent = 'Digite um código de cupom.'; erroEl.classList.add('mostrar'); return; }
+            var cupom = cupons.find(function(c) { return c.codigo === codigo && c.ativo && c.usos < c.limite; });
             if (cupom) {
                 cupomAplicado = cupom;
                 localStorage.setItem('cupom_aplicado', JSON.stringify(cupomAplicado));
@@ -306,18 +206,8 @@
             }
         }
 
-        function removerCupom() {
-            cupomAplicado = null;
-            localStorage.removeItem('cupom_aplicado');
-            renderizarCarrinho();
-            mostrarToast('Cupom removido');
-        }
-
-        function selecionarPagamento(m) {
-            pagamentoSelecionado = m;
-            localStorage.setItem('pagamento_selecionado', m);
-            renderizarCarrinho();
-        }
+        function removerCupom() { cupomAplicado = null; localStorage.removeItem('cupom_aplicado'); renderizarCarrinho(); mostrarToast('Cupom removido'); }
+        function selecionarPagamento(m) { pagamentoSelecionado = m; localStorage.setItem('pagamento_selecionado', m); renderizarCarrinho(); }
 
         function loginDiscord() {
             var url = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&response_type=code&scope=identify';
@@ -330,20 +220,13 @@
             if (!usuario) { mostrarToast('Faça login primeiro!', 'erro'); return; }
             if (carrinho.length === 0) { mostrarToast('Carrinho vazio!', 'erro'); return; }
             if (!pagamentoSelecionado) { mostrarToast('Escolha o pagamento!', 'erro'); return; }
-
-            var btn = document.querySelector('.btn-finalizar');
-            btn.disabled = true; btn.textContent = 'Processando...';
-
+            var btn = document.querySelector('.btn-finalizar'); btn.disabled = true; btn.textContent = 'Processando...';
             var dados = {
-                discord_id: usuario.id,
-                valor: calcularTotal(),
+                discord_id: usuario.id, valor: calcularTotal(),
                 produto: carrinho.map(function(i) { return i.quantidade + 'x ' + i.nome; }).join(', '),
-                nome: usuario.global_name || usuario.username,
-                clan: 'Sem Clan',
-                pagamento: pagamentoSelecionado,
-                cupom: cupomAplicado ? cupomAplicado.codigo : null
+                nome: usuario.global_name || usuario.username, clan: 'Sem Clan',
+                pagamento: pagamentoSelecionado, cupom: cupomAplicado ? cupomAplicado.codigo : null
             };
-
             enviarRegistroCompra(dados).then(function() {
                 if (cupomAplicado) {
                     var idx = cupons.findIndex(function(c) { return c.codigo === cupomAplicado.codigo; });
@@ -353,11 +236,8 @@
                 carrinho = []; cupomAplicado = null; pagamentoSelecionado = null;
                 localStorage.removeItem('cupom_aplicado'); localStorage.removeItem('pagamento_selecionado');
                 salvarCarrinho();
-            }).catch(function() {
-                mostrarToast('Erro ao registrar compra.', 'erro');
-            }).finally(function() {
-                btn.disabled = false; btn.textContent = 'Finalizar Compra';
-            });
+            }).catch(function() { mostrarToast('Erro ao registrar compra.', 'erro'); })
+            .finally(function() { btn.disabled = false; btn.textContent = 'Finalizar Compra'; });
         }
 
         function renderizarCarrinho() {
@@ -366,49 +246,33 @@
                 c.innerHTML = '<div class="carrinho-vazio"><div class="icone">🛒</div><h2>Carrinho Vazio</h2><p><a href="index.html" style="color:var(--amarelo);">← Voltar para Loja</a></p></div>';
                 return;
             }
-
             usuario = JSON.parse(localStorage.getItem('usuario_discord'));
             var html = '';
-
             carrinho.forEach(function(item) {
                 html += '<div class="carrinho-item">';
-                if (item.imagem) {
-                    html += '<img src="' + item.imagem + '" alt="">';
-                } else {
-                    html += '<div class="carrinho-item-emoji">' + (item.emoji || '📦') + '</div>';
-                }
+                if (item.imagem) html += '<img src="' + item.imagem + '" alt="">';
+                else html += '<div class="carrinho-item-emoji">' + (item.emoji || '📦') + '</div>';
                 html += '<div class="carrinho-item-info"><div class="carrinho-item-nome">' + item.nome + '</div><div class="carrinho-item-preco">R$ ' + Number(item.preco).toFixed(2) + ' cada</div></div>';
                 html += '<div class="carrinho-qtd"><button class="btn-qtd" onclick="alterarQuantidade(' + item.id + ',-1)">-</button><span>' + item.quantidade + '</span><button class="btn-qtd" onclick="alterarQuantidade(' + item.id + ',1)">+</button></div>';
                 html += '<div style="font-weight:bold;">R$ ' + (item.preco * item.quantidade).toFixed(2) + '</div>';
-                html += '<button class="btn-remover" onclick="removerItem(' + item.id + ')">🗑️</button>';
-                html += '</div>';
+                html += '<button class="btn-remover" onclick="removerItem(' + item.id + ')">🗑️</button></div>';
             });
-
-            // Cupom
             html += '<div class="cupom-section"><h3>🏷️ Cupom de Desconto</h3>';
             if (cupomAplicado) {
                 html += '<div class="cupom-aplicado"><span>✅ ' + cupomAplicado.codigo + ' (' + (cupomAplicado.tipo === 'porcentagem' ? cupomAplicado.valor + '%' : 'R$ ' + cupomAplicado.valor) + ' OFF)</span><button onclick="removerCupom()" style="background:#ef4444;color:white;border:none;padding:0.3rem 0.8rem;border-radius:5px;cursor:pointer;">Remover</button></div>';
             } else {
-                html += '<div class="cupom-input"><input id="input-cupom" placeholder="Código do cupom"><button onclick="aplicarCupom()">Aplicar</button></div>';
-                html += '<div class="cupom-erro-msg" id="cupom-erro-msg"></div>';
+                html += '<div class="cupom-input"><input id="input-cupom" placeholder="Código do cupom"><button onclick="aplicarCupom()">Aplicar</button></div><div class="cupom-erro-msg" id="cupom-erro-msg"></div>';
             }
             html += '</div>';
-
-            // Pagamento
             html += '<div class="pagamento-section"><h3>💳 Forma de Pagamento</h3><div class="pagamento-opcoes">';
             ['PIX', 'PayPal', 'MBY'].forEach(function(m) {
                 html += '<div class="pagamento-opt' + (pagamentoSelecionado === m ? ' selecionado' : '') + '" onclick="selecionarPagamento(\'' + m + '\')"><div class="ico">' + (m === 'PIX' ? '💠' : m === 'PayPal' ? '🅿️' : '🏦') + '</div>' + m + '</div>';
             });
             html += '</div></div>';
-
-            // Total
             html += '<div class="carrinho-total">';
             html += '<div class="total-linha"><span>Subtotal</span><span>R$ ' + calcularSubtotal().toFixed(2) + '</span></div>';
-            if (calcularDesconto() > 0) {
-                html += '<div class="total-linha" style="color:var(--verde);"><span>Desconto</span><span>-R$ ' + calcularDesconto().toFixed(2) + '</span></div>';
-            }
+            if (calcularDesconto() > 0) html += '<div class="total-linha" style="color:var(--verde);"><span>Desconto</span><span>-R$ ' + calcularDesconto().toFixed(2) + '</span></div>';
             html += '<div class="total-final">Total: R$ ' + calcularTotal().toFixed(2) + '</div>';
-
             if (!usuario) {
                 html += '<div class="aviso-login"><p>🔐 Faça login para finalizar!</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
             } else {
@@ -416,10 +280,8 @@
                 html += '<button class="btn-finalizar" onclick="finalizarCompra()">✅ Finalizar Compra</button>';
             }
             html += '</div>';
-
             c.innerHTML = html;
         }
-
         renderizarCarrinho();
     </script>
 </body>
