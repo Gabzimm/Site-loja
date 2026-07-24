@@ -72,11 +72,26 @@
             window.location.href = url;
         }
         function sair() { localStorage.removeItem('usuario_discord'); window.location.reload(); }
+        function definirClan() {
+            var clan = prompt('🏰 Digite o nome do seu clan:');
+            if (clan && clan.trim()) {
+                localStorage.setItem('meu_clan_' + usuario.id, clan.trim());
+                carregarPerfil();
+            }
+        }
+
+        function buscarClanUsuario(discordId, callback) {
+            var clanSalvo = localStorage.getItem('meu_clan_' + discordId);
+            if (clanSalvo) { callback(clanSalvo); return; }
+            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            var meusPedidos = pedidos.filter(function(p) { return p.discordId === discordId && p.status === 'confirmado'; });
+            if (meusPedidos.length > 0) { callback(meusPedidos[meusPedidos.length - 1].clan || 'Sem Clan'); return; }
+            callback(null);
+        }
 
         function carregarPerfil() {
-            var c = document.getElementById('perfil-content');
             if (!usuario) {
-                c.innerHTML = '<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
+                document.getElementById('perfil-content').innerHTML = '<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
                 return;
             }
             
@@ -84,25 +99,24 @@
             var meusPedidos = pedidos.filter(function(p) { return p.discordId === usuario.id && p.status === 'confirmado'; });
             var totalGasto = meusPedidos.reduce(function(t, p) { return t + Number(p.valor); }, 0);
             
-            // Buscar clan do último pedido confirmado
-            var meuClan = 'Sem Clan';
-            if (meusPedidos.length > 0) {
-                var ultimo = meusPedidos[meusPedidos.length - 1];
-                meuClan = ultimo.clan || 'Sem Clan';
-            }
-            
-            c.innerHTML = 
-                '<div class="perfil-header"><img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>' + (usuario.global_name || usuario.username) + '</h1><p class="tag">@' + usuario.username + '</p><span class="clan-badge">🏰 ' + meuClan + '</span></div></div>' +
-                '<div class="stats-grid">' +
-                    '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras Confirmadas</div></div>' +
-                    '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
-                    '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + meuClan + '</div><div class="label">Seu Clan</div></div>' +
-                    '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank (via Bot)</div></div>' +
-                '</div>' +
-                '<div class="perfil-secao"><h3>📋 Histórico de Compras</h3>' + (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
-                    return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
-                }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>') + '</div>' +
-                '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
+            buscarClanUsuario(usuario.id, function(meuClan) {
+                var clanHtml = meuClan 
+                    ? '<span class="clan-badge">🏰 ' + meuClan + '</span>' 
+                    : '<span class="clan-badge" style="background:#333;cursor:pointer;" onclick="definirClan()">🏰 Clique para definir seu Clan</span>';
+                
+                document.getElementById('perfil-content').innerHTML = 
+                    '<div class="perfil-header"><img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>' + (usuario.global_name || usuario.username) + '</h1><p class="tag">@' + usuario.username + '</p>' + clanHtml + '</div></div>' +
+                    '<div class="stats-grid">' +
+                        '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras</div></div>' +
+                        '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
+                        '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + (meuClan || '—') + '</div><div class="label">Seu Clan</div></div>' +
+                        '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank</div></div>' +
+                    '</div>' +
+                    '<div class="perfil-secao"><h3>📋 Histórico</h3>' + (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
+                        return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
+                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra.</p>') + '</div>' +
+                    '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
+            });
         }
         carregarPerfil();
     </script>
