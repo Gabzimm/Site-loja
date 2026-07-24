@@ -30,6 +30,8 @@
         .btn-sair { background: #ef4444; color: white; padding: 0.8rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 1rem; }
         .btn-login-discord { background: #5865F2; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
         .clan-badge { display: inline-block; background: var(--roxo); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; margin-top: 0.5rem; }
+        .btn-atualizar { background: transparent; border: 1px solid var(--amarelo); color: var(--amarelo); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; margin-top: 0.5rem; transition: all 0.3s; }
+        .btn-atualizar:hover { background: var(--amarelo); color: #000; }
     </style>
 </head>
 <body>
@@ -69,21 +71,44 @@
         })();
 
         function loginDiscord() {
-            var url = 'https://discord.com/api/oauth2/authorize?client_id=1515464456719695952&redirect_uri=' + encodeURIComponent('https://reycraft-hc.shop/callback.html') + '&response_type=code&scope=identify';
+            var url = 'https://discord.com/api/oauth2/authorize?client_id=SEU_CLIENT_ID_AQUI&redirect_uri=' + encodeURIComponent('https://reycraft-hc.shop/callback.html') + '&response_type=code&scope=identify';
             localStorage.setItem('redirect_after_login', 'perfil.html');
             window.location.href = url;
         }
 
         function sair() {
             localStorage.removeItem('usuario_discord');
+            localStorage.removeItem('meu_clan_' + (usuario ? usuario.id : ''));
             window.location.reload();
+        }
+
+        function atualizarClan() {
+            // Reenviar webhook para verificar clan
+            var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    embeds: [{ 
+                        title: "VERIFICAR_CLAN",
+                        fields: [
+                            { name: "discord_id", value: usuario.id },
+                            { name: "username", value: usuario.username }
+                        ]
+                    }] 
+                })
+            }).then(function() {
+                alert('✅ Clan verificado! Faça login novamente para atualizar.');
+            });
         }
 
         // ========== BUSCAR CLAN ==========
         function buscarClanUsuario(discordId, callback) {
+            // Verificar localStorage
             var clanSalvo = localStorage.getItem('meu_clan_' + discordId);
             if (clanSalvo) { callback(clanSalvo); return; }
             
+            // Verificar nos pedidos confirmados
             var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
             var meusPedidos = pedidos.filter(function(p) { return p.discordId === discordId && p.status === 'confirmado'; });
             if (meusPedidos.length > 0) {
@@ -94,6 +119,14 @@
                     return;
                 }
             }
+            
+            // Clan verificado recentemente?
+            var verificado = localStorage.getItem('clan_verificado');
+            if (verificado === 'true') {
+                callback('Verificado! Faça login novamente.');
+                return;
+            }
+            
             callback(null);
         }
 
@@ -109,31 +142,28 @@
             var totalGasto = meusPedidos.reduce(function(t, p) { return t + Number(p.valor); }, 0);
             
             buscarClanUsuario(usuario.id, function(meuClan) {
-                var clanHtml = meuClan 
-                    ? '<span class="clan-badge">🏰 ' + meuClan + '</span>' 
-                    : '<span class="clan-badge" style="background:#333;cursor:pointer;" onclick="definirClan()">🏰 Clique para definir seu Clan</span>';
+                var clanMostrado = meuClan || '—';
+                var clanHtml = meuClan && meuClan !== 'Verificado! Faça login novamente.'
+                    ? '<span class="clan-badge">🏰 ' + meuClan + '</span>'
+                    : '<span class="clan-badge" style="background:#333;">🏰 ' + clanMostrado + '</span>';
+                
+                if (!meuClan || meuClan === 'Verificado! Faça login novamente.') {
+                    clanHtml += '<br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clan</button>';
+                }
                 
                 document.getElementById('perfil-content').innerHTML = 
                     '<div class="perfil-header"><img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>' + (usuario.global_name || usuario.username) + '</h1><p class="tag">@' + usuario.username + '</p>' + clanHtml + '</div></div>' +
                     '<div class="stats-grid">' +
                         '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras</div></div>' +
                         '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
-                        '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + (meuClan || '—') + '</div><div class="label">Seu Clan</div></div>' +
+                        '<div class="stat-card"><div class="icone">🏰</div><div class="valor">' + clanMostrado + '</div><div class="label">Seu Clan</div></div>' +
                         '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank</div></div>' +
                     '</div>' +
                     '<div class="perfil-secao"><h3>📋 Histórico</h3>' + (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
                         return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
-                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra.</p>') + '</div>' +
+                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>') + '</div>' +
                     '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
             });
-        }
-
-        function definirClan() {
-            var clan = prompt('🏰 Digite o nome do seu clan:');
-            if (clan && clan.trim()) {
-                localStorage.setItem('meu_clan_' + usuario.id, clan.trim());
-                carregarPerfil();
-            }
         }
 
         carregarPerfil();
