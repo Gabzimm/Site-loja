@@ -78,12 +78,15 @@
 
         function sair() {
             localStorage.removeItem('usuario_discord');
-            localStorage.removeItem('meu_clan_1213819385576300595');
             window.location.reload();
         }
 
         function atualizarClan() {
             var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
+            
+            var statusEl = document.getElementById('status-clan');
+            if (statusEl) statusEl.textContent = '🔄 Verificando...';
+            
             fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -97,13 +100,16 @@
                     }] 
                 })
             }).then(function() {
-                document.getElementById('status-clan').textContent = '✅ Verificado! O bot encontrou seu clan.';
-                document.getElementById('status-clan').style.color = '#10B981';
-                // Salvar localmente o clan verificado
+                if (statusEl) {
+                    statusEl.textContent = '✅ Clan verificado! Faça uma compra para vê-lo aqui.';
+                    statusEl.style.color = '#10B981';
+                }
                 localStorage.setItem('clan_verificado', 'true');
-                localStorage.setItem('clan_atualizado_em', new Date().toISOString());
             }).catch(function() {
-                document.getElementById('status-clan').textContent = '❌ Erro ao verificar.';
+                if (statusEl) {
+                    statusEl.textContent = '❌ Erro ao verificar.';
+                    statusEl.style.color = '#ef4444';
+                }
             });
         }
 
