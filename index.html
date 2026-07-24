@@ -127,14 +127,25 @@
         }
 
         function renderizarTodasSecoes(){
-            var c=document.getElementById('produtos-area'); if(!c)return;
-            if(produtos.length===0){c.innerHTML='<div class="loja-vazia">📦<br>Loja Vazia</div>';return;}
-            c.innerHTML='';
-            c.appendChild(criarSecao('🔥 Produtos em Destaque','destaque',produtos));
-            if(categorias.length > 0){
+           var c = document.getElementById('produtos-area');
+            if(!c) return;
+            if(produtos.length === 0) {
+                c.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>';
+                return;
+            }
+            
+            c.innerHTML = '';
+    
+    // Seção "Produtos em Destaque" (TODOS os produtos)
+            c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
+    
+    // Seções por categoria
+            if(categorias && categorias.length > 0) {
                 categorias.forEach(function(cat){
-                    var p=produtos.filter(function(x){return x.categoria===cat.nome});
-                    if(p.length>0)c.appendChild(criarSecao(cat.nome,'cat-'+cat.nome.replace(/\s+/g,'-'),p));
+                    var produtosDaCat = produtos.filter(function(x){ return x.categoria === cat.nome; });
+                    if(produtosDaCat.length > 0) {
+                        c.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), produtosDaCat));
+                    }
                 });
             }
         }
