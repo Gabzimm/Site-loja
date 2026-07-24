@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciar Staff</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .admin-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
+        .sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; font-size: 1.3rem; }
+        .sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s; }
+        .sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
+        .content { flex: 1; padding: 2rem; max-width: 700px; }
+        .btn-add { background: var(--verde); color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; }
+        .input-group { margin: 1rem 0; }
+        .input-group input { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
+        .staff-card { background: var(--card); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .btn-remover { background: #ef4444; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; }
+        .badge-master { background: var(--amarelo); color: #000; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+        
+        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <h2>⚙️ Admin</h2>
+            <nav>
+                <a href="dashboard.html">📊 Dashboard</a>
+                <a href="produtos.html">📦 Produtos</a>
+                <a href="categorias.html">📂 Categorias</a>
+                <a href="pedidos.html">📋 Pedidos</a>
+                <a href="cupons.html">🏷️ Cupons</a>
+                <a href="staff.html" class="ativo">👥 Staff</a>
+                <a href="configuracoes.html">🎨 Configurações</a>
+                <a href="#" onclick="sair()">🚪 Sair</a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <h1>👥 Gerenciar Staff</h1>
+            <p style="color:var(--texto-cinza);margin-bottom:1.5rem;">Adicione ou remova administradores pelo Discord ID</p>
+            
+            <div id="staff-area">
+                <!-- Admin Master sempre aparece primeiro -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('admin_logado')) { window.location.href = 'login.html'; }
+        
+        var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+        var ADMINS = JSON.parse(localStorage.getItem('admins')) || ['1213819385576300595'];
+        var ADMIN_MASTER = '1213819385576300595';
+        var isMaster = usuario && usuario.id === ADMIN_MASTER;
+
+        function sair() { localStorage.removeItem('admin_logado'); window.location.href = 'login.html'; }
+
+        function salvarAdmins() {
+            localStorage.setItem('admins', JSON.stringify(ADMINS));
+            renderizar();
+        }
+
+        function adicionarStaff() {
+            if (!isMaster) { alert('Apenas o Admin Master pode adicionar staffs!'); return; }
+            
+            var id = document.getElementById('novo-staff-id').value.trim();
+            if (!id) { alert('Digite um Discord ID!'); return; }
+            if (ADMINS.indexOf(id) !== -1) { alert('Este ID já é staff!'); return; }
+            
+            ADMINS.push(id);
+            salvarAdmins();
+            document.getElementById('novo-staff-id').value = '';
+        }
+
+        function removerStaff(id) {
+            if (!isMaster) { alert('Apenas o Admin Master pode remover staffs!'); return; }
+            if (id === ADMIN_MASTER) { alert('Não pode remover o Admin Master!'); return; }
+            
+            if (confirm('Remover staff ' + id + '?')) {
+                ADMINS = ADMINS.filter(function(a) { return a !== id; });
+                salvarAdmins();
+            }
+        }
+
+        function renderizar() {
+            var area = document.getElementById('staff-area');
+            var html = '';
+            
+            ADMINS.forEach(function(id) {
+                var isAdminMaster = id === ADMIN_MASTER;
+                html += '<div class="staff-card">' +
+                    '<span>🆔 ' + id + (isAdminMaster ? ' <span class="badge-master">MASTER</span>' : '') + '</span>' +
+                    (!isAdminMaster && isMaster ? '<button class="btn-remover" onclick="removerStaff(\'' + id + '\')">🗑️ Remover</button>' : '') +
+                '</div>';
+            });
+            
+            if (isMaster) {
+                html += '<div style="margin-top:2rem;background:var(--card);padding:1.5rem;border-radius:10px;">' +
+                    '<h3 style="color:var(--amarelo);margin-bottom:1rem;">➕ Adicionar Staff</h3>' +
+                    '<div class="input-group"><input id="novo-staff-id" placeholder="Discord ID do novo staff"></div>' +
+                    '<button class="btn-add" onclick="adicionarStaff()">Adicionar</button>' +
+                '</div>';
+            }
+            
+            area.innerHTML = html;
+        }
+
+        renderizar();
+    </script>
+</body>
+</html>
