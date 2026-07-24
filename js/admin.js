@@ -48,6 +48,7 @@ var imagemTemporaria = null;
 
 function salvarProdutos() {
     localStorage.setItem('produtos', JSON.stringify(produtos));
+    enviarParaBin();
     renderizarTabela();
 }
 
@@ -268,7 +269,8 @@ function selecionarCategoria(produtoId, categoriaNome) {
     var produto = produtos.find(function(p) { return p.id === produtoId; });
     if (produto) {
         produto.categoria = categoriaNome || '';
-        salvarProdutos();
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+        enviarParaBin();
         
         var txt = document.getElementById('cat-txt-' + produtoId);
         if (txt) txt.textContent = categoriaNome || '—';
