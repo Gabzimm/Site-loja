@@ -286,6 +286,29 @@
             cursor: pointer; font-weight: bold;
         }
         
+        /* ========== TOAST ========== */
+        .toast-aviso {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--verde);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 9999;
+            animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOutToast {
+            0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
+        }
+        
         @media (max-width: 768px) {
             .header { padding: 0.8rem 1rem; }
             .header-ip { font-size: 0.7rem; }
@@ -440,6 +463,17 @@
         }
         atualizarPerfilHeader();
 
+        // ========== TOAST ==========
+        function mostrarToast(mensagem) {
+            var toast = document.createElement('div');
+            toast.className = 'toast-aviso';
+            toast.textContent = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 2800);
+        }
+
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
         var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
@@ -460,7 +494,7 @@
             if (item) { item.quantidade++; }
             else { carrinho.push({ id: produto.id, nome: produto.nome, preco: precoFinal, emoji: produto.emoji || '', imagem: produto.imagem || '', categoria: produto.categoria || '', quantidade: 1 }); }
             salvarCarrinho();
-            alert(produto.nome + ' adicionado! 🛒');
+            mostrarToast(produto.nome + ' adicionado ao carrinho! 🛒');
         }
 
         function atualizarContador() {
