@@ -1,16 +1,18 @@
-// ========== CONFIGURAÇÃO ==========
-const WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
+// ========== CONFIGURAÇÃO DO WEBHOOK ==========
+var WEBHOOK_URL = 'https://discord.com/api/webhooks/SEU_WEBHOOK_ID/SEU_WEBHOOK_TOKEN';
 
-// ========== FUNÇÕES PARA O SITE ==========
+// ========== ENVIAR REGISTRO DE COMPRA ==========
 function enviarRegistroCompra(dados) {
-    const embed = {
+    var embed = {
         title: "REGISTRAR_COMPRA",
         fields: [
             { name: "discord_id", value: dados.discord_id },
             { name: "valor", value: dados.valor.toString() },
             { name: "produto", value: dados.produto },
             { name: "nome", value: dados.nome },
-            { name: "clan", value: dados.clan || "Sem Clan" }
+            { name: "clan", value: dados.clan || "Sem Clan" },
+            { name: "pagamento", value: dados.pagamento || "N/A" },
+            { name: "cupom", value: dados.cupom || "Nenhum" }
         ]
     };
     
@@ -18,11 +20,15 @@ function enviarRegistroCompra(dados) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ embeds: [embed] })
-    }).then(r => r.ok);
+    }).then(function(r) {
+        if (!r.ok) throw new Error('Erro no webhook');
+        return r.json();
+    });
 }
 
+// ========== CONFIRMAR PEDIDO ==========
 function enviarConfirmacaoPedido(discord_id, pedido_id) {
-    const embed = {
+    var embed = {
         title: "CONFIRMAR_PEDIDO",
         fields: [
             { name: "discord_id", value: discord_id },
@@ -34,11 +40,12 @@ function enviarConfirmacaoPedido(discord_id, pedido_id) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ embeds: [embed] })
-    }).then(r => r.ok);
+    }).then(function(r) { return r.ok; });
 }
 
+// ========== SOLICITAR DADOS ==========
 function solicitarDadosUsuario(discord_id) {
-    const embed = {
+    var embed = {
         title: "SOLICITAR_DADOS",
         fields: [
             { name: "discord_id", value: discord_id }
@@ -49,5 +56,5 @@ function solicitarDadosUsuario(discord_id) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ embeds: [embed] })
-    }).then(r => r.ok);
+    }).then(function(r) { return r.ok; });
 }
