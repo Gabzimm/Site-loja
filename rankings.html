@@ -10,59 +10,62 @@
         :root { --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
         
-        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e1e2e; }
+        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
         .header-logo img { height: 40px; }
-        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; }
-        .header-link { color: var(--texto); text-decoration: none; font-size: 0.85rem; transition: all 0.3s; }
-        .header-link:hover { color: var(--amarelo); }
+        
+        .icon-btn {
+            width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.3s; text-decoration: none;
+        }
+        .icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
+        .icon-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid var(--amarelo); }
         
         .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
-        .tab-btn { padding: 0.8rem 1.5rem; background: var(--card); border: none; color: var(--texto-cinza); border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .tab-btn:hover { background: var(--roxo); color: white; }
-        .tab-btn.ativo { background: var(--roxo); color: white; }
         
-        .ranking-card { background: var(--card); padding: 1.2rem 1.5rem; border-radius: 10px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1rem; border: 1px solid #1e1e2e; }
-        .ranking-pos { font-size: 1.5rem; font-weight: bold; width: 50px; text-align: center; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; position: sticky; top: 70px; z-index: 50; background: var(--fundo); padding: 1rem 0; }
+        .tab-btn { padding: 0.8rem 1.5rem; background: var(--card); border: 2px solid transparent; color: var(--texto-cinza); border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .tab-btn:hover { border-color: var(--roxo); color: var(--texto); }
+        .tab-btn.ativo { background: var(--roxo); color: white; border-color: var(--roxo); }
+        
+        .ranking-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .ranking-card { background: var(--card); padding: 1.2rem 1.5rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #1e1e2e; transition: all 0.3s; }
+        .ranking-card:hover { border-color: var(--roxo); }
+        .ranking-pos { font-size: 1.5rem; font-weight: bold; width: 50px; text-align: center; flex-shrink: 0; }
         .ranking-info { flex: 1; }
         .ranking-nome { font-weight: bold; font-size: 1.1rem; }
         .ranking-sub { color: var(--texto-cinza); font-size: 0.85rem; }
         .ranking-valor { font-weight: bold; color: var(--verde); font-size: 1.2rem; }
+        .ranking-clan { color: var(--roxo); font-size: 0.85rem; font-weight: bold; }
         
         .medalha-1 { color: #FFD700; } .medalha-2 { color: #C0C0C0; } .medalha-3 { color: #CD7F32; }
+        .sem-dados { text-align: center; padding: 3rem; color: var(--texto-cinza); }
         
-        .info-box { background: rgba(245,158,11,0.1); border: 1px solid var(--amarelo); border-radius: 10px; padding: 2rem; text-align: center; }
+        @media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .header-logo img { height: 30px; } .tabs { overflow-x: auto; } .tab-btn { white-space: nowrap; } }
     </style>
 </head>
 <body>
     <header class="header">
-        <a href="index.html" class="header-voltar">← Voltar</a>
-        <div style="display:flex;gap:2rem;">
-            <a href="index.html" class="header-link">🏠 Loja</a>
-            <a href="rankings.html" class="header-link" style="color:var(--amarelo);">🏆 Rankings</a>
-        </div>
+        <a href="index.html" class="header-voltar">←</a>
         <a href="index.html" class="header-logo"><img src="https://i.imgur.com/TneGRwW.png" alt="ReyCraft" id="logo-img"></a>
+        <a href="perfil.html" id="btn-perfil" class="icon-btn" title="Perfil">
+            <img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);">
+        </a>
     </header>
 
     <div class="container">
-        <h1 style="color:var(--amarelo);margin-bottom:1.5rem;">🏆 Rankings</h1>
-        
         <div class="tabs">
-            <button class="tab-btn ativo" onclick="mostrarRanking('clans')">🏰 Clãs</button>
-            <button class="tab-btn" onclick="mostrarRanking('jogadores')">👤 Jogadores</button>
-            <button class="tab-btn" onclick="mostrarRanking('donaters')">💎 Donaters</button>
+            <button class="tab-btn ativo" onclick="mostrarRanking('clans')">🏰 TOP Clãs</button>
+            <button class="tab-btn" onclick="mostrarRanking('jogadores')">👤 TOP Jogadores</button>
+            <button class="tab-btn" onclick="mostrarRanking('donaters')">💎 TOP Donaters</button>
         </div>
         
-        <div id="ranking-content">
-            <div class="info-box">
-                <p style="font-size:1.2rem;">📡 Clique em um ranking acima para solicitar ao bot!</p>
-                <p style="color:var(--texto-cinza);margin-top:0.5rem;">Os resultados aparecerão no canal do Discord.</p>
-            </div>
-        </div>
+        <div id="ranking-content" class="ranking-list"></div>
     </div>
 
-    <script src="js/api.js"></script>
     <script>
+        // ========== CONFIGURAÇÕES ==========
         (function() {
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (config) {
@@ -73,25 +76,116 @@
             }
         })();
 
-        var rankingAtual = '';
+        // ========== PERFIL ==========
+        (function() {
+            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var btnPerfil = document.getElementById('btn-perfil');
+            var perfilImg = document.getElementById('perfil-img');
+            if (!btnPerfil || !perfilImg) return;
+            if (usuario && usuario.avatar) {
+                btnPerfil.style.background = 'transparent';
+                perfilImg.src = usuario.avatar;
+                perfilImg.style.width = '40px'; perfilImg.style.height = '40px';
+                perfilImg.style.borderRadius = '8px'; perfilImg.style.filter = 'none';
+                perfilImg.style.objectFit = 'cover';
+            }
+        })();
+
+        // ========== DADOS ==========
+        var rankingAtual = 'clans';
 
         function mostrarRanking(tipo) {
             rankingAtual = tipo;
             document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('ativo'); });
             event.target.classList.add('ativo');
-            carregarRanking();
+            renderizarRanking();
         }
 
-        function carregarRanking() {
-            var container = document.getElementById('ranking-content');
-            container.innerHTML = '<div class="info-box"><p style="font-size:1.2rem;">📡 Solicitando ranking ao bot...</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Os resultados aparecerão no canal #📡・webhook-loja do Discord</p></div>';
+        function getTopClans() {
+            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            var clans = {};
             
-            solicitarRanking(rankingAtual).then(function() {
-                container.innerHTML = '<div class="info-box" style="border-color:var(--verde);background:rgba(16,185,129,0.1);"><p style="font-size:1.2rem;color:var(--verde);">✅ Ranking de <strong>' + rankingAtual + '</strong> solicitado!</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Verifique o canal do Discord para ver o resultado.</p></div>';
-            }).catch(function() {
-                container.innerHTML = '<div class="info-box" style="border-color:#ef4444;background:rgba(239,68,68,0.1);"><p style="font-size:1.2rem;color:#ef4444;">❌ Erro ao solicitar</p><p style="color:var(--texto-cinza);margin-top:0.5rem;">Verifique se o webhook está configurado.</p></div>';
+            // Só conta pedidos CONFIRMADOS
+            pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
+                var clan = p.clan || 'Sem Clan';
+                if (!clans[clan]) clans[clan] = { nome: clan, pontos: 0, membros: new Set() };
+                clans[clan].pontos += Number(p.valor || 0);
+                clans[clan].membros.add(p.discordId);
             });
+            
+            var resultado = Object.values(clans).map(function(c) {
+                return { nome: c.nome, pontos: c.pontos, membros: c.membros.size };
+            });
+            resultado.sort(function(a, b) { return b.pontos - a.pontos; });
+            return resultado.slice(0, 10);
         }
+
+        function getTopJogadores() {
+            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            var jogadores = {};
+            
+            pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
+                var id = p.discordId;
+                if (!jogadores[id]) jogadores[id] = { nome: p.cliente || 'User#' + id, pontos: 0, clan: p.clan || 'Sem Clan' };
+                jogadores[id].pontos += Number(p.valor || 0);
+            });
+            
+            var resultado = Object.values(jogadores);
+            resultado.sort(function(a, b) { return b.pontos - a.pontos; });
+            return resultado.slice(0, 10);
+        }
+
+        function getTopDonaters() {
+            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            var donaters = {};
+            
+            pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
+                var nome = p.cliente || 'Desconhecido';
+                if (!donaters[nome]) donaters[nome] = { nome: nome, valor: 0, clan: p.clan || 'Sem Clan' };
+                donaters[nome].valor += Number(p.valor || 0);
+            });
+            
+            var resultado = Object.values(donaters);
+            resultado.sort(function(a, b) { return b.valor - a.valor; });
+            return resultado.slice(0, 10);
+        }
+
+        function renderizarRanking() {
+            var container = document.getElementById('ranking-content');
+            var dados = [];
+            var tipoValor = 'pontos';
+            
+            if (rankingAtual === 'clans') { dados = getTopClans(); tipoValor = 'pontos'; }
+            else if (rankingAtual === 'jogadores') { dados = getTopJogadores(); tipoValor = 'pontos'; }
+            else if (rankingAtual === 'donaters') { dados = getTopDonaters(); tipoValor = 'R$'; }
+            
+            if (dados.length === 0) {
+                container.innerHTML = '<div class="sem-dados">📭 Nenhum dado disponível ainda</div>';
+                return;
+            }
+            
+            var medals = ['🥇', '🥈', '🥉'];
+            
+            container.innerHTML = dados.map(function(item, i) {
+                var medalClass = i < 3 ? 'medalha-' + (i+1) : '';
+                var pos = i < 3 ? medals[i] : (i+1) + 'º';
+                var valor = tipoValor === 'R$' ? 'R$ ' + Number(item.valor).toFixed(2) : item.pontos + ' pts';
+                var sub = '';
+                
+                if (rankingAtual === 'clans') sub = item.membros + ' membros';
+                if (rankingAtual === 'jogadores') sub = '<span class="ranking-clan">' + (item.clan || 'Sem Clan') + '</span>';
+                if (rankingAtual === 'donaters') sub = '<span class="ranking-clan">' + (item.clan || 'Sem Clan') + '</span>';
+                
+                return '<div class="ranking-card">' +
+                    '<div class="ranking-pos ' + medalClass + '">' + pos + '</div>' +
+                    '<div class="ranking-info"><div class="ranking-nome">' + item.nome + '</div>' +
+                    (sub ? '<div class="ranking-sub">' + sub + '</div>' : '') + '</div>' +
+                    '<div class="ranking-valor">' + valor + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        renderizarRanking();
     </script>
 </body>
 </html>
