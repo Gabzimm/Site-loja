@@ -41,6 +41,7 @@
     <div class="perfil-container" id="perfil-content"></div>
 
     <script>
+        // ========== CONFIGURAÇÕES ==========
         (function() {
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (config) {
@@ -53,6 +54,7 @@
 
         var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
 
+        // ========== PERFIL HEADER ==========
         (function() {
             var btnPerfil = document.getElementById('btn-perfil');
             var perfilImg = document.getElementById('perfil-img');
@@ -71,24 +73,31 @@
             localStorage.setItem('redirect_after_login', 'perfil.html');
             window.location.href = url;
         }
-        function sair() { localStorage.removeItem('usuario_discord'); window.location.reload(); }
-        function definirClan() {
-            var clan = prompt('🏰 Digite o nome do seu clan:');
-            if (clan && clan.trim()) {
-                localStorage.setItem('meu_clan_' + usuario.id, clan.trim());
-                carregarPerfil();
-            }
+
+        function sair() {
+            localStorage.removeItem('usuario_discord');
+            window.location.reload();
         }
 
+        // ========== BUSCAR CLAN ==========
         function buscarClanUsuario(discordId, callback) {
             var clanSalvo = localStorage.getItem('meu_clan_' + discordId);
             if (clanSalvo) { callback(clanSalvo); return; }
+            
             var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
             var meusPedidos = pedidos.filter(function(p) { return p.discordId === discordId && p.status === 'confirmado'; });
-            if (meusPedidos.length > 0) { callback(meusPedidos[meusPedidos.length - 1].clan || 'Sem Clan'); return; }
+            if (meusPedidos.length > 0) {
+                var clan = meusPedidos[meusPedidos.length - 1].clan;
+                if (clan && clan !== 'Sem Clan') {
+                    localStorage.setItem('meu_clan_' + discordId, clan);
+                    callback(clan);
+                    return;
+                }
+            }
             callback(null);
         }
 
+        // ========== CARREGAR PERFIL ==========
         function carregarPerfil() {
             if (!usuario) {
                 document.getElementById('perfil-content').innerHTML = '<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
@@ -118,6 +127,15 @@
                     '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
             });
         }
+
+        function definirClan() {
+            var clan = prompt('🏰 Digite o nome do seu clan:');
+            if (clan && clan.trim()) {
+                localStorage.setItem('meu_clan_' + usuario.id, clan.trim());
+                carregarPerfil();
+            }
+        }
+
         carregarPerfil();
     </script>
 </body>
