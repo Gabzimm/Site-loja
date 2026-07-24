@@ -4,269 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil - ReyCraft Shop</title>
-    <link rel="stylesheet" href="css/style.css">
     <style>
-        .perfil-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B;
+            --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8;
         }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--fundo); color: var(--texto);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: #0a0a0f; padding: 0.8rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #1e1e2e;
+        }
+        .header-logo img { height: 40px; }
+        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; }
+        
+        .perfil-container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
         
         .perfil-header {
-            background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
-            border-radius: 15px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            border: 2px solid var(--amarelo);
+            background: var(--card); border-radius: 15px; padding: 2rem;
+            display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;
         }
-        
         .perfil-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 4px solid var(--amarelo);
-            object-fit: cover;
+            width: 90px; height: 90px; border-radius: 50%;
+            border: 3px solid var(--amarelo); object-fit: cover;
         }
+        .perfil-info h1 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .perfil-info .tag { color: var(--amarelo); font-size: 0.9rem; }
         
-        .perfil-info h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.3rem;
-        }
-        
-        .perfil-info .discord-tag {
-            color: var(--amarelo);
-            font-size: 1rem;
-        }
-        
-        .perfil-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .stat-card {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid #333;
+            background: var(--card); padding: 1.3rem; border-radius: 10px;
+            text-align: center; border: 1px solid #1e1e2e;
         }
-        
-        .stat-card .stat-icone {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-card .stat-valor {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--amarelo);
-        }
-        
-        .stat-card .stat-label {
-            color: var(--texto-cinza);
-            font-size: 0.9rem;
-        }
+        .stat-card .icone { font-size: 2rem; margin-bottom: 0.5rem; }
+        .stat-card .valor { font-size: 1.5rem; font-weight: bold; color: var(--amarelo); }
+        .stat-card .label { color: var(--texto-cinza); font-size: 0.8rem; }
         
         .perfil-secao {
-            background: var(--card);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: var(--card); padding: 1.5rem; border-radius: 10px;
+            margin-bottom: 1rem; border: 1px solid #1e1e2e;
         }
-        
-        .perfil-secao h3 {
-            color: var(--amarelo);
-            margin-bottom: 1rem;
-        }
-        
-        .historico-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid #333;
-        }
-        
-        .historico-item:last-child {
-            border-bottom: none;
-        }
+        .perfil-secao h3 { color: var(--amarelo); margin-bottom: 1rem; }
         
         .btn-sair {
-            background: #ef4444;
-            color: white;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 1rem;
-            transition: all 0.3s;
+            background: #ef4444; color: white; padding: 0.8rem 2rem;
+            border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
+            width: 100%; margin-top: 1rem;
         }
-        
-        .btn-sair:hover {
-            background: #dc2626;
-        }
-        
-        .sem-login {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-        
-        .sem-login .icone {
-            font-size: 5rem;
-            margin-bottom: 1rem;
-        }
-        
         .btn-login-discord {
-            background: #5865F2;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            background: #5865F2; color: white; padding: 1rem 2rem;
+            border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem;
             font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s;
-        }
-        
-        .btn-login-discord:hover {
-            background: #4752C4;
-            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo">
-            <h1>🛒 ReyCraft Shop</h1>
-        </div>
-        <nav class="nav">
-            <a href="index.html">🏠 Home</a>
-            <a href="carrinho.html">🛒 Carrinho <span id="contador-carrinho">(0)</span></a>
-            <a href="perfil.html" id="link-perfil" style="display: flex; align-items: center; gap: 0.5rem;">
-                <span id="perfil-nome">👤 Perfil</span>
-            </a>
-        </nav>
+        <a href="index.html" class="header-voltar">← Voltar</a>
+        <a href="index.html" class="header-logo">
+            <img src="https://i.imgur.com/TneGRwW.png" alt="ReyCraft">
+        </a>
+        <div></div>
     </header>
 
-    <div class="perfil-container">
-        <div id="perfil-content"></div>
-    </div>
+    <div class="perfil-container" id="perfil-content"></div>
 
     <script>
-        const DISCORD_CLIENT_ID = '1515464456719695952';
-        const REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
-        
-        const usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+        var DISCORD_CLIENT_ID = 'SEU_CLIENT_ID_AQUI';
+        var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+        var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
 
-        function carregarPerfil() {
-            const container = document.getElementById('perfil-content');
-            
-            if (!usuario) {
-                container.innerHTML = `
-                    <div class="sem-login">
-                        <div class="icone">🔒</div>
-                        <h2>Faça login para ver seu perfil</h2>
-                        <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Conecte sua conta do Discord para acessar estatísticas e rankings</p>
-                        <button class="btn-login-discord" onclick="loginDiscord()">
-                            🔐 Login com Discord
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Pedidos do usuário
-            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
-            const meusPedidos = pedidos.filter(p => p.discordId === usuario.id);
-            const totalGasto = meusPedidos.reduce((total, p) => total + Number(p.valor), 0);
-            const totalCompras = meusPedidos.length;
-            
-            container.innerHTML = `
-                <div class="perfil-header">
-                    <img src="${usuario.avatar}" alt="Avatar" class="perfil-avatar">
-                    <div class="perfil-info">
-                        <h1>${usuario.global_name || usuario.username}</h1>
-                        <p class="discord-tag">@${usuario.username}</p>
-                        <p style="color: var(--texto-cinza);">ID: ${usuario.id}</p>
-                    </div>
-                </div>
-                
-                <div class="perfil-stats">
-                    <div class="stat-card">
-                        <div class="stat-icone">🛒</div>
-                        <div class="stat-valor">${totalCompras}</div>
-                        <div class="stat-label">Compras</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icone">💰</div>
-                        <div class="stat-valor">R$ ${totalGasto.toFixed(2)}</div>
-                        <div class="stat-label">Total Gasto</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icone">🏰</div>
-                        <div class="stat-valor">Em breve</div>
-                        <div class="stat-label">Clan (via Bot)</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icone">🏆</div>
-                        <div class="stat-valor">Em breve</div>
-                        <div class="stat-label">Rank (via Bot)</div>
-                    </div>
-                </div>
-                
-                <div class="perfil-secao">
-                    <h3>📋 Histórico de Compras</h3>
-                    ${meusPedidos.length > 0 
-                        ? meusPedidos.map(p => `
-                            <div class="historico-item">
-                                <span>🛒 Pedido #${p.id}</span>
-                                <span>R$ ${Number(p.valor).toFixed(2)}</span>
-                                <span class="status status-${p.status}">${p.status}</span>
-                                <span style="color: var(--texto-cinza);">${p.data}</span>
-                            </div>
-                        `).join('')
-                        : '<p style="color: var(--texto-cinza);">Nenhuma compra ainda.</p>'
-                    }
-                </div>
-                
-                <div class="perfil-secao">
-                    <h3>🏆 Rankings (Em breve)</h3>
-                    <p style="color: var(--texto-cinza);">Top compradores e clans serão exibidos aqui após conectar com o bot.</p>
-                </div>
-                
-                <button class="btn-sair" onclick="sair()">🚪 Sair da Conta</button>
-            `;
-        }
-        
         function loginDiscord() {
-            const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify`;
-            window.location.href = authUrl;
+            var url = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&response_type=code&scope=identify';
+            localStorage.setItem('redirect_after_login', 'perfil.html');
+            window.location.href = url;
         }
-        
+
         function sair() {
             localStorage.removeItem('usuario_discord');
             window.location.reload();
         }
-        
-        // Atualizar link do perfil no header
-        function atualizarHeader() {
-            const perfilNome = document.getElementById('perfil-nome');
-            if (usuario && perfilNome) {
-                perfilNome.innerHTML = `<img src="${usuario.avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;"> ${usuario.global_name || usuario.username}`;
+
+        function carregarPerfil() {
+            var c = document.getElementById('perfil-content');
+            if (!usuario) {
+                c.innerHTML = '<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>';
+                return;
             }
+            
+            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            var meusPedidos = pedidos.filter(function(p) { return p.discordId === usuario.id; });
+            var totalGasto = meusPedidos.reduce(function(t, p) { return t + Number(p.valor); }, 0);
+            
+            c.innerHTML = 
+                '<div class="perfil-header">' +
+                    '<img src="' + usuario.avatar + '" class="perfil-avatar" alt="Avatar">' +
+                    '<div class="perfil-info">' +
+                        '<h1>' + (usuario.global_name || usuario.username) + '</h1>' +
+                        '<p class="tag">@' + usuario.username + '</p>' +
+                        '<p style="color:var(--texto-cinza);">ID: ' + usuario.id + '</p>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="stats-grid">' +
+                    '<div class="stat-card"><div class="icone">🛒</div><div class="valor">' + meusPedidos.length + '</div><div class="label">Compras</div></div>' +
+                    '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ ' + totalGasto.toFixed(2) + '</div><div class="label">Total Gasto</div></div>' +
+                    '<div class="stat-card"><div class="icone">🏰</div><div class="valor">—</div><div class="label">Clan (via Bot)</div></div>' +
+                    '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank (via Bot)</div></div>' +
+                '</div>' +
+                '<div class="perfil-secao"><h3>📋 Histórico</h3>' + 
+                    (meusPedidos.length > 0 ? meusPedidos.map(function(p) {
+                        return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #' + p.id + '</span><span>R$ ' + Number(p.valor).toFixed(2) + '</span><span style="color:var(--amarelo);">' + p.status + '</span><span style="color:var(--texto-cinza);">' + p.data + '</span></div>';
+                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra.</p>') +
+                '</div>' +
+                '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
         }
-        
+
         carregarPerfil();
-        atualizarHeader();
     </script>
 </body>
 </html>
