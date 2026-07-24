@@ -108,6 +108,25 @@
             window.location.href = u;
         }
 
+        function aplicarCoresENome() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (!config) return;
+            if (config.nomeSite) {
+                document.getElementById('titulo-pagina').textContent = config.nomeSite;
+            }
+            if (config.favicon) {
+                document.getElementById('favicon-pagina').href = config.favicon;
+            }
+            if (config.corRoxo) {
+                var style = document.createElement('style');
+                style.id = 'cores-style';
+                style.textContent = ':root { --roxo: ' + config.corRoxo + ' !important; --roxo-escuro: ' + config.corRoxo + 'cc !important; --verde: ' + config.corVerde + ' !important; --verde-escuro: ' + config.corVerde + 'cc !important; --amarelo: ' + config.corAmarelo + ' !important; --amarelo-escuro: ' + config.corAmarelo + 'cc !important; }';
+                var old = document.getElementById('cores-style');
+                if (old) old.remove();
+                document.head.appendChild(style);
+            }
+        }
+
         function aplicarFundo() {
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (config && config.bgImagem) {
@@ -236,7 +255,12 @@
                 return;
             }
             c.innerHTML = '';
-            c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
+            var produtosDestaque = produtos.filter(function(p) { return p.destaque !== false; });
+            if (produtosDestaque.length > 0) {
+                c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtosDestaque));
+            } else {
+                c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
+            }
             if (categorias.length > 0) {
                 categorias.forEach(function(cat) {
                     var p = produtos.filter(function(x) { return x.categoria === cat.nome; });
@@ -347,22 +371,23 @@
             produtos = JSON.parse(localStorage.getItem('produtos')) || [];
             categorias = JSON.parse(localStorage.getItem('categorias')) || [];
             carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            aplicarCoresENome();
+            aplicarFundo();
+            aplicarConfigLogo();
             carregarSidebar();
             carregarBanner();
             renderizarTodasSecoes();
             atualizarContador();
             verificarBotaoAdmin();
             atualizarPerfilHeader();
-            aplicarConfigLogo();
-            aplicarFundo();
         }).catch(function() {
             produtos = JSON.parse(localStorage.getItem('produtos')) || [];
             categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+            aplicarFundo();
             carregarSidebar();
             carregarBanner();
             renderizarTodasSecoes();
             atualizarContador();
-            aplicarFundo();
         });
     </script>
 </body>
