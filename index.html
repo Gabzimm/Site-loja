@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReyCraft Shop</title>
+    <title id="titulo-pagina">ReyCraft Shop</title>
+    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
     <style>
-        /* ========== RESET ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -29,7 +29,6 @@
             min-height: 100vh;
         }
         
-        /* ========== HEADER ========== */
         .header {
             background: #0a0a0f;
             padding: 0.8rem 2rem;
@@ -40,24 +39,17 @@
             top: 0;
             z-index: 100;
         }
-        
         .header-ip {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            color: var(--texto-cinza);
-            font-size: 0.85rem;
-            transition: all 0.3s;
-            position: relative;
+            display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; color: var(--texto-cinza);
+            font-size: 0.85rem; transition: all 0.3s; position: relative;
         }
         .header-ip:hover { color: var(--amarelo); }
         .header-ip .ip-porta { color: var(--verde); font-weight: bold; }
         .header-ip .ip-endereco { color: var(--texto); }
         
         .copiado-msg {
-            position: absolute;
-            top: 100%; left: 0;
+            position: absolute; top: 100%; left: 0;
             background: var(--verde); color: white;
             padding: 0.3rem 0.8rem; border-radius: 5px;
             font-size: 0.75rem; display: none; white-space: nowrap;
@@ -74,10 +66,9 @@
         .header-icones { display: flex; gap: 0.8rem; align-items: center; }
         
         .icon-btn {
-            width: 40px; height: 40px;
-            background: var(--amarelo); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s;
+            width: 40px; height: 40px; background: var(--amarelo);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; transition: all 0.3s;
             position: relative; text-decoration: none;
         }
         .icon-btn:hover { background: var(--amarelo-escuro); transform: scale(1.05); }
@@ -85,12 +76,10 @@
         
         .icon-contador {
             position: absolute; top: -6px; right: -6px;
-            background: #ef4444; color: white;
-            font-size: 0.7rem; font-weight: bold;
-            width: 18px; height: 18px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            background: #ef4444; color: white; font-size: 0.7rem;
+            font-weight: bold; width: 18px; height: 18px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
-        
         .icon-avatar {
             width: 40px; height: 40px; border-radius: 8px;
             object-fit: cover; cursor: pointer;
@@ -98,7 +87,6 @@
         }
         .icon-avatar:hover { transform: scale(1.05); }
         
-        /* ========== BANNER RANKS ========== */
         .banner-ranks {
             text-align: center; padding: 1.5rem 2rem; background: #0d0d15;
         }
@@ -118,81 +106,48 @@
         }
         .rank-item.breve:hover { border-color: #1e1e2e; transform: none; }
         
-        /* ========== CONTEÚDO PRINCIPAL ========== */
         .main-container {
-            display: flex;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 2rem 2rem 1.5rem 1rem;
-            gap: 2rem;
+            display: flex; max-width: 1300px; margin: 0 auto;
+            padding: 2rem 2rem 1.5rem 1rem; gap: 2rem;
         }
         
-        /* ========== SIDEBAR COM FUNDO AMARELO ========== */
         .sidebar {
-            width: 200px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 120px;
-            height: fit-content;
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
-            background: var(--amarelo);
-            border-radius: 12px;
-            padding: 1.2rem;
+            width: 200px; flex-shrink: 0; position: sticky;
+            top: 120px; height: fit-content;
+            max-height: calc(100vh - 150px); overflow-y: auto;
+            background: var(--amarelo); border-radius: 12px; padding: 1.2rem;
         }
-        
         .sidebar-titulo {
-            color: #000;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(0,0,0,0.2);
-            font-weight: bold;
+            color: #000; font-size: 0.8rem; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 1rem; padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0,0,0,0.2); font-weight: bold;
         }
-        
         .categoria-btn {
-            display: block;
-            width: 100%;
-            padding: 0.7rem 1rem;
-            background: transparent;
-            border: none;
-            color: #000;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            margin-bottom: 0.2rem;
-            font-weight: 500;
+            display: block; width: 100%; padding: 0.7rem 1rem;
+            background: transparent; border: none; color: #000;
+            text-align: left; cursor: pointer; border-radius: 8px;
+            transition: all 0.3s; font-size: 0.9rem; margin-bottom: 0.2rem; font-weight: 500;
         }
         .categoria-btn:hover { background: rgba(0,0,0,0.1); }
         .categoria-btn.ativo { background: rgba(0,0,0,0.2); font-weight: bold; }
         
-        /* ========== ÁREA DE PRODUTOS ========== */
         .produtos-area { flex: 1; min-width: 0; }
-        
         .categoria-secao { margin-bottom: 3rem; }
         .categoria-titulo {
             display: flex; align-items: center; gap: 0.8rem;
             margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: bold;
         }
         .categoria-barra {
-            width: 3px; height: 28px; background: var(--amarelo);
-            border-radius: 3px;
+            width: 3px; height: 28px; background: var(--amarelo); border-radius: 3px;
         }
         
         .grid-produtos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;
         }
-        
         .produto-card {
-            background: var(--card); border-radius: 12px;
-            padding: 1.2rem; border: 1px solid #1e1e2e;
-            transition: all 0.3s; text-align: center; position: relative;
+            background: var(--card); border-radius: 12px; padding: 1.2rem;
+            border: 1px solid #1e1e2e; transition: all 0.3s;
+            text-align: center; position: relative;
         }
         .produto-card:hover { border-color: var(--roxo); transform: translateY(-3px); }
         .produto-card img {
@@ -200,54 +155,42 @@
             border-radius: 8px; margin-bottom: 0.8rem; display: block;
         }
         .produto-imagem {
-            width: 100%; height: 180px;
-            background: linear-gradient(45deg, #1a1a2e, #14141f);
+            width: 100%; height: 180px; background: linear-gradient(45deg, #1a1a2e, #14141f);
             border-radius: 8px; margin-bottom: 0.8rem;
             display: flex; align-items: center; justify-content: center; font-size: 3rem;
         }
         .badge-promo {
             position: absolute; top: 10px; right: 10px;
-            background: #ef4444; color: white;
-            padding: 0.3rem 0.7rem; border-radius: 15px;
-            font-size: 0.75rem; font-weight: bold; z-index: 1;
+            background: #ef4444; color: white; padding: 0.3rem 0.7rem;
+            border-radius: 15px; font-size: 0.75rem; font-weight: bold; z-index: 1;
         }
         .produto-categoria-tag {
-            display: inline-block;
-            background: rgba(139, 92, 246, 0.2); color: var(--roxo);
-            padding: 0.2rem 0.7rem; border-radius: 10px;
+            display: inline-block; background: rgba(139, 92, 246, 0.2);
+            color: var(--roxo); padding: 0.2rem 0.7rem; border-radius: 10px;
             font-size: 0.7rem; margin-bottom: 0.5rem;
         }
         .produto-nome { font-size: 1rem; font-weight: bold; margin-bottom: 0.3rem; }
-        .produto-preco {
-            font-size: 1.3rem; font-weight: bold; color: var(--verde); margin-bottom: 0.8rem;
-        }
+        .produto-preco { font-size: 1.3rem; font-weight: bold; color: var(--verde); margin-bottom: 0.8rem; }
         .produto-preco-original {
             text-decoration: line-through; color: var(--texto-cinza);
             font-size: 0.85rem; margin-right: 0.5rem;
         }
         .produto-preco-promo { color: #ef4444; font-weight: bold; }
-        
         .btn-comprar {
-            width: 100%; padding: 0.7rem;
-            background: var(--roxo); color: white;
-            border: none; border-radius: 8px;
-            font-weight: bold; cursor: pointer;
-            transition: all 0.3s; font-size: 0.9rem;
+            width: 100%; padding: 0.7rem; background: var(--roxo);
+            color: white; border: none; border-radius: 8px;
+            font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.9rem;
         }
         .btn-comprar:hover { background: var(--roxo-escuro); }
-        
         .btn-detalhes {
-            width: 100%; padding: 0.5rem;
-            background: transparent; border: 1px solid #1e1e2e;
-            color: var(--texto-cinza); border-radius: 8px;
-            margin-top: 0.5rem; cursor: pointer; font-size: 0.8rem;
-            transition: all 0.3s;
+            width: 100%; padding: 0.5rem; background: transparent;
+            border: 1px solid #1e1e2e; color: var(--texto-cinza);
+            border-radius: 8px; margin-top: 0.5rem; cursor: pointer;
+            font-size: 0.8rem; transition: all 0.3s;
         }
         .btn-detalhes:hover { border-color: var(--roxo); color: var(--texto); }
-        
         .loja-vazia { text-align: center; padding: 4rem; color: var(--texto-cinza); }
         
-        /* ========== MODAL DETALHES ========== */
         .modal-detalhes-fundo {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 9999;
@@ -258,8 +201,8 @@
             width: 100%; max-width: 800px; max-height: 85vh; overflow-y: auto;
         }
         .modal-detalhes-titulo {
-            color: var(--amarelo); font-size: 1.8rem;
-            font-weight: bold; text-align: center; margin-bottom: 1.5rem;
+            color: var(--amarelo); font-size: 1.8rem; font-weight: bold;
+            text-align: center; margin-bottom: 1.5rem;
         }
         .modal-detalhes-conteudo { display: flex; gap: 1.5rem; }
         .modal-detalhes-img {
@@ -281,23 +224,15 @@
         }
         .modal-detalhes-preco { font-size: 1.8rem; font-weight: bold; color: var(--verde); }
         .modal-detalhes-fechar {
-            background: var(--roxo); color: white;
-            padding: 0.7rem 2rem; border: none; border-radius: 8px;
-            cursor: pointer; font-weight: bold;
+            background: var(--roxo); color: white; padding: 0.7rem 2rem;
+            border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
         }
         
-        /* ========== TOAST ========== */
         .toast-aviso {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--verde);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            font-weight: bold;
-            z-index: 9999;
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%); background: var(--verde);
+            color: white; padding: 1rem 2rem; border-radius: 10px;
+            font-weight: bold; z-index: 9999;
             animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
@@ -327,7 +262,6 @@
 </head>
 <body>
 
-    <!-- HEADER -->
     <header class="header">
         <div class="header-ip" onclick="copiarIP()" title="Clique para copiar">
             🌐 <span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
@@ -349,7 +283,6 @@
         </div>
     </header>
 
-    <!-- BANNER RANKS -->
     <div class="banner-ranks">
         <h2>🎯 Ranks do Servidor</h2>
         <div class="ranks-grid" id="ranks-grid">
@@ -360,21 +293,32 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="main-container">
         <aside class="sidebar" id="sidebar-categorias">
             <div class="sidebar-titulo">Categorias</div>
         </aside>
-        
         <div class="produtos-area" id="produtos-area"></div>
     </div>
 
-    <a href="admin/login.html" style="position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
+    <a href="admin/login.html" id="btn-admin-flutuante" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
 
     <script>
         // ========== CONFIGURAÇÃO ==========
         var DISCORD_CLIENT_ID = '1515464456719695952';
         var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
+
+        // ========== APLICAR CONFIGURAÇÕES (NOME E FAVICON) ==========
+        (function() {
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            if (config) {
+                if (config.nomeSite) {
+                    document.getElementById('titulo-pagina').textContent = config.nomeSite;
+                }
+                if (config.favicon) {
+                    document.getElementById('favicon-pagina').href = config.favicon;
+                }
+            }
+        })();
 
         // ========== COPIAR IP ==========
         function copiarIP() {
@@ -385,7 +329,6 @@
             });
         }
 
-        // ========== LOGIN DISCORD ==========
         function loginDiscord() {
             var authUrl = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + 
                 '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + 
@@ -415,49 +358,32 @@
                         fundo.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background-image:url(' + config.bgImagem + ');background-size:' + (config.bgModo || 'cover') + ';background-position:' + (config.bgPosicao || 'center') + ';opacity:' + ((config.bgOpacidade || 50) / 100) + ';';
                         document.body.insertBefore(fundo, document.body.firstChild);
                     }
-                    if (config.favicon) {
-                        var link = document.createElement('link');
-                        link.rel = 'icon'; link.href = config.favicon;
-                        document.head.appendChild(link);
-                    }
                 }
             } catch(e) {}
         })();
 
-        // ========== PERFIL / LOGIN ==========
+        // ========== PERFIL ==========
         function atualizarPerfilHeader() {
             var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
             var btnPerfil = document.getElementById('btn-perfil');
             var perfilImg = document.getElementById('perfil-img');
-            
             if (!btnPerfil || !perfilImg) return;
             
             if (usuario && usuario.avatar) {
                 btnPerfil.style.background = 'transparent';
                 perfilImg.src = usuario.avatar;
-                perfilImg.style.width = '40px';
-                perfilImg.style.height = '40px';
-                perfilImg.style.borderRadius = '8px';
-                perfilImg.style.filter = 'none';
-                perfilImg.style.border = '2px solid var(--amarelo)';
-                perfilImg.style.objectFit = 'cover';
-                btnPerfil.href = 'perfil.html';
-                btnPerfil.onclick = null;
+                perfilImg.style.width = '40px'; perfilImg.style.height = '40px';
+                perfilImg.style.borderRadius = '8px'; perfilImg.style.filter = 'none';
+                perfilImg.style.border = '2px solid var(--amarelo)'; perfilImg.style.objectFit = 'cover';
+                btnPerfil.href = 'perfil.html'; btnPerfil.onclick = null;
                 btnPerfil.title = (usuario.global_name || usuario.username);
             } else {
                 btnPerfil.style.background = 'var(--amarelo)';
                 perfilImg.src = 'https://cdn-icons-png.flaticon.com/512/3106/3106921.png';
-                perfilImg.style.width = '20px';
-                perfilImg.style.height = '20px';
-                perfilImg.style.borderRadius = '0';
-                perfilImg.style.filter = 'brightness(0)';
-                perfilImg.style.border = 'none';
-                perfilImg.style.objectFit = 'contain';
-                btnPerfil.href = '#';
-                btnPerfil.onclick = function(e) {
-                    e.preventDefault();
-                    loginDiscord();
-                };
+                perfilImg.style.width = '20px'; perfilImg.style.height = '20px';
+                perfilImg.style.borderRadius = '0'; perfilImg.style.filter = 'brightness(0)';
+                perfilImg.style.border = 'none'; perfilImg.style.objectFit = 'contain';
+                btnPerfil.href = '#'; btnPerfil.onclick = function(e) { e.preventDefault(); loginDiscord(); };
                 btnPerfil.title = 'Login com Discord';
             }
         }
@@ -466,24 +392,31 @@
         // ========== TOAST ==========
         function mostrarToast(mensagem) {
             var toast = document.createElement('div');
-            toast.className = 'toast-aviso';
-            toast.textContent = mensagem;
+            toast.className = 'toast-aviso'; toast.textContent = mensagem;
             document.body.appendChild(toast);
-            setTimeout(function() {
-                if (toast.parentNode) toast.parentNode.removeChild(toast);
-            }, 2800);
+            setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2800);
+        }
+
+        // ========== BOTÃO ADMIN ==========
+        function verificarBotaoAdmin() {
+            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+            var admins = JSON.parse(localStorage.getItem('admins')) || ['1213819385576300595'];
+            var btnAdmin = document.getElementById('btn-admin-flutuante');
+            if (usuario && admins.indexOf(usuario.id) !== -1) {
+                btnAdmin.style.display = 'block';
+            } else {
+                btnAdmin.style.display = 'none';
+            }
         }
 
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
         var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
         var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
         if (!carrinho || typeof carrinho === 'string') { carrinho = []; localStorage.setItem('carrinho', '[]'); }
 
         function salvarCarrinho() {
-            try { localStorage.setItem('carrinho', JSON.stringify(carrinho)); atualizarContador(); }
-            catch(e) {}
+            try { localStorage.setItem('carrinho', JSON.stringify(carrinho)); atualizarContador(); } catch(e) {}
         }
 
         function adicionarAoCarrinho(id) {
@@ -501,10 +434,7 @@
             var total = 0;
             carrinho.forEach(function(item) { total += item.quantidade; });
             var contador = document.getElementById('contador-carrinho');
-            if (contador) {
-                contador.textContent = total;
-                contador.style.display = total > 0 ? 'flex' : 'none';
-            }
+            if (contador) { contador.textContent = total; contador.style.display = total > 0 ? 'flex' : 'none'; }
         }
 
         function mostrarDetalhes(id) {
@@ -512,53 +442,28 @@
             if (!produto) return;
             var antigo = document.querySelector('.modal-detalhes-fundo');
             if (antigo) antigo.remove();
-            
-            var modal = document.createElement('div');
-            modal.className = 'modal-detalhes-fundo';
-            
-            var imgHtml = produto.imagem 
-                ? '<img src="' + produto.imagem + '" class="modal-detalhes-img" alt="' + produto.nome + '">'
-                : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
-            
+            var modal = document.createElement('div'); modal.className = 'modal-detalhes-fundo';
+            var imgHtml = produto.imagem ? '<img src="' + produto.imagem + '" class="modal-detalhes-img" alt="' + produto.nome + '">' : '<div class="modal-detalhes-placeholder">' + (produto.emoji || '📦') + '</div>';
             var precoHtml = '';
             if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
                 precoHtml = '<span style="text-decoration:line-through;color:#666;font-size:1rem;">R$ ' + Number(produto.preco).toFixed(2) + '</span> <span style="color:#ef4444;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
-            } else {
-                precoHtml = 'R$ ' + Number(produto.preco).toFixed(2);
-            }
-            
-            modal.innerHTML = 
-                '<div class="modal-detalhes-box">' +
-                    '<div class="modal-detalhes-titulo">' + produto.nome + '</div>' +
-                    '<div class="modal-detalhes-conteudo">' + imgHtml + '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição.') + '</div>' +
-                    '</div>' +
-                    '<div class="modal-detalhes-rodape">' +
-                        '<div class="modal-detalhes-preco">' + precoHtml + '</div>' +
-                        '<button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button>' +
-                    '</div>' +
-                '</div>';
-            
+            } else { precoHtml = 'R$ ' + Number(produto.preco).toFixed(2); }
+            modal.innerHTML = '<div class="modal-detalhes-box"><div class="modal-detalhes-titulo">' + produto.nome + '</div><div class="modal-detalhes-conteudo">' + imgHtml + '<div class="modal-detalhes-texto">' + (produto.descricao || 'Sem descrição.') + '</div></div><div class="modal-detalhes-rodape"><div class="modal-detalhes-preco">' + precoHtml + '</div><button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button></div></div>';
             document.body.appendChild(modal);
             modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
         }
 
-        // ========== SIDEBAR + PRODUTOS POR SEÇÃO ==========
         function carregarSidebar() {
             var sidebar = document.getElementById('sidebar-categorias');
             if (!sidebar) return;
-            
             var botoesAntigos = sidebar.querySelectorAll('.categoria-btn');
             botoesAntigos.forEach(function(b) { b.remove(); });
-            
             categorias.forEach(function(cat) {
                 var btn = document.createElement('button');
-                btn.className = 'categoria-btn';
-                btn.textContent = cat.nome;
+                btn.className = 'categoria-btn'; btn.textContent = cat.nome;
                 btn.onclick = function() {
                     var secao = document.getElementById('cat-' + cat.nome.replace(/\s+/g, '-'));
-                    if (secao) {
-                        secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                    if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 };
                 sidebar.appendChild(btn);
             });
@@ -567,124 +472,68 @@
         function renderizarTodasSecoes() {
             var container = document.getElementById('produtos-area');
             if (!container) return;
-            
-            if (produtos.length === 0) {
-                container.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>';
-                return;
-            }
-            
+            if (produtos.length === 0) { container.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>'; return; }
             container.innerHTML = '';
-            
-            var secaoDestaque = criarSecao('🔥 Produtos em Destaque', 'destaque', produtos);
-            container.appendChild(secaoDestaque);
-            
+            container.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
             categorias.forEach(function(cat) {
-                var produtosDaCat = produtos.filter(function(p) { return p.categoria === cat.nome; });
-                if (produtosDaCat.length > 0) {
-                    var secao = criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), produtosDaCat);
-                    container.appendChild(secao);
-                }
+                var prods = produtos.filter(function(p) { return p.categoria === cat.nome; });
+                if (prods.length > 0) container.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), prods));
             });
         }
 
-        function criarSecao(titulo, id, listaProdutos) {
-            var secao = document.createElement('div');
-            secao.className = 'categoria-secao';
-            secao.id = id;
-            
-            var tituloDiv = document.createElement('div');
-            tituloDiv.className = 'categoria-titulo';
+        function criarSecao(titulo, id, lista) {
+            var secao = document.createElement('div'); secao.className = 'categoria-secao'; secao.id = id;
+            var tituloDiv = document.createElement('div'); tituloDiv.className = 'categoria-titulo';
             tituloDiv.innerHTML = '<div class="categoria-barra"></div>' + titulo;
             secao.appendChild(tituloDiv);
-            
-            var grid = document.createElement('div');
-            grid.className = 'grid-produtos';
-            
-            listaProdutos.forEach(function(produto) {
-                var card = document.createElement('div');
-                card.className = 'produto-card';
-                
+            var grid = document.createElement('div'); grid.className = 'grid-produtos';
+            lista.forEach(function(produto) {
+                var card = document.createElement('div'); card.className = 'produto-card';
                 if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
-                    var badge = document.createElement('div');
-                    badge.className = 'badge-promo';
+                    var badge = document.createElement('div'); badge.className = 'badge-promo';
                     badge.textContent = '-' + Math.round((1 - Number(produto.precoPromo) / Number(produto.preco)) * 100) + '%';
                     card.appendChild(badge);
                 }
-                
                 if (produto.imagem) {
-                    var img = document.createElement('img');
-                    img.src = produto.imagem;
-                    img.alt = produto.nome;
-                    card.appendChild(img);
+                    var img = document.createElement('img'); img.src = produto.imagem; img.alt = produto.nome; card.appendChild(img);
                 } else {
-                    var ph = document.createElement('div');
-                    ph.className = 'produto-imagem';
-                    ph.textContent = produto.emoji || '📦';
-                    card.appendChild(ph);
+                    var ph = document.createElement('div'); ph.className = 'produto-imagem'; ph.textContent = produto.emoji || '📦'; card.appendChild(ph);
                 }
-                
                 if (produto.categoria) {
-                    var tag = document.createElement('div');
-                    tag.className = 'produto-categoria-tag';
-                    tag.textContent = produto.categoria;
-                    card.appendChild(tag);
+                    var tag = document.createElement('div'); tag.className = 'produto-categoria-tag'; tag.textContent = produto.categoria; card.appendChild(tag);
                 }
-                
-                var nome = document.createElement('div');
-                nome.className = 'produto-nome';
-                nome.textContent = produto.nome;
-                card.appendChild(nome);
-                
-                var preco = document.createElement('div');
-                preco.className = 'produto-preco';
+                var nome = document.createElement('div'); nome.className = 'produto-nome'; nome.textContent = produto.nome; card.appendChild(nome);
+                var preco = document.createElement('div'); preco.className = 'produto-preco';
                 if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
                     preco.innerHTML = '<span class="produto-preco-original">R$ ' + Number(produto.preco).toFixed(2) + '</span><span class="produto-preco-promo">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
-                } else {
-                    preco.textContent = 'R$ ' + Number(produto.preco).toFixed(2);
-                }
+                } else { preco.textContent = 'R$ ' + Number(produto.preco).toFixed(2); }
                 card.appendChild(preco);
-                
-                var btnComprar = document.createElement('button');
-                btnComprar.className = 'btn-comprar';
-                btnComprar.textContent = '🛒 Comprar';
+                var btnComprar = document.createElement('button'); btnComprar.className = 'btn-comprar'; btnComprar.textContent = '🛒 Comprar';
                 btnComprar.onclick = (function(id) { return function() { adicionarAoCarrinho(id); }; })(produto.id);
                 card.appendChild(btnComprar);
-                
                 if (produto.descricao && produto.descricao.trim()) {
-                    var btnDet = document.createElement('button');
-                    btnDet.className = 'btn-detalhes';
-                    btnDet.textContent = '📋 Detalhes';
+                    var btnDet = document.createElement('button'); btnDet.className = 'btn-detalhes'; btnDet.textContent = '📋 Detalhes';
                     btnDet.onclick = (function(id) { return function() { mostrarDetalhes(id); }; })(produto.id);
                     card.appendChild(btnDet);
                 }
-                
                 grid.appendChild(card);
             });
-            
             secao.appendChild(grid);
             return secao;
         }
 
-        // ========== BANNER ==========
         function carregarBanner() {
             var bannerData = JSON.parse(localStorage.getItem('banner_ranks')) || [];
             var grid = document.getElementById('ranks-grid');
             if (!grid) return;
-            
             if (bannerData.length === 0) {
                 grid.innerHTML = '';
-                for (var i = 0; i < 4; i++) {
-                    grid.innerHTML += '<div class="rank-item breve">EM BREVE</div>';
-                }
+                for (var i = 0; i < 4; i++) { grid.innerHTML += '<div class="rank-item breve">EM BREVE</div>'; }
                 return;
             }
-            
             grid.innerHTML = bannerData.map(function(rank) {
-                if (rank.ativo && rank.imagem) {
-                    return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + rank.nome + '"></div>';
-                } else {
-                    return '<div class="rank-item breve">' + (rank.nome || 'EM BREVE') + '</div>';
-                }
+                if (rank.ativo && rank.imagem) return '<div class="rank-item"><img src="' + rank.imagem + '" alt="' + rank.nome + '"></div>';
+                return '<div class="rank-item breve">' + (rank.nome || 'EM BREVE') + '</div>';
             }).join('');
         }
 
@@ -693,6 +542,7 @@
         carregarBanner();
         renderizarTodasSecoes();
         atualizarContador();
+        verificarBotaoAdmin();
     </script>
 </body>
 </html>
