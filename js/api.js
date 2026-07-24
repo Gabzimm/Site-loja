@@ -1,5 +1,5 @@
 // ========== CONFIGURAÇÃO DO WEBHOOK ==========
-var WEBHOOK_URL = 'https://discord.com/api/webhooks/SEU_WEBHOOK_ID/SEU_WEBHOOK_TOKEN';
+var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
 
 // ========== ENVIAR REGISTRO DE COMPRA ==========
 function enviarRegistroCompra(dados) {
