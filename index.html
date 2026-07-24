@@ -407,28 +407,27 @@
 
         // ========== PERFIL / LOGIN ==========
         function atualizarPerfilHeader() {
-            var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
-            var btnPerfil = document.getElementById('btn-perfil');
-            if (!btnPerfil) return;
-            
-            if (usuario) {
-                btnPerfil.style.background = 'transparent';
-                btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/3106/3106921.png\';this.style.border=\'none\';">';
-                btnPerfil.href = 'perfil.html';
-                btnPerfil.onclick = null;
-                btnPerfil.title = (usuario.global_name || usuario.username);
-            } else {
-                btnPerfil.style.background = 'var(--amarelo)';
-                btnPerfil.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil" id="perfil-icon">';
-                btnPerfil.href = '#';
-                btnPerfil.onclick = function(e) {
-                    e.preventDefault();
-                    loginDiscord();
-                };
-                btnPerfil.title = 'Login com Discord';
-            }
-        }
-        atualizarPerfilHeader();
+    var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+    var btnPerfil = document.getElementById('btn-perfil');
+    if (!btnPerfil) return;
+    
+    if (usuario && usuario.avatar) {
+        btnPerfil.style.background = 'transparent';
+        btnPerfil.innerHTML = '<img src="' + usuario.avatar + '" class="icon-avatar" alt="Perfil" crossorigin="anonymous">';
+        btnPerfil.href = 'perfil.html';
+        btnPerfil.onclick = null;
+        btnPerfil.title = (usuario.global_name || usuario.username);
+    } else {
+        btnPerfil.style.background = 'var(--amarelo)';
+        btnPerfil.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" alt="Perfil">';
+        btnPerfil.href = '#';
+        btnPerfil.onclick = function(e) {
+            e.preventDefault();
+            loginDiscord();
+        };
+        btnPerfil.title = 'Login com Discord';
+    }
+}
 
         // ========== DADOS ==========
         var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
