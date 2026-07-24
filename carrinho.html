@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrinho - ReyCraft Shop</title>
-    <link rel="stylesheet" href="css/style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -118,6 +117,13 @@
             background: rgba(16,185,129,0.1); padding: 0.8rem; border-radius: 8px; margin-top: 0.5rem;
         }
         .cupom-aplicado span { color: var(--verde); font-weight: bold; }
+        .cupom-erro-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .cupom-erro-msg.mostrar { display: block; }
         
         .pagamento-section {
             background: var(--card);
@@ -171,6 +177,33 @@
             display: flex; align-items: center; gap: 0.8rem; justify-content: center; margin: 1rem 0;
         }
         .usuario-info img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--verde); }
+        
+        /* ========== TOAST ========== */
+        .toast-aviso {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--verde);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 9999;
+            animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .toast-erro { background: #ef4444; }
+        
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOutToast {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -199,6 +232,17 @@
         var pagamentoSelecionado = localStorage.getItem('pagamento_selecionado') || null;
         var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
 
+        // ========== TOAST ==========
+        function mostrarToast(mensagem, tipo) {
+            var toast = document.createElement('div');
+            toast.className = 'toast-aviso' + (tipo === 'erro' ? ' toast-erro' : '');
+            toast.textContent = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 2800);
+        }
+
         function salvarCarrinho() {
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
             renderizarCarrinho();
@@ -207,6 +251,7 @@
         function removerItem(id) {
             carrinho = carrinho.filter(function(item) { return item.id !== id; });
             salvarCarrinho();
+            mostrarToast('Item removido do carrinho');
         }
 
         function alterarQuantidade(id, delta) {
@@ -234,13 +279,30 @@
 
         function aplicarCupom() {
             var codigo = document.getElementById('input-cupom').value.trim().toUpperCase();
-            var cupom = cupons.find(function(c) { return c.codigo === codigo && c.ativo && c.usos < c.limite; });
+            var erroEl = document.getElementById('cupom-erro-msg');
+            
+            if (!codigo) {
+                erroEl.textContent = 'Digite um código de cupom.';
+                erroEl.classList.add('mostrar');
+                return;
+            }
+            
+            var cupom = cupons.find(function(c) { 
+                return c.codigo === codigo && c.ativo && c.usos < c.limite; 
+            });
+            
             if (cupom) {
                 cupomAplicado = cupom;
-                localStorage.setItem('cupom_aplicado', JSON.stringify(cupom));
+                localStorage.setItem('cupom_aplicado', JSON.stringify(cupomAplicado));
+                erroEl.classList.remove('mostrar');
+                document.getElementById('input-cupom').value = '';
                 renderizarCarrinho();
+                mostrarToast('✅ Cupom ' + cupom.codigo + ' aplicado!');
             } else {
-                alert('Cupom inválido!');
+                erroEl.textContent = 'Cupom errado, veja se digitou corretamente.';
+                erroEl.classList.add('mostrar');
+                cupomAplicado = null;
+                localStorage.removeItem('cupom_aplicado');
             }
         }
 
@@ -248,6 +310,7 @@
             cupomAplicado = null;
             localStorage.removeItem('cupom_aplicado');
             renderizarCarrinho();
+            mostrarToast('Cupom removido');
         }
 
         function selecionarPagamento(m) {
@@ -264,9 +327,9 @@
 
         function finalizarCompra() {
             usuario = JSON.parse(localStorage.getItem('usuario_discord'));
-            if (!usuario) { alert('Faça login primeiro!'); return; }
-            if (carrinho.length === 0) { alert('Carrinho vazio!'); return; }
-            if (!pagamentoSelecionado) { alert('Escolha o pagamento!'); return; }
+            if (!usuario) { mostrarToast('Faça login primeiro!', 'erro'); return; }
+            if (carrinho.length === 0) { mostrarToast('Carrinho vazio!', 'erro'); return; }
+            if (!pagamentoSelecionado) { mostrarToast('Escolha o pagamento!', 'erro'); return; }
 
             var btn = document.querySelector('.btn-finalizar');
             btn.disabled = true; btn.textContent = 'Processando...';
@@ -286,12 +349,12 @@
                     var idx = cupons.findIndex(function(c) { return c.codigo === cupomAplicado.codigo; });
                     if (idx >= 0) { cupons[idx].usos++; localStorage.setItem('cupons', JSON.stringify(cupons)); }
                 }
-                alert('✅ Compra registrada!\nPagamento: ' + pagamentoSelecionado + '\nAguarde confirmação via DM.');
+                mostrarToast('✅ Compra registrada! Aguarde confirmação via DM.');
                 carrinho = []; cupomAplicado = null; pagamentoSelecionado = null;
                 localStorage.removeItem('cupom_aplicado'); localStorage.removeItem('pagamento_selecionado');
                 salvarCarrinho();
             }).catch(function() {
-                alert('Erro ao registrar compra.');
+                mostrarToast('Erro ao registrar compra.', 'erro');
             }).finally(function() {
                 btn.disabled = false; btn.textContent = 'Finalizar Compra';
             });
@@ -327,6 +390,7 @@
                 html += '<div class="cupom-aplicado"><span>✅ ' + cupomAplicado.codigo + ' (' + (cupomAplicado.tipo === 'porcentagem' ? cupomAplicado.valor + '%' : 'R$ ' + cupomAplicado.valor) + ' OFF)</span><button onclick="removerCupom()" style="background:#ef4444;color:white;border:none;padding:0.3rem 0.8rem;border-radius:5px;cursor:pointer;">Remover</button></div>';
             } else {
                 html += '<div class="cupom-input"><input id="input-cupom" placeholder="Código do cupom"><button onclick="aplicarCupom()">Aplicar</button></div>';
+                html += '<div class="cupom-erro-msg" id="cupom-erro-msg"></div>';
             }
             html += '</div>';
 
