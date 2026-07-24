@@ -43,7 +43,6 @@
     <div class="perfil-container" id="perfil-content"></div>
 
     <script>
-        // ========== CONFIGURAÇÕES ==========
         (function() {
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (config) {
@@ -55,8 +54,8 @@
         })();
 
         var usuario = JSON.parse(localStorage.getItem('usuario_discord'));
+        var GUILD_ID = '1332289203127582780';
 
-        // ========== PERFIL HEADER ==========
         (function() {
             var btnPerfil = document.getElementById('btn-perfil');
             var perfilImg = document.getElementById('perfil-img');
@@ -76,40 +75,49 @@
             window.location.href = url;
         }
 
-        function sair() {
-            localStorage.removeItem('usuario_discord');
-            window.location.reload();
-        }
+        function sair() { localStorage.removeItem('usuario_discord'); window.location.reload(); }
 
         function atualizarClan() {
-            var WEBHOOK_URL = 'https://discord.com/api/webhooks/1529978977433944075/qXWlHM-KXy_tDonaHfWAHEJ5j8AONfQ0gkjJCYWzLCH8vAzNqVSD9jtyE9rOsRv_PJ36';
+            var config = JSON.parse(localStorage.getItem('config_loja'));
+            var BOT_TOKEN = config ? config.botToken : '';
+            
+            if (!BOT_TOKEN) {
+                alert('⚠️ Token do bot não configurado!');
+                return;
+            }
             
             var statusEl = document.getElementById('status-clan');
-            if (statusEl) statusEl.textContent = '🔄 Verificando...';
+            if (statusEl) { statusEl.textContent = '🔄 Verificando...'; statusEl.style.color = '#94A3B8'; }
             
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    embeds: [{ 
-                        title: "VERIFICAR_CLAN",
-                        fields: [
-                            { name: "discord_id", value: usuario.id },
-                            { name: "username", value: usuario.username }
-                        ]
-                    }] 
-                })
-            }).then(function() {
-                if (statusEl) {
-                    statusEl.textContent = '✅ Clan verificado! Faça uma compra para vê-lo aqui.';
-                    statusEl.style.color = '#10B981';
+            fetch('https://discord.com/api/guilds/' + GUILD_ID + '/members/' + usuario.id, {
+                headers: { 'Authorization': 'Bot ' + BOT_TOKEN }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(memberData) {
+                if (memberData.roles) {
+                    return fetch('https://discord.com/api/guilds/' + GUILD_ID + '/roles', {
+                        headers: { 'Authorization': 'Bot ' + BOT_TOKEN }
+                    }).then(function(r) { return r.json(); }).then(function(roles) {
+                        var clanEncontrado = null;
+                        memberData.roles.forEach(function(roleId) {
+                            var role = roles.find(function(r) { return r.id === roleId; });
+                            if (role && role.name.startsWith('・ ')) {
+                                clanEncontrado = role.name.replace('・ ', '');
+                            }
+                        });
+                        
+                        if (clanEncontrado) {
+                            localStorage.setItem('meu_clan_' + usuario.id, clanEncontrado);
+                            if (statusEl) { statusEl.textContent = '✅ Clan: ' + clanEncontrado; statusEl.style.color = '#10B981'; }
+                            setTimeout(function() { location.reload(); }, 1500);
+                        } else {
+                            if (statusEl) { statusEl.textContent = '❌ Nenhum clan.'; statusEl.style.color = '#ef4444'; }
+                        }
+                    });
                 }
-                localStorage.setItem('clan_verificado', 'true');
-            }).catch(function() {
-                if (statusEl) {
-                    statusEl.textContent = '❌ Erro ao verificar.';
-                    statusEl.style.color = '#ef4444';
-                }
+            })
+            .catch(function() {
+                if (statusEl) { statusEl.textContent = '❌ Erro.'; statusEl.style.color = '#ef4444'; }
             });
         }
 
@@ -123,15 +131,12 @@
             var meusPedidos = pedidos.filter(function(p) { return p.discordId === usuario.id && p.status === 'confirmado'; });
             var totalGasto = meusPedidos.reduce(function(t, p) { return t + Number(p.valor); }, 0);
             
-            // Buscar clan
             var meuClan = localStorage.getItem('meu_clan_' + usuario.id);
             if (!meuClan && meusPedidos.length > 0) {
                 meuClan = meusPedidos[meusPedidos.length - 1].clan;
                 if (meuClan && meuClan !== 'Sem Clan') {
                     localStorage.setItem('meu_clan_' + usuario.id, meuClan);
-                } else {
-                    meuClan = null;
-                }
+                } else { meuClan = null; }
             }
             
             var clanMostrado = meuClan || 'Não definido';
