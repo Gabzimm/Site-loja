@@ -21,7 +21,7 @@
         .copiado-msg.mostrar { display: block; animation: fadeOut 2s forwards; }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
         .header-logo { position: relative; }
-        .header-logo img { height: 40px; transition: all 0.3s; }
+        .header-logo img { height: 40px; transition: all 0.3s; width: auto; }
         .header-icones { display: flex; gap: 0.8rem; align-items: center; }
         .icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; text-decoration: none; }
         .icon-btn:hover { background: var(--amarelo-escuro); transform: scale(1.05); }
@@ -73,18 +73,36 @@
 </head>
 <body>
     <header class="header">
-        <div class="header-ip" onclick="copiarIP()"><span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span><span class="copiado-msg" id="copiado-msg">✅ Copiado!</span></div>
-        <a href="index.html" class="header-logo"><img src="https://i.imgur.com/TneGRwW.png" id="logo-img"></a>
+        <div class="header-ip" onclick="copiarIP()">
+            <span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
+            <span class="copiado-msg" id="copiado-msg">✅ Copiado!</span>
+        </div>
+        <a href="index.html" class="header-logo" id="header-logo-link">
+            <img src="https://i.imgur.com/TneGRwW.png" id="logo-img">
+        </a>
         <div class="header-icones">
-            <a href="carrinho.html" class="icon-btn"><img src="https://cdn-icons-png.flaticon.com/512/4/4295.png"><span class="icon-contador" id="contador-carrinho" style="display:none;">0</span></a>
-            <a href="#" id="btn-perfil" class="icon-btn"><img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);"></a>
+            <a href="carrinho.html" class="icon-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/4/4295.png">
+                <span class="icon-contador" id="contador-carrinho" style="display:none;">0</span>
+            </a>
+            <a href="#" id="btn-perfil" class="icon-btn">
+                <img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);">
+            </a>
         </div>
     </header>
-    <div class="banner-ranks"><h2>🎯 Rankings do Servidor</h2><div class="ranks-grid" id="ranks-grid"></div></div>
+
+    <div class="banner-ranks">
+        <h2>🎯 Rankings do Servidor</h2>
+        <div class="ranks-grid" id="ranks-grid"></div>
+    </div>
+
     <div class="main-container">
-        <aside class="sidebar" id="sidebar-categorias"><div class="sidebar-titulo">Categorias</div></aside>
+        <aside class="sidebar" id="sidebar-categorias">
+            <div class="sidebar-titulo">Categorias</div>
+        </aside>
         <div class="produtos-area" id="produtos-area"></div>
     </div>
+
     <a href="admin/login.html" id="btn-admin-flutuante" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
 
     <script>
@@ -142,8 +160,38 @@
             var config = JSON.parse(localStorage.getItem('config_loja'));
             if (!config) return;
             var logoImg = document.getElementById('logo-img');
-            if (config.logoUrl && logoImg) logoImg.src = config.logoUrl;
-            if (config.logoTamanho && logoImg) logoImg.style.height = config.logoTamanho + 'px';
+            var headerLogoLink = document.getElementById('header-logo-link');
+            var iconBtns = document.querySelectorAll('.icon-btn');
+            var headerIp = document.querySelector('.header-ip');
+            
+            if (config.logoUrl && logoImg) {
+                logoImg.src = config.logoUrl;
+            }
+            
+            var tamanho = config.logoTamanho || 40;
+            if (logoImg) {
+                logoImg.style.height = tamanho + 'px';
+                logoImg.style.width = 'auto';
+            }
+            
+            var iconSize = Math.round(tamanho * 1.0);
+            if (iconBtns) {
+                iconBtns.forEach(function(btn) {
+                    btn.style.width = iconSize + 'px';
+                    btn.style.height = iconSize + 'px';
+                });
+            }
+            
+            var fontSize = Math.round(tamanho * 0.55);
+            if (headerIp) {
+                headerIp.style.fontSize = fontSize + 'px';
+            }
+            
+            var posicao = config.logoPosicao || 0;
+            if (headerLogoLink) {
+                headerLogoLink.style.position = 'relative';
+                headerLogoLink.style.left = posicao + 'px';
+            }
         }
 
         function atualizarPerfilHeader() {
