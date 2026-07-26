@@ -1,76 +1,59 @@
 // ========================================================
-// _db.js — helper interno usado pelas outras funções da /api
-// NÃO é uma rota pública. Concentra o único ponto do projeto
-// que conhece a Master Key do JSONBin.
+// db.js — agora fala só com /api/data (nosso backend).
+// Nenhuma chave secreta existe mais nesse arquivo.
 // ========================================================
 
-const JSONBIN_URL = process.env.JSONBIN_URL; // ex: https://api.jsonbin.io/v3/b/xxxxxxxx
-const JSONBIN_KEY = process.env.JSONBIN_KEY; // X-Master-Key, só existe no servidor agora
-
-async function getDB() {
-  const r = await fetch(JSONBIN_URL + '/latest', {
-    headers: { 'X-Master-Key': JSONBIN_KEY }
-  });
-  if (!r.ok) throw new Error('Falha ao ler JSONBin: ' + r.status);
-  const json = await r.json();
-  const data = json.record || {};
-  // Garante que todas as coleções existem, mesmo em bin novo/vazio
-  data.produtos = data.produtos || [];
-  data.categorias = data.categorias || [];
-  data.cupons = data.cupons || [];
-  data.pedidos = data.pedidos || [];
-  data.admins = data.admins || ['1213819385576300595'];
-  data.config_loja = data.config_loja || {};
-  data.logs = data.logs || [];
-  return data;
+function tokenAdmin() {
+  return localStorage.getItem('admin_sessao') || '';
 }
 
-async function saveDB(data) {
-  const r = await fetch(JSONBIN_URL, {
-    method: 'PUT',
+// Busca os dados do backend e atualiza o localStorage (cache local pra renderizar rápido)
+function sincronizarLocalStorage() {
+  var headers = {};
+  if (tokenAdmin()) headers['Authorization'] = 'Bearer ' + tokenAdmin();
+  return fetch('/api/data', { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      Object.keys(data).forEach(function(chave) {
+        localStorage.setItem(chave, JSON.stringify(data[chave]));
+      });
+      return data;
+    })
+    .catch(function(e) { console.error('Erro ao sincronizar:', e); });
+}
+
+// Salva UMA coleção (produtos, categorias, cupons, pedidos, admins) no backend.
+// acao/detalhes são opcionais — quando enviados, viram uma entrada no log de auditoria.
+function enviarParaBin(chave, valor, acao, detalhes) {
+  if (!tokenAdmin()) return Promise.resolve(); // sem sessão de admin, não escreve
+  var usuario = JSON.parse(localStorage.getItem('usuario_discord') || 'null');
+  return fetch('/api/data', {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Master-Key': JSONBIN_KEY
+      Authorization: 'Bearer ' + tokenAdmin()
     },
-    body: JSON.stringify(data)
-  });
-  if (!r.ok) throw new Error('Falha ao salvar JSONBin: ' + r.status);
-  return true;
-}
-
-// Adiciona uma entrada no log de auditoria (quem fez o quê, quando)
-function registrarLog(data, quemId, quemNome, acao, detalhes) {
-  data.logs.unshift({
-    quem_id: quemId,
-    quem_nome: quemNome || quemId,
-    acao: acao,
-    detalhes: detalhes || '',
-    data: new Date().toISOString()
-  });
-  // mantém só os últimos 500 registros pra não crescer infinito
-  if (data.logs.length > 500) data.logs = data.logs.slice(0, 500);
-}
-
-// Envia mensagem pro webhook do Discord (agora só roda no servidor)
-async function notificarDiscord(titulo, campos) {
-  const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
-  if (!WEBHOOK_URL) return;
-  await fetch(WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      embeds: [{
-        title: titulo,
-        fields: campos.map(function(c) { return { name: c[0], value: String(c[1]) }; }),
-        color: 0x10B981
-      }]
+      chave: chave,
+      valor: valor,
+      acao: acao,
+      detalhes: detalhes,
+      quem_nome: usuario ? (usuario.global_name || usuario.username) : null
     })
+  }).then(function(r) {
+    if (r.status === 401) {
+      alert('Sua sessão expirou, faça login novamente.');
+      localStorage.removeItem('admin_sessao');
+      window.location.href = 'login.html';
+    }
+    return r.json();
   });
 }
 
-// Valida se um Discord ID é admin, consultando o próprio banco
-async function ehAdmin(data, discordId) {
-  return data.admins.indexOf(discordId) !== -1;
+// Descobre o clã do usuário via backend (sem expor bot token)
+function buscarClan(discordId) {
+  return fetch('/api/clan-lookup?discord_id=' + encodeURIComponent(discordId))
+    .then(function(r) { return r.json(); })
+    .then(function(d) { return d.clan; })
+    .catch(function() { return 'Sem Clã'; });
 }
-
-module.exports = { getDB, saveDB, registrarLog, notificarDiscord, ehAdmin };
