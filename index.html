@@ -1,442 +1,416 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="referrer" content="no-referrer">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="titulo-pagina">ReyCraft Shop</title>
-    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
-    <script src="js/db.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --roxo: #8B5CF6; --roxo-escuro: #6D28D9; --verde: #10B981; --verde-escuro: #059669; --amarelo: #F59E0B; --amarelo-escuro: #D97706; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; position: relative; }
-        body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .header-ip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--texto-cinza); font-size: 0.85rem; position: relative; }
-        .header-ip:hover { color: var(--amarelo); }
-        .header-ip .ip-porta { color: var(--verde); font-weight: bold; }
-        .header-ip .ip-endereco { color: var(--texto); }
-        .copiado-msg { position: absolute; top: 100%; left: 0; background: var(--verde); color: white; padding: 0.3rem 0.8rem; border-radius: 5px; font-size: 0.75rem; display: none; }
-        .copiado-msg.mostrar { display: block; animation: fadeOut 2s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
-        .header-logo { position: relative; }
-        .header-logo img { height: 40px; transition: all 0.3s; width: auto; }
-        .header-icones { display: flex; gap: 0.8rem; align-items: center; }
-        .icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; text-decoration: none; }
-        .icon-btn:hover { background: var(--amarelo-escuro); transform: scale(1.05); }
-        .icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
-        .icon-contador { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .icon-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid var(--amarelo); }
-        .banner-ranks { text-align: center; padding: 1.5rem 2rem; background: #0d0d15; }
-        .banner-ranks h2 { color: var(--amarelo); font-size: 1.3rem; margin-bottom: 1rem; }
-        .ranks-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-        .main-container { display: flex; max-width: 1300px; margin: 0 auto; padding: 2rem 2rem 1.5rem 1rem; gap: 2rem; }
-        .sidebar { width: 200px; flex-shrink: 0; position: sticky; top: 120px; height: fit-content; background: var(--amarelo); border-radius: 12px; padding: 1.2rem; }
-        .sidebar-titulo { color: #000; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(0,0,0,0.2); font-weight: bold; }
-        .categoria-btn { display: block; width: 100%; padding: 0.7rem 1rem; background: transparent; border: none; color: #000; text-align: left; cursor: pointer; border-radius: 8px; font-size: 0.9rem; margin-bottom: 0.2rem; font-weight: 500; }
-        .categoria-btn:hover { background: rgba(0,0,0,0.1); }
-        .produtos-area { flex: 1; min-width: 0; }
-        .categoria-secao { margin-bottom: 3rem; }
-        .categoria-titulo { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: bold; }
-        .categoria-barra { width: 3px; height: 28px; background: var(--amarelo); border-radius: 3px; }
-        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
-        .produto-card { background: var(--card); border-radius: 12px; padding: 1.2rem; border: 1px solid #1e1e2e; transition: all 0.3s; text-align: center; position: relative; }
-        .produto-card:hover { border-color: var(--roxo); transform: translateY(-3px); }
-        .produto-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 0.8rem; display: block; background: #0a0a0f; }
-        .produto-imagem { width: 100%; height: 180px; background: linear-gradient(45deg, #1a1a2e, #14141f); border-radius: 8px; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-        .badge-promo { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 0.3rem 0.7rem; border-radius: 15px; font-size: 0.75rem; font-weight: bold; z-index: 1; }
-        .produto-nome { font-size: 1rem; font-weight: bold; margin-bottom: 0.3rem; }
-        .produto-preco { font-size: 1.3rem; font-weight: bold; color: var(--verde); margin-bottom: 0.8rem; }
-        .produto-preco-original { text-decoration: line-through; color: var(--texto-cinza); font-size: 0.85rem; margin-right: 0.5rem; }
-        .produto-preco-promo { color: #ef4444; font-weight: bold; }
-        .btn-comprar { width: 100%; padding: 0.7rem; background: var(--roxo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .btn-detalhes { width: 100%; padding: 0.5rem; background: transparent; border: 1px solid #1e1e2e; color: var(--texto-cinza); border-radius: 8px; margin-top: 0.5rem; cursor: pointer; font-size: 0.8rem; }
-        .btn-detalhes:hover { border-color: var(--roxo); color: var(--texto); }
-        .loja-vazia { text-align: center; padding: 4rem; color: var(--texto-cinza); }
-        .toast-aviso { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: bold; z-index: 9999; animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards; }
-        @keyframes slideUp { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
-        @keyframes fadeOutToast { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
-        .modal-detalhes-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-        .modal-detalhes-box { background: var(--card); border-radius: 15px; padding: 2.5rem; width: 100%; max-width: 900px; max-height: 85vh; overflow-y: auto; }
-        .modal-detalhes-titulo { color: var(--amarelo); font-size: 2rem; font-weight: bold; text-align: center; margin-bottom: 2rem; }
-        .modal-detalhes-conteudo { display: flex; gap: 2rem; align-items: flex-start; }
-        .modal-detalhes-img { width: 350px; height: 350px; object-fit: contain; border-radius: 10px; flex-shrink: 0; background: #0a0a0f; }
-        .modal-detalhes-placeholder { width: 350px; height: 350px; border-radius: 10px; background: linear-gradient(45deg, #1a1a2e, #14141f); display: flex; align-items: center; justify-content: center; font-size: 6rem; flex-shrink: 0; }
-        .modal-detalhes-texto { flex: 1; line-height: 1.8; white-space: pre-line; color: var(--texto-cinza); font-size: 1.1rem; }
-        .modal-detalhes-rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333; }
-        .modal-detalhes-preco { font-size: 2.2rem; font-weight: bold; color: var(--verde); }
-        .modal-detalhes-fechar { background: var(--roxo); color: white; padding: 1rem 2.5rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
-        .modal-detalhes-fechar:hover { background: var(--roxo-escuro); }
-        @media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .main-container { flex-direction: column; } .sidebar { position: static; width: 100%; display: flex; gap: 0.5rem; overflow-x: auto; } .sidebar-titulo { display: none; } .categoria-btn { white-space: nowrap; width: auto; } .modal-detalhes-conteudo { flex-direction: column; } .modal-detalhes-img, .modal-detalhes-placeholder { width: 100%; height: 250px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="titulo-pagina">ReyCraft Shop</title>
+<link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
+<script src="js/db.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --roxo: #8B5CF6; --roxo-escuro: #6D28D9; --verde: #10B981; --verde-escuro: #059669; --amarelo: #F59E0B; --amarelo-escuro: #D97706; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; position: relative; }
+body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+.header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-ip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--texto-cinza); font-size: 0.85rem; position: relative; }
+.header-ip:hover { color: var(--amarelo); }
+.header-ip .ip-porta { color: var(--verde); font-weight: bold; }
+.header-ip .ip-endereco { color: var(--texto); }
+.copiado-msg { position: absolute; top: 100%; left: 0; background: var(--verde); color: white; padding: 0.3rem 0.8rem; border-radius: 5px; font-size: 0.75rem; display: none; }
+.copiado-msg.mostrar { display: block; animation: fadeOut 2s forwards; }
+@keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+.header-logo { position: relative; }
+.header-logo img { height: 40px; transition: all 0.3s; width: auto; }
+.header-icones { display: flex; gap: 0.8rem; align-items: center; }
+.icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; text-decoration: none; }
+.icon-btn:hover { background: var(--amarelo-escuro); transform: scale(1.05); }
+.icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
+.icon-contador { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.icon-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 2px solid var(--amarelo); }
+.banner-ranks { text-align: center; padding: 1.5rem 2rem; background: #0d0d15; }
+.banner-ranks h2 { color: var(--amarelo); font-size: 1.3rem; margin-bottom: 1rem; }
+.ranks-grid { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+.main-container { display: flex; max-width: 1300px; margin: 0 auto; padding: 2rem 2rem 1.5rem 1rem; gap: 2rem; }
+.sidebar { width: 200px; flex-shrink: 0; position: sticky; top: 120px; height: fit-content; background: var(--amarelo); border-radius: 12px; padding: 1.2rem; }
+.sidebar-titulo { color: #000; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(0,0,0,0.2); font-weight: bold; }
+.categoria-btn { display: block; width: 100%; padding: 0.7rem 1rem; background: transparent; border: none; color: #000; text-align: left; cursor: pointer; border-radius: 8px; font-size: 0.9rem; margin-bottom: 0.2rem; font-weight: 500; }
+.categoria-btn:hover { background: rgba(0,0,0,0.1); }
+.produtos-area { flex: 1; min-width: 0; }
+.categoria-secao { margin-bottom: 3rem; }
+.categoria-titulo { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.5rem; font-size: 1.3rem; font-weight: bold; }
+.categoria-barra { width: 3px; height: 28px; background: var(--amarelo); border-radius: 3px; }
+.grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+.produto-card { background: var(--card); border-radius: 12px; padding: 1.2rem; border: 1px solid #1e1e2e; transition: all 0.3s; text-align: center; position: relative; }
+.produto-card:hover { border-color: var(--roxo); transform: translateY(-3px); }
+.produto-card img { width: 100%; height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 0.8rem; display: block; background: #0a0a0f; }
+.produto-imagem { width: 100%; height: 180px; background: linear-gradient(45deg, #1a1a2e, #14141f); border-radius: 8px; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.badge-promo { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 0.3rem 0.7rem; border-radius: 15px; font-size: 0.75rem; font-weight: bold; z-index: 1; }
+.produto-nome { font-size: 1rem; font-weight: bold; margin-bottom: 0.3rem; }
+.produto-preco { font-size: 1.3rem; font-weight: bold; color: var(--verde); margin-bottom: 0.8rem; }
+.produto-preco-original { text-decoration: line-through; color: var(--texto-cinza); font-size: 0.85rem; margin-right: 0.5rem; }
+.produto-preco-promo { color: #ef4444; font-weight: bold; }
+.btn-comprar { width: 100%; padding: 0.7rem; background: var(--roxo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+.btn-detalhes { width: 100%; padding: 0.5rem; background: transparent; border: 1px solid #1e1e2e; color: var(--texto-cinza); border-radius: 8px; margin-top: 0.5rem; cursor: pointer; font-size: 0.8rem; }
+.btn-detalhes:hover { border-color: var(--roxo); color: var(--texto); }
+.loja-vazia { text-align: center; padding: 4rem; color: var(--texto-cinza); }
+.toast-aviso { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: bold; z-index: 9999; animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards; }
+@keyframes slideUp { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+@keyframes fadeOutToast { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+.modal-detalhes-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.modal-detalhes-box { background: var(--card); border-radius: 15px; padding: 2.5rem; width: 100%; max-width: 900px; max-height: 85vh; overflow-y: auto; }
+.modal-detalhes-titulo { color: var(--amarelo); font-size: 2rem; font-weight: bold; text-align: center; margin-bottom: 2rem; }
+.modal-detalhes-conteudo { display: flex; gap: 2rem; align-items: flex-start; }
+.modal-detalhes-img { width: 350px; height: 350px; object-fit: contain; border-radius: 10px; flex-shrink: 0; background: #0a0a0f; }
+.modal-detalhes-placeholder { width: 350px; height: 350px; border-radius: 10px; background: linear-gradient(45deg, #1a1a2e, #14141f); display: flex; align-items: center; justify-content: center; font-size: 6rem; flex-shrink: 0; }
+.modal-detalhes-texto { flex: 1; line-height: 1.8; white-space: pre-line; color: var(--texto-cinza); font-size: 1.1rem; }
+.modal-detalhes-rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #333; }
+.modal-detalhes-preco { font-size: 2.2rem; font-weight: bold; color: var(--verde); }
+.modal-detalhes-fechar { background: var(--roxo); color: white; padding: 1rem 2.5rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+.modal-detalhes-fechar:hover { background: var(--roxo-escuro); }
+@media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .main-container { flex-direction: column; } .sidebar { position: static; width: 100%; display: flex; gap: 0.5rem; overflow-x: auto; } .sidebar-titulo { display: none; } .categoria-btn { white-space: nowrap; width: auto; } .modal-detalhes-conteudo { flex-direction: column; } .modal-detalhes-img, .modal-detalhes-placeholder { width: 100%; height: 250px; } }
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-ip" onclick="copiarIP()">
-            <span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
-            <span class="copiado-msg" id="copiado-msg">✅ Copiado!</span>
-        </div>
-        <a href="index.html" class="header-logo" id="header-logo-link">
-            <img src="https://i.imgur.com/TneGRwW.png" id="logo-img">
-        </a>
-        <div class="header-icones">
-            <a href="carrinho.html" class="icon-btn">
-                <img src="https://cdn-icons-png.flaticon.com/512/4/4295.png">
-                <span class="icon-contador" id="contador-carrinho" style="display:none;">0</span>
-            </a>
-            <a href="#" id="btn-perfil" class="icon-btn">
-                <img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);">
-            </a>
-        </div>
-    </header>
-
-    <div class="banner-ranks">
-        <h2>🎯 Rankings do Servidor</h2>
-        <div class="ranks-grid" id="ranks-grid"></div>
-    </div>
-
-    <div class="main-container">
-        <aside class="sidebar" id="sidebar-categorias">
-            <div class="sidebar-titulo">Categorias</div>
-        </aside>
-        <div class="produtos-area" id="produtos-area"></div>
-    </div>
-
-    <a href="admin/login.html" id="btn-admin-flutuante" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
-
-    <script>
-        var DISCORD_CLIENT_ID = '1515464456719695952';
-        var REDIRECT_URI = 'https://reycraft-hc.shop/callback.html';
-        var produtos = [];
-        var categorias = [];
-        var carrinho = [];
-
-        function copiarIP() {
-            navigator.clipboard.writeText('reycraft.blazebr.com:26813').then(function() {
-                var m = document.getElementById('copiado-msg');
-                m.classList.add('mostrar');
-                setTimeout(function() { m.classList.remove('mostrar'); }, 2000);
-            });
-        }
-
-        function loginDiscord() {
-            var u = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&response_type=code&scope=identify';
-            localStorage.setItem('redirect_after_login', 'index.html');
-            window.location.href = u;
-        }
-
-        function aplicarCoresENome() {
-            var config = JSON.parse(localStorage.getItem('config_loja'));
-            if (!config) return;
-            if (config.nomeSite) {
-                document.getElementById('titulo-pagina').textContent = config.nomeSite;
-            }
-            if (config.favicon) {
-                document.getElementById('favicon-pagina').href = config.favicon;
-            }
-            if (config.corRoxo) {
-                var style = document.createElement('style');
-                style.id = 'cores-style';
-                style.textContent = ':root { --roxo: ' + config.corRoxo + ' !important; --roxo-escuro: ' + config.corRoxo + 'cc !important; --verde: ' + config.corVerde + ' !important; --verde-escuro: ' + config.corVerde + 'cc !important; --amarelo: ' + config.corAmarelo + ' !important; --amarelo-escuro: ' + config.corAmarelo + 'cc !important; }';
-                var old = document.getElementById('cores-style');
-                if (old) old.remove();
-                document.head.appendChild(style);
-            }
-        }
-
-        function aplicarFundo() {
-            var config = JSON.parse(localStorage.getItem('config_loja'));
-            if (config && config.bgImagem) {
-                document.body.classList.add('com-fundo');
-                var style = document.createElement('style');
-                style.id = 'fundo-style';
-                style.textContent = 'body.com-fundo::before { background-image: url(' + config.bgImagem + '); background-size: ' + (config.bgModo || 'cover') + '; background-position: ' + (config.bgPosicao || 'center') + '; background-repeat: ' + (config.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + '; opacity: ' + ((config.bgOpacidade || 50) / 100) + '; }';
-                document.head.appendChild(style);
-            }
-        }
-
-        function aplicarConfigLogo() {
-            var config = JSON.parse(localStorage.getItem('config_loja'));
-            if (!config) return;
-            var logoImg = document.getElementById('logo-img');
-            var headerLogoLink = document.getElementById('header-logo-link');
-            var iconBtns = document.querySelectorAll('.icon-btn');
-            var headerIp = document.querySelector('.header-ip');
-            
-            if (config.logoUrl && logoImg) {
-                logoImg.src = config.logoUrl;
-            }
-            
-            var tamanho = config.logoTamanho || 40;
-            if (logoImg) {
-                logoImg.style.height = tamanho + 'px';
-                logoImg.style.width = 'auto';
-            }
-            
-            var iconSize = Math.round(tamanho * 1.0);
-            if (iconBtns) {
-                iconBtns.forEach(function(btn) {
-                    btn.style.width = iconSize + 'px';
-                    btn.style.height = iconSize + 'px';
-                });
-            }
-            
-            var fontSize = Math.round(tamanho * 0.55);
-            if (headerIp) {
-                headerIp.style.fontSize = fontSize + 'px';
-            }
-            
-            var posicao = config.logoPosicao || 0;
-            if (headerLogoLink) {
-                headerLogoLink.style.position = 'relative';
-                headerLogoLink.style.left = posicao + 'px';
-            }
-        }
-
-        function atualizarPerfilHeader() {
-            var u = JSON.parse(localStorage.getItem('usuario_discord'));
-            var btn = document.getElementById('btn-perfil');
-            var img = document.getElementById('perfil-img');
-            if (!btn || !img) return;
-            if (u && u.avatar) {
-                btn.style.background = 'transparent';
-                img.src = u.avatar;
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.borderRadius = '8px';
-                img.style.filter = 'none';
-                img.style.objectFit = 'cover';
-                btn.href = 'perfil.html';
-                btn.onclick = null;
-            } else {
-                btn.style.background = 'var(--amarelo)';
-                img.src = 'https://cdn-icons-png.flaticon.com/512/3106/3106921.png';
-                img.style.width = '50%';
-                img.style.height = '50%';
-                img.style.borderRadius = '0';
-                img.style.filter = 'brightness(0)';
-                btn.href = '#';
-                btn.onclick = function(e) { e.preventDefault(); loginDiscord(); };
-            }
-        }
-
-        function verificarBotaoAdmin() {
-            var u = JSON.parse(localStorage.getItem('usuario_discord'));
-            var a = JSON.parse(localStorage.getItem('admins')) || ['1213819385576300595'];
-            var btn = document.getElementById('btn-admin-flutuante');
-            if (u && a.indexOf(u.id) !== -1) btn.style.display = 'block';
-            else btn.style.display = 'none';
-        }
-
-        function mostrarToast(m) {
-            var t = document.createElement('div');
-            t.className = 'toast-aviso';
-            t.textContent = m;
-            document.body.appendChild(t);
-            setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 2800);
-        }
-
-        function salvarCarrinho() {
-            try { localStorage.setItem('carrinho', JSON.stringify(carrinho)); atualizarContador(); } catch(e) {}
-        }
-
-        function adicionarAoCarrinho(id) {
-            var p = produtos.find(function(x) { return x.id === id; });
-            if (!p) return;
-            var pf = (p.precoPromo && Number(p.precoPromo) < Number(p.preco)) ? Number(p.precoPromo) : Number(p.preco);
-            var item = carrinho.find(function(i) { return i.id === id; });
-            if (item) item.quantidade++;
-            else carrinho.push({ id: p.id, nome: p.nome, preco: pf, emoji: p.emoji || '', imagem: p.imagem || '', categoria: p.categoria || '', quantidade: 1 });
-            salvarCarrinho();
-            mostrarToast(p.nome + ' adicionado! 🛒');
-        }
-
-        function atualizarContador() {
-            var t = 0;
-            carrinho.forEach(function(i) { t += i.quantidade; });
-            var c = document.getElementById('contador-carrinho');
-            if (c) { c.textContent = t; c.style.display = t > 0 ? 'flex' : 'none'; }
-        }
-
-        function mostrarDetalhes(id) {
-            var p = produtos.find(function(x) { return x.id === id; });
-            if (!p) return;
-            var antigo = document.querySelector('.modal-detalhes-fundo');
-            if (antigo) antigo.remove();
-            var m = document.createElement('div');
-            m.className = 'modal-detalhes-fundo';
-            var imgHtml = p.imagem ? '<img src="' + p.imagem + '" class="modal-detalhes-img" style="object-fit:contain;background:#0a0a0f;" alt="' + p.nome + '">' : '<div class="modal-detalhes-placeholder">' + (p.emoji || '📦') + '</div>';
-            var precoHtml = '';
-            if (p.precoPromo && Number(p.precoPromo) < Number(p.preco)) {
-                precoHtml = '<span style="text-decoration:line-through;color:#666;font-size:1.2rem;">R$ ' + Number(p.preco).toFixed(2) + '</span> <span style="color:#ef4444;">R$ ' + Number(p.precoPromo).toFixed(2) + '</span>';
-            } else {
-                precoHtml = 'R$ ' + Number(p.preco).toFixed(2);
-            }
-            m.innerHTML = '<div class="modal-detalhes-box"><div class="modal-detalhes-titulo">' + p.nome + '</div><div class="modal-detalhes-conteudo">' + imgHtml + '<div class="modal-detalhes-texto">' + (p.descricao || 'Sem descrição disponível.') + '</div></div><div class="modal-detalhes-rodape"><div class="modal-detalhes-preco">' + precoHtml + '</div><button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button></div></div>';
-            document.body.appendChild(m);
-            m.onclick = function(e) { if (e.target === m) m.remove(); };
-        }
-
-        function carregarSidebar() {
-            var s = document.getElementById('sidebar-categorias');
-            if (!s) return;
-            var olds = s.querySelectorAll('.categoria-btn');
-            olds.forEach(function(b) { b.remove(); });
-            categorias.forEach(function(cat) {
-                var btn = document.createElement('button');
-                btn.className = 'categoria-btn';
-                btn.textContent = cat.nome;
-                btn.onclick = function() {
-                    var sec = document.getElementById('cat-' + cat.nome.replace(/\s+/g, '-'));
-                    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                };
-                s.appendChild(btn);
-            });
-        }
-
-        function renderizarTodasSecoes() {
-            var c = document.getElementById('produtos-area');
-            if (!c) return;
-            if (produtos.length === 0) {
-                c.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>';
-                return;
-            }
-            c.innerHTML = '';
-            var produtosDestaque = produtos.filter(function(p) { return p.destaque !== false; });
-            if (produtosDestaque.length > 0) {
-                c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtosDestaque));
-            } else {
-                c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
-            }
-            if (categorias.length > 0) {
-                categorias.forEach(function(cat) {
-                    var p = produtos.filter(function(x) { return x.categoria === cat.nome; });
-                    if (p.length > 0) c.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), p));
-                });
-            }
-        }
-
-        function criarSecao(titulo, id, lista) {
-            var sec = document.createElement('div');
-            sec.className = 'categoria-secao';
-            sec.id = id;
-            var tdiv = document.createElement('div');
-            tdiv.className = 'categoria-titulo';
-            tdiv.innerHTML = '<div class="categoria-barra"></div>' + titulo;
-            sec.appendChild(tdiv);
-            var grid = document.createElement('div');
-            grid.className = 'grid-produtos';
-            lista.forEach(function(produto) {
-                var card = document.createElement('div');
-                card.className = 'produto-card';
-                if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
-                    var badge = document.createElement('div');
-                    badge.className = 'badge-promo';
-                    badge.textContent = '-' + Math.round((1 - Number(produto.precoPromo) / Number(produto.preco)) * 100) + '%';
-                    card.appendChild(badge);
-                }
-                if (produto.imagem) {
-                    var img = document.createElement('img');
-                    img.src = produto.imagem;
-                    img.alt = produto.nome;
-                    img.style.objectFit = 'contain';
-                    img.style.background = '#0a0a0f';
-                    card.appendChild(img);
-                } else {
-                    var ph = document.createElement('div');
-                    ph.className = 'produto-imagem';
-                    ph.textContent = produto.emoji || '📦';
-                    card.appendChild(ph);
-                }
-                var nome = document.createElement('div');
-                nome.className = 'produto-nome';
-                nome.textContent = produto.nome;
-                card.appendChild(nome);
-                var preco = document.createElement('div');
-                preco.className = 'produto-preco';
-                if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
-                    preco.innerHTML = '<span class="produto-preco-original">R$ ' + Number(produto.preco).toFixed(2) + '</span><span class="produto-preco-promo">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
-                } else {
-                    preco.textContent = 'R$ ' + Number(produto.preco).toFixed(2);
-                }
-                card.appendChild(preco);
-                var btnC = document.createElement('button');
-                btnC.className = 'btn-comprar';
-                btnC.textContent = '🛒 Comprar';
-                btnC.onclick = (function(id) { return function() { adicionarAoCarrinho(id); }; })(produto.id);
-                card.appendChild(btnC);
-                if (produto.descricao && produto.descricao.trim()) {
-                    var btnD = document.createElement('button');
-                    btnD.className = 'btn-detalhes';
-                    btnD.textContent = '📋 Detalhes';
-                    btnD.onclick = (function(id) { return function() { mostrarDetalhes(id); }; })(produto.id);
-                    card.appendChild(btnD);
-                }
-                grid.appendChild(card);
-            });
-            sec.appendChild(grid);
-            return sec;
-        }
-
-        function carregarBanner() {
-            var g = document.getElementById('ranks-grid');
-            if (!g) return;
-            var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
-            var clans = {};
-            var jogadores = {};
-            var donaters = {};
-            pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
-                var c = p.clan || 'Sem Clan';
-                if (!clans[c]) clans[c] = { nome: c, pontos: 0 };
-                clans[c].pontos += Number(p.valor || 0);
-                var n = p.cliente || 'Desconhecido';
-                if (!jogadores[n]) jogadores[n] = { nome: n, pontos: 0 };
-                jogadores[n].pontos += Number(p.valor || 0);
-                if (!donaters[n]) donaters[n] = { nome: n, valor: 0 };
-                donaters[n].valor += Number(p.valor || 0);
-            });
-            var tc = Object.values(clans).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
-            var tj = Object.values(jogadores).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
-            var td = Object.values(donaters).sort(function(a, b) { return b.valor - a.valor; }).slice(0, 3);
-            var medals = ['🥇', '🥈', '🥉'];
-            function card(titulo, icone, dados, tipo, link) {
-                var h = '<a href="' + link + '" style="text-decoration:none;"><div style="background:var(--card);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:left;min-width:220px;">';
-                h += '<div style="color:var(--amarelo);font-weight:bold;margin-bottom:0.8rem;">' + icone + ' ' + titulo + '</div>';
-                if (dados.length === 0) h += '<div style="color:var(--texto-cinza);">Nenhum dado</div>';
-                else dados.forEach(function(item, i) {
-                    var v = tipo === 'R$' ? 'R$ ' + Number(item.valor).toFixed(2) : item.pontos + ' pts';
-                    h += '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;color:var(--texto-cinza);"><span>' + medals[i] + ' ' + (item.nome || '?').substring(0, 15) + '</span><span style="color:var(--verde);">' + v + '</span></div>';
-                });
-                h += '<div style="text-align:center;margin-top:0.8rem;color:var(--roxo);font-weight:bold;">VER COMPLETO →</div></div></a>';
-                return h;
-            }
-            g.innerHTML = card('TOP Clãs', '🏰', tc, 'pontos', 'rankings.html?tab=clans') + card('TOP Jogadores', '👤', tj, 'pontos', 'rankings.html?tab=jogadores') + card('TOP Donaters', '💎', td, 'R$', 'rankings.html?tab=donaters');
-        }
-
-        // ========== INICIAR ==========
-        sincronizarLocalStorage().then(function() {
-            produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-            categorias = JSON.parse(localStorage.getItem('categorias')) || [];
-            carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-            aplicarCoresENome();
-            aplicarFundo();
-            aplicarConfigLogo();
-            carregarSidebar();
-            carregarBanner();
-            renderizarTodasSecoes();
-            atualizarContador();
-            verificarBotaoAdmin();
-            atualizarPerfilHeader();
-        }).catch(function() {
-            produtos = JSON.parse(localStorage.getItem('produtos')) || [];
-            categorias = JSON.parse(localStorage.getItem('categorias')) || [];
-            aplicarFundo();
-            carregarSidebar();
-            carregarBanner();
-            renderizarTodasSecoes();
-            atualizarContador();
-        });
-    </script>
+<header class="header">
+<div class="header-ip" onclick="copiarIP()">
+<span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
+<span class="copiado-msg" id="copiado-msg">✅ Copiado!</span>
+</div>
+<a href="index.html" class="header-logo" id="header-logo-link">
+<img src="https://i.imgur.com/TneGRwW.png" id="logo-img">
+</a>
+<div class="header-icones">
+<a href="carrinho.html" class="icon-btn">
+<img src="https://cdn-icons-png.flaticon.com/512/4/4295.png">
+<span class="icon-contador" id="contador-carrinho" style="display:none;">0</span>
+</a>
+<a href="#" id="btn-perfil" class="icon-btn">
+<img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);">
+</a>
+</div>
+</header>
+<div class="banner-ranks">
+<h2>🎯 Rankings do Servidor</h2>
+<div class="ranks-grid" id="ranks-grid"></div>
+</div>
+<div class="main-container">
+<aside class="sidebar" id="sidebar-categorias">
+<div class="sidebar-titulo">Categorias</div>
+</aside>
+<div class="produtos-area" id="produtos-area"></div>
+</div>
+<a href="admin/login.html" id="btn-admin-flutuante" style="display:none;position:fixed;bottom:20px;right:20px;background:var(--amarelo);color:#000;padding:0.5rem 1rem;border-radius:20px;text-decoration:none;font-size:0.8rem;font-weight:bold;z-index:100;">⚙️ Admin</a>
+<script>
+var DISCORD_CLIENT_ID = '1515464456719695952';
+var REDIRECT_URI = 'https://www.reycraft-hc.shop/callback.html';
+var produtos = [];
+var categorias = [];
+var carrinho = [];
+function copiarIP() {
+navigator.clipboard.writeText('reycraft.blazebr.com:26813').then(function() {
+var m = document.getElementById('copiado-msg');
+m.classList.add('mostrar');
+setTimeout(function() { m.classList.remove('mostrar'); }, 2000);
+});
+}
+function loginDiscord() {
+var u = 'https://discord.com/api/oauth2/authorize?client_id=' + DISCORD_CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&response_type=code&scope=identify';
+localStorage.setItem('redirect_after_login', 'index.html');
+window.location.href = u;
+}
+function aplicarCoresENome() {
+var config = JSON.parse(localStorage.getItem('config_loja'));
+if (!config) return;
+if (config.nomeSite) {
+document.getElementById('titulo-pagina').textContent = config.nomeSite;
+}
+if (config.favicon) {
+document.getElementById('favicon-pagina').href = config.favicon;
+}
+if (config.corRoxo) {
+var style = document.createElement('style');
+style.id = 'cores-style';
+style.textContent = ':root { --roxo: ' + config.corRoxo + ' !important; --roxo-escuro: ' + config.corRoxo + 'cc !important; --verde: ' + config.corVerde + ' !important; --verde-escuro: ' + config.corVerde + 'cc !important; --amarelo: ' + config.corAmarelo + ' !important; --amarelo-escuro: ' + config.corAmarelo + 'cc !important; }';
+var old = document.getElementById('cores-style');
+if (old) old.remove();
+document.head.appendChild(style);
+}
+}
+function aplicarFundo() {
+var config = JSON.parse(localStorage.getItem('config_loja'));
+if (config && config.bgImagem) {
+document.body.classList.add('com-fundo');
+var style = document.createElement('style');
+style.id = 'fundo-style';
+style.textContent = 'body.com-fundo::before { background-image: url(' + config.bgImagem + '); background-size: ' + (config.bgModo || 'cover') + '; background-position: ' + (config.bgPosicao || 'center') + '; background-repeat: ' + (config.bgModo === 'repeat' ? 'repeat' : 'no-repeat') + '; opacity: ' + ((config.bgOpacidade || 50) / 100) + '; }';
+document.head.appendChild(style);
+}
+}
+function aplicarConfigLogo() {
+var config = JSON.parse(localStorage.getItem('config_loja'));
+if (!config) return;
+var logoImg = document.getElementById('logo-img');
+var headerLogoLink = document.getElementById('header-logo-link');
+var iconBtns = document.querySelectorAll('.icon-btn');
+var headerIp = document.querySelector('.header-ip');
+if (config.logoUrl && logoImg) {
+logoImg.src = config.logoUrl;
+}
+var tamanho = config.logoTamanho || 40;
+if (logoImg) {
+logoImg.style.height = tamanho + 'px';
+logoImg.style.width = 'auto';
+}
+var iconSize = Math.round(tamanho * 1.0);
+if (iconBtns) {
+iconBtns.forEach(function(btn) {
+btn.style.width = iconSize + 'px';
+btn.style.height = iconSize + 'px';
+});
+}
+var fontSize = Math.round(tamanho * 0.55);
+if (headerIp) {
+headerIp.style.fontSize = fontSize + 'px';
+}
+var posicao = config.logoPosicao || 0;
+if (headerLogoLink) {
+headerLogoLink.style.position = 'relative';
+headerLogoLink.style.left = posicao + 'px';
+}
+}
+function atualizarPerfilHeader() {
+var u = JSON.parse(localStorage.getItem('usuario_discord'));
+var btn = document.getElementById('btn-perfil');
+var img = document.getElementById('perfil-img');
+if (!btn || !img) return;
+if (u && u.avatar) {
+btn.style.background = 'transparent';
+img.src = u.avatar;
+img.style.width = '100%';
+img.style.height = '100%';
+img.style.borderRadius = '8px';
+img.style.filter = 'none';
+img.style.objectFit = 'cover';
+btn.href = 'perfil.html';
+btn.onclick = null;
+} else {
+btn.style.background = 'var(--amarelo)';
+img.src = 'https://cdn-icons-png.flaticon.com/512/3106/3106921.png';
+img.style.width = '50%';
+img.style.height = '50%';
+img.style.borderRadius = '0';
+img.style.filter = 'brightness(0)';
+btn.href = '#';
+btn.onclick = function(e) { e.preventDefault(); loginDiscord(); };
+}
+}
+function verificarBotaoAdmin() {
+var u = JSON.parse(localStorage.getItem('usuario_discord'));
+var a = JSON.parse(localStorage.getItem('admins')) || ['1213819385576300595'];
+var btn = document.getElementById('btn-admin-flutuante');
+if (u && a.indexOf(u.id) !== -1) btn.style.display = 'block';
+else btn.style.display = 'none';
+}
+function mostrarToast(m) {
+var t = document.createElement('div');
+t.className = 'toast-aviso';
+t.textContent = m;
+document.body.appendChild(t);
+setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 2800);
+}
+function salvarCarrinho() {
+try { localStorage.setItem('carrinho', JSON.stringify(carrinho)); atualizarContador(); } catch(e) {}
+}
+function adicionarAoCarrinho(id) {
+var p = produtos.find(function(x) { return x.id === id; });
+if (!p) return;
+var pf = (p.precoPromo && Number(p.precoPromo) < Number(p.preco)) ? Number(p.precoPromo) : Number(p.preco);
+var item = carrinho.find(function(i) { return i.id === id; });
+if (item) item.quantidade++;
+else carrinho.push({ id: p.id, nome: p.nome, preco: pf, emoji: p.emoji || '', imagem: p.imagem || '', categoria: p.categoria || '', quantidade: 1 });
+salvarCarrinho();
+mostrarToast(p.nome + ' adicionado! 🛒');
+}
+function atualizarContador() {
+var t = 0;
+carrinho.forEach(function(i) { t += i.quantidade; });
+var c = document.getElementById('contador-carrinho');
+if (c) { c.textContent = t; c.style.display = t > 0 ? 'flex' : 'none'; }
+}
+function mostrarDetalhes(id) {
+var p = produtos.find(function(x) { return x.id === id; });
+if (!p) return;
+var antigo = document.querySelector('.modal-detalhes-fundo');
+if (antigo) antigo.remove();
+var m = document.createElement('div');
+m.className = 'modal-detalhes-fundo';
+var imgHtml = p.imagem ? '<img src="' + p.imagem + '" class="modal-detalhes-img" style="object-fit:contain;background:#0a0a0f;" alt="' + p.nome + '">' : '<div class="modal-detalhes-placeholder">' + (p.emoji || '📦') + '</div>';
+var precoHtml = '';
+if (p.precoPromo && Number(p.precoPromo) < Number(p.preco)) {
+precoHtml = '<span style="text-decoration:line-through;color:#666;font-size:1.2rem;">R$ ' + Number(p.preco).toFixed(2) + '</span> <span style="color:#ef4444;">R$ ' + Number(p.precoPromo).toFixed(2) + '</span>';
+} else {
+precoHtml = 'R$ ' + Number(p.preco).toFixed(2);
+}
+m.innerHTML = '<div class="modal-detalhes-box"><div class="modal-detalhes-titulo">' + p.nome + '</div><div class="modal-detalhes-conteudo">' + imgHtml + '<div class="modal-detalhes-texto">' + (p.descricao || 'Sem descrição disponível.') + '</div></div><div class="modal-detalhes-rodape"><div class="modal-detalhes-preco">' + precoHtml + '</div><button class="modal-detalhes-fechar" onclick="this.closest(\'.modal-detalhes-fundo\').remove()">Fechar</button></div></div>';
+document.body.appendChild(m);
+m.onclick = function(e) { if (e.target === m) m.remove(); };
+}
+function carregarSidebar() {
+var s = document.getElementById('sidebar-categorias');
+if (!s) return;
+var olds = s.querySelectorAll('.categoria-btn');
+olds.forEach(function(b) { b.remove(); });
+categorias.forEach(function(cat) {
+var btn = document.createElement('button');
+btn.className = 'categoria-btn';
+btn.textContent = cat.nome;
+btn.onclick = function() {
+var sec = document.getElementById('cat-' + cat.nome.replace(/\s+/g, '-'));
+if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+s.appendChild(btn);
+});
+}
+function renderizarTodasSecoes() {
+var c = document.getElementById('produtos-area');
+if (!c) return;
+if (produtos.length === 0) {
+c.innerHTML = '<div class="loja-vazia">📦<br>Loja Vazia</div>';
+return;
+}
+c.innerHTML = '';
+var produtosDestaque = produtos.filter(function(p) { return p.destaque !== false; });
+if (produtosDestaque.length > 0) {
+c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtosDestaque));
+} else {
+c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
+}
+if (categorias.length > 0) {
+categorias.forEach(function(cat) {
+var p = produtos.filter(function(x) { return x.categoria === cat.nome; });
+if (p.length > 0) c.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), p));
+});
+}
+}
+function criarSecao(titulo, id, lista) {
+var sec = document.createElement('div');
+sec.className = 'categoria-secao';
+sec.id = id;
+var tdiv = document.createElement('div');
+tdiv.className = 'categoria-titulo';
+tdiv.innerHTML = '<div class="categoria-barra"></div>' + titulo;
+sec.appendChild(tdiv);
+var grid = document.createElement('div');
+grid.className = 'grid-produtos';
+lista.forEach(function(produto) {
+var card = document.createElement('div');
+card.className = 'produto-card';
+if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+var badge = document.createElement('div');
+badge.className = 'badge-promo';
+badge.textContent = '-' + Math.round((1 - Number(produto.precoPromo) / Number(produto.preco)) * 100) + '%';
+card.appendChild(badge);
+}
+if (produto.imagem) {
+var img = document.createElement('img');
+img.src = produto.imagem;
+img.alt = produto.nome;
+img.style.objectFit = 'contain';
+img.style.background = '#0a0a0f';
+card.appendChild(img);
+} else {
+var ph = document.createElement('div');
+ph.className = 'produto-imagem';
+ph.textContent = produto.emoji || '📦';
+card.appendChild(ph);
+}
+var nome = document.createElement('div');
+nome.className = 'produto-nome';
+nome.textContent = produto.nome;
+card.appendChild(nome);
+var preco = document.createElement('div');
+preco.className = 'produto-preco';
+if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
+preco.innerHTML = '<span class="produto-preco-original">R$ ' + Number(produto.preco).toFixed(2) + '</span><span class="produto-preco-promo">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
+} else {
+preco.textContent = 'R$ ' + Number(produto.preco).toFixed(2);
+}
+card.appendChild(preco);
+var btnC = document.createElement('button');
+btnC.className = 'btn-comprar';
+btnC.textContent = '🛒 Comprar';
+btnC.onclick = (function(id) { return function() { adicionarAoCarrinho(id); }; })(produto.id);
+card.appendChild(btnC);
+if (produto.descricao && produto.descricao.trim()) {
+var btnD = document.createElement('button');
+btnD.className = 'btn-detalhes';
+btnD.textContent = '📋 Detalhes';
+btnD.onclick = (function(id) { return function() { mostrarDetalhes(id); }; })(produto.id);
+card.appendChild(btnD);
+}
+grid.appendChild(card);
+});
+sec.appendChild(grid);
+return sec;
+}
+function carregarBanner() {
+var g = document.getElementById('ranks-grid');
+if (!g) return;
+var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+var clans = {};
+var jogadores = {};
+var donaters = {};
+pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
+var c = p.clan || 'Sem Clã';
+if (!clans[c]) clans[c] = { nome: c, pontos: 0 };
+clans[c].pontos += Number(p.valor || 0);
+var n = p.cliente || 'Desconhecido';
+if (!jogadores[n]) jogadores[n] = { nome: n, pontos: 0 };
+jogadores[n].pontos += Number(p.valor || 0);
+if (!donaters[n]) donaters[n] = { nome: n, valor: 0 };
+donaters[n].valor += Number(p.valor || 0);
+});
+var tc = Object.values(clans).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
+var tj = Object.values(jogadores).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
+var td = Object.values(donaters).sort(function(a, b) { return b.valor - a.valor; }).slice(0, 3);
+var medals = ['🥇', '🥈', '🥉'];
+function card(titulo, icone, dados, tipo, link) {
+var h = '<a href="' + link + '" style="text-decoration:none;"><div style="background:var(--card);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:left;min-width:220px;">';
+h += '<div style="color:var(--amarelo);font-weight:bold;margin-bottom:0.8rem;">' + icone + ' ' + titulo + '</div>';
+if (dados.length === 0) h += '<div style="color:var(--texto-cinza);">Nenhum dado</div>';
+else dados.forEach(function(item, i) {
+var v = tipo === 'R$' ? 'R$ ' + Number(item.valor).toFixed(2) : item.pontos + ' pts';
+h += '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;color:var(--texto-cinza);"><span>' + medals[i] + ' ' + (item.nome || '?').substring(0, 15) + '</span><span style="color:var(--verde);">' + v + '</span></div>';
+});
+h += '<div style="text-align:center;margin-top:0.8rem;color:var(--roxo);font-weight:bold;">VER COMPLETO →</div></div></a>';
+return h;
+}
+g.innerHTML = card('TOP Clãs', '🏰', tc, 'pontos', 'rankings.html?tab=clans') + card('TOP Jogadores', '👤', tj, 'pontos', 'rankings.html?tab=jogadores') + card('TOP Donaters', '💎', td, 'R$', 'rankings.html?tab=donaters');
+}
+// ========== INICIAR ==========
+sincronizarLocalStorage().then(function() {
+produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+aplicarCoresENome();
+aplicarFundo();
+aplicarConfigLogo();
+carregarSidebar();
+carregarBanner();
+renderizarTodasSecoes();
+atualizarContador();
+verificarBotaoAdmin();
+atualizarPerfilHeader();
+}).catch(function() {
+produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+categorias = JSON.parse(localStorage.getItem('categorias')) || [];
+aplicarFundo();
+carregarSidebar();
+carregarBanner();
+renderizarTodasSecoes();
+atualizarContador();
+});
+</script>
 </body>
 </html>
