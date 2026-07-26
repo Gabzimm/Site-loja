@@ -22,7 +22,11 @@ module.exports = async function handler(req, res) {
         redirect_uri: redirect_uri
       })
     });
-    if (!tokenResp.ok) return res.status(400).json({ error: 'code inválido ou expirado' });
+    if (!tokenResp.ok) {
+      const erroTexto = await tokenResp.text();
+      console.error('Discord recusou a troca do code:', tokenResp.status, erroTexto);
+      return res.status(400).json({ error: 'code inválido ou expirado', detalhe: erroTexto });
+    }
     const tokenData = await tokenResp.json();
 
     const userResp = await fetch('https://discord.com/api/users/@me', {
