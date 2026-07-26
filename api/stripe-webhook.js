@@ -2,7 +2,7 @@
 // Precisa do corpo cru (raw body) pra validar a assinatura, por isso desligamos
 // o bodyParser padrão da Vercel aqui embaixo.
 const crypto = require('crypto');
-const { getDB, saveDB, notificarDiscord } = require('./_db');
+const { getDB, saveDB, notificarDiscord } = require('../lib/db');
 
 module.exports.config = { api: { bodyParser: false } };
 
