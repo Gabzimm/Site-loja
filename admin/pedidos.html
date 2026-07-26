@@ -1,67 +1,93 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Pedidos</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/db.js"></script>
-    <style>
-        .admin-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
-        .sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; }
-        .sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; }
-        .sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
-        .content { flex: 1; padding: 2rem; }
-        .filtros { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        .filtro-btn { padding: 0.5rem 1rem; background: var(--card); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); cursor: pointer; }
-        .filtro-btn.ativo, .filtro-btn:hover { background: var(--roxo); color: white; }
-        .tabela-pedidos { background: var(--card); border-radius: 10px; padding: 1rem; overflow-x: auto; }
-        .tabela-pedidos table { width: 100%; border-collapse: collapse; }
-        .tabela-pedidos th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--roxo); color: var(--amarelo); }
-        .tabela-pedidos td { padding: 1rem; border-bottom: 1px solid #333; }
-        .status { padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.9rem; font-weight: bold; }
-        .status-pendente { background: rgba(245,158,11,0.2); color: var(--amarelo); }
-        .status-confirmado { background: rgba(16,185,129,0.2); color: var(--verde); }
-        .btn-confirmar { background: var(--verde); color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
-        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Pedidos</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/db.js"></script>
+<style>
+.admin-container { display: flex; min-height: 100vh; }
+.content { flex: 1; padding: 2rem; }
+.filtros { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.filtro-btn { padding: 0.5rem 1rem; background: var(--card); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); cursor: pointer; }
+.filtro-btn.ativo, .filtro-btn:hover { background: var(--roxo); color: white; }
+.tabela-pedidos { background: var(--card); border-radius: 10px; padding: 1rem; overflow-x: auto; }
+.tabela-pedidos table { width: 100%; border-collapse: collapse; }
+.tabela-pedidos th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--roxo); color: var(--amarelo); white-space:nowrap; }
+.tabela-pedidos td { padding: 1rem; border-bottom: 1px solid #333; }
+.status { padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; font-weight: bold; white-space:nowrap; }
+.status-pendente_pagamento { background: rgba(148,163,184,0.2); color: var(--texto-cinza); }
+.status-pendente { background: rgba(245,158,11,0.2); color: var(--amarelo); }
+.status-confirmado { background: rgba(16,185,129,0.2); color: var(--verde); }
+.metodo-badge { font-size:0.8rem; color:var(--texto-cinza); }
+@media (max-width: 768px) { .admin-container { flex-direction: column; } }
+</style>
 </head>
 <body>
-    <div class="admin-container">
-        <aside class="sidebar">
-            <h2>⚙️ Admin</h2>
-            <nav>
-                <a href="dashboard.html">📊 Dashboard</a>
-                <a href="produtos.html">📦 Produtos</a>
-                <a href="categorias.html">📂 Categorias</a>
-                <a href="pedidos.html" class="ativo">📋 Pedidos</a>
-                <a href="cupons.html">🏷️ Cupons</a>
-                <a href="staff.html">👥 Staff</a>
-                <a href="configuracoes.html">🎨 Configurações</a>
-                <a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
-                <a href="#" onclick="sair()">🚪 Sair</a>
-            </nav>
-        </aside>
-        <main class="content">
-            <h1>📋 Pedidos</h1>
-            <div class="filtros">
-                <button class="filtro-btn ativo" onclick="filtrar('todos')">Todos</button>
-                <button class="filtro-btn" onclick="filtrar('pendente')">Pendentes</button>
-                <button class="filtro-btn" onclick="filtrar('confirmado')">Confirmados</button>
-            </div>
-            <div class="tabela-pedidos"><table><thead><tr><th>ID</th><th>Cliente</th><th>Valor</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody id="lista-pedidos"></tbody></table></div>
-        </main>
-    </div>
-    <script>
-        if(!localStorage.getItem('admin_logado'))window.location.href='login.html';
-        function sair(){localStorage.removeItem('admin_logado');window.location.href='login.html';}
-        var pedidos=[], filtroAtual='todos';
-        function salvarPedidos(){localStorage.setItem('pedidos',JSON.stringify(pedidos)); enviarParaBin(); renderizar();}
-        function filtrar(f){filtroAtual=f; document.querySelectorAll('.filtro-btn').forEach(function(b){b.classList.remove('ativo')}); event.target.classList.add('ativo'); renderizar();}
-        function confirmarPedido(id){var p=pedidos.find(function(x){return x.id===id}); if(p&&p.status==='pendente'){p.status='confirmado'; salvarPedidos();}}
-        function renderizar(){var t=document.getElementById('lista-pedidos'), pf=filtroAtual==='todos'?pedidos:pedidos.filter(function(p){return p.status===filtroAtual}); if(pf.length===0){t.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;">📋 Nenhum</td></tr>';return;} t.innerHTML=pf.map(function(p){return '<tr><td>#'+p.id+'</td><td>'+p.cliente+'</td><td>R$ '+Number(p.valor).toFixed(2)+'</td><td>'+p.data+'</td><td><span class="status status-'+p.status+'">'+p.status+'</span></td><td>'+(p.status==='pendente'?'<button class="btn-confirmar" onclick="confirmarPedido('+p.id+')">✅</button>':'—')+'</td></tr>';}).join('');}
-        sincronizarLocalStorage().then(function(){pedidos=JSON.parse(localStorage.getItem('pedidos'))||[]; renderizar();});
-    </script>
+<div class="admin-container">
+<aside class="sidebar">
+<h2>⚙️ Admin</h2>
+<nav>
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="produtos.html">📦 Produtos</a>
+<a href="categorias.html">📂 Categorias</a>
+<a href="pedidos.html" class="ativo">📋 Pedidos</a>
+<a href="cupons.html">🏷️ Cupons</a>
+<a href="staff.html">👥 Staff</a>
+<a href="logs.html">🧾 Logs</a>
+<a href="configuracoes.html">🎨 Configurações</a>
+<a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
+<a href="#" onclick="sair()">🚪 Sair</a>
+</nav>
+</aside>
+<main class="content">
+<h1>📋 Pedidos</h1>
+<div class="filtros">
+<button class="filtro-btn ativo" onclick="filtrar('todos')">Todos</button>
+<button class="filtro-btn" onclick="filtrar('pendente_pagamento')">Aguardando pagamento</button>
+<button class="filtro-btn" onclick="filtrar('confirmado')">Confirmados</button>
+</div>
+<div class="tabela-pedidos"><table><thead><tr><th>ID</th><th>Cliente</th><th>Itens</th><th>Valor</th><th>Pagamento</th><th>Data</th><th>Status</th></tr></thead><tbody id="lista-pedidos"></tbody></table></div>
+</main>
+</div>
+<script>
+if (!localStorage.getItem('admin_sessao')) window.location.href = 'login.html';
+function sair() { localStorage.removeItem('admin_sessao'); window.location.href = 'login.html'; }
+
+var pedidos = [], filtroAtual = 'todos';
+
+function filtrar(f) {
+    filtroAtual = f;
+    document.querySelectorAll('.filtro-btn').forEach(function(b) { b.classList.remove('ativo'); });
+    event.target.classList.add('ativo');
+    renderizar();
+}
+
+function renderizar() {
+    var t = document.getElementById('lista-pedidos');
+    var pf = filtroAtual === 'todos' ? pedidos : pedidos.filter(function(p) { return p.status === filtroAtual; });
+    pf = pf.slice().sort(function(a, b) { return new Date(b.data) - new Date(a.data); });
+    if (pf.length === 0) { t.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;">📋 Nenhum pedido</td></tr>'; return; }
+    t.innerHTML = pf.map(function(p) {
+        var itensTxt = p.itens ? p.itens.map(function(i) { return i.quantidade + 'x ' + i.nome; }).join(', ') : '—';
+        var pagamentoTxt = p.pagamento ? p.pagamento + (p.transacao_id ? '<br><span class="metodo-badge">#' + p.transacao_id + '</span>' : '') : '<span class="metodo-badge">aguardando</span>';
+        return '<tr>' +
+            '<td>#' + p.id + '</td>' +
+            '<td>' + p.cliente + '</td>' +
+            '<td>' + itensTxt + '</td>' +
+            '<td>R$ ' + Number(p.valor).toFixed(2) + '</td>' +
+            '<td>' + pagamentoTxt + '</td>' +
+            '<td>' + new Date(p.data).toLocaleString('pt-BR') + '</td>' +
+            '<td><span class="status status-' + p.status + '">' + (p.status === 'pendente_pagamento' ? 'Aguardando' : p.status) + '</span></td>' +
+        '</tr>';
+    }).join('');
+}
+
+sincronizarLocalStorage().then(function() {
+    pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+    renderizar();
+});
+</script>
 </body>
 </html>
