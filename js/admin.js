@@ -1,14 +1,14 @@
-// ========== VERIFICAR LOGIN ==========
-if (!localStorage.getItem('admin_logado')) {
+// ========== VERIFICAR LOGIN (sessão real, não mais um "true" fixo) ==========
+if (!localStorage.getItem('admin_sessao')) {
     window.location.href = 'login.html';
 }
 
 function sair() {
-    localStorage.removeItem('admin_logado');
+    localStorage.removeItem('admin_sessao');
     window.location.href = 'login.html';
 }
 
-// ========== MODAL DE CONFIRMAÇÃO ==========
+// ========== MODAL DE CONFIRMAÇÃO ========== (sem mudanças)
 function mostrarConfirmacao(mensagem, icone, onConfirmar, tipoBotao) {
     tipoBotao = tipoBotao || 'remover';
     var modal = document.getElementById('modal-confirmacao');
@@ -36,7 +36,6 @@ function mostrarConfirmacao(mensagem, icone, onConfirmar, tipoBotao) {
     };
     modal.classList.add('ativo');
 }
-
 function fecharConfirmacao() {
     var modal = document.getElementById('modal-confirmacao');
     if (modal) modal.classList.remove('ativo');
@@ -46,9 +45,16 @@ function fecharConfirmacao() {
 var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 var imagemTemporaria = null;
 
-function salvarProdutos() {
+// Sincroniza com o backend antes de renderizar (antes essa página não fazia isso)
+sincronizarLocalStorage().then(function() {
+    produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+    renderizarTabela();
+    carregarCategoriasNoSelect();
+});
+
+function salvarProdutos(acao, detalhes) {
     localStorage.setItem('produtos', JSON.stringify(produtos));
-    enviarParaBin();
+    enviarParaBin('produtos', produtos, acao, detalhes);
     renderizarTabela();
 }
 
@@ -66,7 +72,6 @@ function mostrarForm(id) {
     document.getElementById('form-produto').classList.add('ativo');
     limparForm();
     carregarCategoriasNoSelect();
-    
     if (id) {
         var produto = produtos.find(function(p) { return p.id === id; });
         document.getElementById('nome-produto').value = produto.nome;
@@ -79,7 +84,6 @@ function mostrarForm(id) {
         document.getElementById('destaque-produto').value = produto.destaque === false ? 'nao' : 'sim';
         document.getElementById('form-produto').dataset.editId = id;
         document.getElementById('form-titulo').textContent = '✏️ Editar Produto';
-        
         if (produto.imagem) {
             document.getElementById('preview-imagem').src = produto.imagem;
             document.getElementById('preview-imagem').classList.add('ativo');
@@ -89,7 +93,6 @@ function mostrarForm(id) {
         document.getElementById('destaque-produto').value = 'sim';
         document.getElementById('form-titulo').textContent = '➕ Novo Produto';
     }
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -166,46 +169,33 @@ function salvarProduto() {
     var categoria = document.getElementById('categoria-produto').value;
     var destaque = document.getElementById('destaque-produto').value === 'sim';
     var imagem = imagemTemporaria || urlImagem || '';
-    
+
     if (!nome || !preco) {
         alert('⚠️ Preencha nome e preço!');
         return;
     }
-    
+
     var editId = document.getElementById('form-produto').dataset.editId;
-    
+
     mostrarConfirmacao(
         editId ? 'Salvar alterações em "' + nome + '"?' : 'Adicionar "' + nome + '" à loja por R$ ' + preco.toFixed(2) + '?',
         editId ? '✏️' : '➕',
         function() {
             if (editId) {
                 var index = produtos.findIndex(function(p) { return p.id === parseInt(editId); });
-                produtos[index] = { 
-                    id: produtos[index].id, 
-                    nome: nome, 
-                    preco: preco,
-                    precoPromo: precoPromo,
-                    emoji: emoji, 
-                    descricao: descricao,
-                    imagem: imagem,
-                    categoria: categoria,
-                    destaque: destaque
+                produtos[index] = {
+                    id: produtos[index].id, nome: nome, preco: preco, precoPromo: precoPromo,
+                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque
                 };
+                salvarProdutos('Editou produto', nome);
             } else {
                 var novoId = produtos.length > 0 ? Math.max.apply(null, produtos.map(function(p) { return p.id; })) + 1 : 1;
-                produtos.push({ 
-                    id: novoId, 
-                    nome: nome, 
-                    preco: preco,
-                    precoPromo: precoPromo,
-                    emoji: emoji, 
-                    descricao: descricao,
-                    imagem: imagem,
-                    categoria: categoria,
-                    destaque: destaque
+                produtos.push({
+                    id: novoId, nome: nome, preco: preco, precoPromo: precoPromo,
+                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque
                 });
+                salvarProdutos('Criou produto', nome);
             }
-            salvarProdutos();
             fecharForm();
         },
         'salvar'
@@ -220,31 +210,26 @@ function removerProduto(id) {
             '⚠️',
             function() {
                 produtos = produtos.filter(function(p) { return p.id !== id; });
-                salvarProdutos();
+                salvarProdutos('Removeu produto', produto.nome);
             },
             'remover'
         );
     }
 }
 
-function editarProduto(id) {
-    mostrarForm(id);
-}
+function editarProduto(id) { mostrarForm(id); }
 
 // ========== MUDAR CATEGORIA RÁPIDO ==========
 function mudarCategoria(produtoId) {
     var produto = produtos.find(function(p) { return p.id === produtoId; });
     if (!produto) return;
-    
     var categorias = JSON.parse(localStorage.getItem('categorias')) || [];
     if (categorias.length === 0) {
         alert('⚠️ Nenhuma categoria cadastrada!\nVá em 📂 Categorias primeiro.');
         return;
     }
-    
     var modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    
     var opcoes = categorias.map(function(cat) {
         var selecionado = produto.categoria === cat.nome ? 'style="border-color:var(--verde);background:rgba(16,185,129,0.1);"' : '';
         return '<div ' + selecionado + ' onclick="selecionarCategoria(' + produtoId + ', \'' + cat.nome.replace(/'/g, "\\'") + '\')" style="background:var(--fundo);padding:1rem;border-radius:8px;cursor:pointer;margin-bottom:0.5rem;border:2px solid #333;transition:all 0.3s;">' +
@@ -252,8 +237,7 @@ function mudarCategoria(produtoId) {
             (cat.descricao ? '<br><small style="color:var(--texto-cinza);">' + cat.descricao + '</small>' : '') +
         '</div>';
     }).join('');
-    
-    modal.innerHTML = 
+    modal.innerHTML =
         '<div style="background:var(--card);padding:2rem;border-radius:15px;border:2px solid var(--roxo);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">' +
             '<h3 style="color:var(--amarelo);margin-bottom:1rem;">📂 Categoria para: ' + produto.nome + '</h3>' +
             '<p style="color:var(--texto-cinza);margin-bottom:1rem;">Selecione uma categoria:</p>' +
@@ -261,7 +245,6 @@ function mudarCategoria(produtoId) {
             opcoes +
             '<button onclick="fecharModalCat()" style="background:#64748b;color:white;padding:0.8rem;border:none;border-radius:8px;width:100%;margin-top:1rem;cursor:pointer;">Cancelar</button>' +
         '</div>';
-    
     modal.id = 'modal-categoria-rapido';
     document.body.appendChild(modal);
     modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
@@ -272,7 +255,7 @@ function selecionarCategoria(produtoId, categoriaNome) {
     if (produto) {
         produto.categoria = categoriaNome || '';
         localStorage.setItem('produtos', JSON.stringify(produtos));
-        enviarParaBin();
+        enviarParaBin('produtos', produtos, 'Mudou categoria', produto.nome + ' → ' + (categoriaNome || 'sem categoria'));
         var txt = document.getElementById('cat-txt-' + produtoId);
         if (txt) txt.textContent = categoriaNome || '—';
         fecharModalCat();
@@ -288,25 +271,20 @@ function fecharModalCat() {
 function renderizarTabela() {
     var tbody = document.getElementById('lista-produtos-admin');
     if (!tbody) return;
-    
     if (produtos.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 3rem; color: var(--texto-cinza);">📦 Nenhum produto cadastrado</td></tr>';
         return;
     }
-    
     tbody.innerHTML = produtos.map(function(produto) {
-        var imgCell = produto.imagem 
+        var imgCell = produto.imagem
             ? '<img src="' + produto.imagem + '" style="width:50px;height:50px;object-fit:cover;border-radius:8px;" alt="">'
             : '<div style="width:50px;height:50px;background:var(--fundo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">' + (produto.emoji || '📦') + '</div>';
-        
         var precoCell = 'R$ ' + Number(produto.preco).toFixed(2);
         if (produto.precoPromo && Number(produto.precoPromo) < Number(produto.preco)) {
             precoCell = '<span style="text-decoration:line-through;color:var(--texto-cinza);">R$ ' + Number(produto.preco).toFixed(2) + '</span> <span style="color:#ef4444;font-weight:bold;">R$ ' + Number(produto.precoPromo).toFixed(2) + '</span>';
         }
-        
         var catAtual = produto.categoria || '—';
         var destaqueBadge = produto.destaque !== false ? ' <span class="badge-destaque">⭐</span>' : '—';
-        
         return '<tr>' +
             '<td>' + imgCell + '</td>' +
             '<td>' + produto.nome + '</td>' +
@@ -320,5 +298,3 @@ function renderizarTabela() {
         '</tr>';
     }).join('');
 }
-
-renderizarTabela();
