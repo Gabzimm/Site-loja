@@ -1,58 +1,76 @@
-// ========== BANCO DE DADOS CENTRALIZADO - JSONBin ==========
-var JSONBIN_URL = 'https://api.jsonbin.io/v3/b/6a63b1ddf5f4af5e29bcc812';
-var JSONBIN_KEY = '$2a$10$DHEm2oWljLi.pnkhaPJXOey/Y1q8/OHsNPUZSquJ0OB8NhAeR6.Fa';
-var dadosCache = null;
+// ========================================================
+// _db.js — helper interno usado pelas outras funções da /api
+// NÃO é uma rota pública. Concentra o único ponto do projeto
+// que conhece a Master Key do JSONBin.
+// ========================================================
 
-// Carregar todos os dados
-function carregarDados() {
-    return fetch(JSONBIN_URL + '/latest', {
-        headers: { 'X-Master-Key': JSONBIN_KEY }
+const JSONBIN_URL = process.env.JSONBIN_URL; // ex: https://api.jsonbin.io/v3/b/xxxxxxxx
+const JSONBIN_KEY = process.env.JSONBIN_KEY; // X-Master-Key, só existe no servidor agora
+
+async function getDB() {
+  const r = await fetch(JSONBIN_URL + '/latest', {
+    headers: { 'X-Master-Key': JSONBIN_KEY }
+  });
+  if (!r.ok) throw new Error('Falha ao ler JSONBin: ' + r.status);
+  const json = await r.json();
+  const data = json.record || {};
+  // Garante que todas as coleções existem, mesmo em bin novo/vazio
+  data.produtos = data.produtos || [];
+  data.categorias = data.categorias || [];
+  data.cupons = data.cupons || [];
+  data.pedidos = data.pedidos || [];
+  data.admins = data.admins || ['1213819385576300595'];
+  data.config_loja = data.config_loja || {};
+  data.logs = data.logs || [];
+  return data;
+}
+
+async function saveDB(data) {
+  const r = await fetch(JSONBIN_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_KEY
+    },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error('Falha ao salvar JSONBin: ' + r.status);
+  return true;
+}
+
+// Adiciona uma entrada no log de auditoria (quem fez o quê, quando)
+function registrarLog(data, quemId, quemNome, acao, detalhes) {
+  data.logs.unshift({
+    quem_id: quemId,
+    quem_nome: quemNome || quemId,
+    acao: acao,
+    detalhes: detalhes || '',
+    data: new Date().toISOString()
+  });
+  // mantém só os últimos 500 registros pra não crescer infinito
+  if (data.logs.length > 500) data.logs = data.logs.slice(0, 500);
+}
+
+// Envia mensagem pro webhook do Discord (agora só roda no servidor)
+async function notificarDiscord(titulo, campos) {
+  const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+  if (!WEBHOOK_URL) return;
+  await fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      embeds: [{
+        title: titulo,
+        fields: campos.map(function(c) { return { name: c[0], value: String(c[1]) }; }),
+        color: 0x10B981
+      }]
     })
-    .then(function(r) { 
-        if (!r.ok) throw new Error('Erro ao carregar');
-        return r.json(); 
-    })
-    .then(function(data) { 
-        dadosCache = data.record;
-        return data.record; 
-    });
+  });
 }
 
-// Salvar todos os dados
-function salvarDados(dados) {
-    dadosCache = dados;
-    return fetch(JSONBIN_URL, {
-        method: 'PUT',
-        headers: { 
-            'Content-Type': 'application/json',
-            'X-Master-Key': JSONBIN_KEY 
-        },
-        body: JSON.stringify(dados)
-    }).then(function(r) { return r.json(); });
+// Valida se um Discord ID é admin, consultando o próprio banco
+async function ehAdmin(data, discordId) {
+  return data.admins.indexOf(discordId) !== -1;
 }
 
-// Sincronizar localStorage com a Bin
-function sincronizarLocalStorage() {
-    return carregarDados().then(function(dados) {
-        if (dados.produtos) localStorage.setItem('produtos', JSON.stringify(dados.produtos));
-        if (dados.categorias) localStorage.setItem('categorias', JSON.stringify(dados.categorias));
-        if (dados.cupons) localStorage.setItem('cupons', JSON.stringify(dados.cupons));
-        if (dados.pedidos) localStorage.setItem('pedidos', JSON.stringify(dados.pedidos));
-        if (dados.admins) localStorage.setItem('admins', JSON.stringify(dados.admins));
-        if (dados.config_loja) localStorage.setItem('config_loja', JSON.stringify(dados.config_loja));
-        return dados;
-    });
-}
-
-// Enviar localStorage para a Bin
-function enviarParaBin() {
-    var dados = {
-        produtos: JSON.parse(localStorage.getItem('produtos') || '[]'),
-        categorias: JSON.parse(localStorage.getItem('categorias') || '[]'),
-        cupons: JSON.parse(localStorage.getItem('cupons') || '[]'),
-        pedidos: JSON.parse(localStorage.getItem('pedidos') || '[]'),
-        admins: JSON.parse(localStorage.getItem('admins') || '["1213819385576300595"]'),
-        config_loja: JSON.parse(localStorage.getItem('config_loja') || '{}')
-    };
-    return salvarDados(dados);
-}
+module.exports = { getDB, saveDB, registrarLog, notificarDiscord, ehAdmin };
