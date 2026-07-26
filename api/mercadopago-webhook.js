@@ -1,6 +1,6 @@
 // POST /api/mercadopago-webhook
 // O Mercado Pago chama essa URL sozinho quando o status de um pagamento muda.
-const { getDB, saveDB, notificarDiscord } = require('./_db');
+const { getDB, saveDB, notificarDiscord } = require('../lib/db');
 
 const NOMES_METODO = {
   pix: 'PIX',
