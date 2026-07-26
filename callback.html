@@ -1,57 +1,40 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="titulo-pagina">ReyCraft Shop - Conectando...</title>
-    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
-    <script src="js/db.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #E2E8F0; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; }
-        .loader { width: 60px; height: 60px; border: 5px solid #8B5CF6; border-top-color: #F59E0B; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .box { background: #14141f; padding: 3rem; border-radius: 15px; border: 2px solid #8B5CF6; max-width: 500px; width: 90%; }
-    </style>
+<meta charset="UTF-8">
+<title>Entrando...</title>
+<style>
+body{background:#0a0a0f;color:#E2E8F0;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.box{text-align:center;}
+</style>
 </head>
 <body>
-    <div class="box"><div class="loader"></div><h2 style="color:#F59E0B;">Conectando...</h2><p id="status" style="color:#94A3B8;">Aguarde</p></div>
+<div class="box">
+  <h2>🔄 Entrando com Discord...</h2>
+  <p id="msg" style="color:#94A3B8;margin-top:0.5rem;"></p>
+</div>
+<script>
+var REDIRECT_URI = window.location.origin + '/callback.html';
+var params = new URLSearchParams(window.location.search);
+var code = params.get('code');
 
-    <script>
-        (function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon;}})();
-
-        var DISCORD_CLIENT_ID='1515464456719695952', DISCORD_CLIENT_SECRET='BxIwFvl6Hn7DvW4b6BwEvCxDrLr9YSb_', REDIRECT_URI='https://reycraft-hc.shop/callback.html', GUILD_ID='1332289203127582780';
-
-        async function buscarClan(userId){
-            var config=JSON.parse(localStorage.getItem('config_loja')), BOT_TOKEN=config?config.botToken:'';
-            if(!BOT_TOKEN)return null;
-            try{
-                var mr=await fetch('https://discord.com/api/guilds/'+GUILD_ID+'/members/'+userId,{headers:{'Authorization':'Bot '+BOT_TOKEN}});
-                if(!mr.ok)return null;
-                var md=await mr.json(), rr=await fetch('https://discord.com/api/guilds/'+GUILD_ID+'/roles',{headers:{'Authorization':'Bot '+BOT_TOKEN}}), roles=await rr.json(), clan=null;
-                if(md.roles){for(var i=0;i<md.roles.length;i++){var r=roles.find(function(x){return x.id===md.roles[i]}); if(r&&r.name.startsWith('・ ')){clan=r.name.replace('・ ',''); break;}}}
-                return clan;
-            }catch(e){return null;}
-        }
-
-        async function handleCallback(){
-            var params=new URLSearchParams(window.location.search), code=params.get('code');
-            if(!code){document.getElementById('status').textContent='❌ Erro'; return;}
-            try{
-                document.getElementById('status').textContent='🔄 Verificando...';
-                var tr=await fetch('https://discord.com/api/oauth2/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:DISCORD_CLIENT_ID,client_secret:DISCORD_CLIENT_SECRET,grant_type:'authorization_code',code:code,redirect_uri:REDIRECT_URI})});
-                var td=await tr.json(); if(td.error)throw new Error(td.error_description);
-                var ur=await fetch('https://discord.com/api/users/@me',{headers:{'Authorization':'Bearer '+td.access_token}}), ud=await ur.json();
-                var usuario={id:ud.id,username:ud.username,avatar:ud.avatar?'https://cdn.discordapp.com/avatars/'+ud.id+'/'+ud.avatar+'.png?size=256':'https://cdn.discordapp.com/embed/avatars/0.png?size=256',global_name:ud.global_name||ud.username,loggedAt:new Date().toISOString()};
-                localStorage.setItem('usuario_discord',JSON.stringify(usuario));
-                document.getElementById('status').textContent='🔍 Buscando clan...';
-                var clan=await buscarClan(ud.id);
-                if(clan){localStorage.setItem('meu_clan_'+ud.id,clan); console.log('✅ Clan:'+clan);}
-                document.getElementById('status').textContent='✅ Redirecionando...'; document.getElementById('status').style.color='#10B981';
-                setTimeout(function(){window.location.href=localStorage.getItem('redirect_after_login')||'index.html';},1000);
-            }catch(e){document.getElementById('status').innerHTML='❌ '+e.message+'<br><br><a href="index.html" style="color:#F59E0B;">← Voltar</a>';}
-        }
-        handleCallback();
-    </script>
+if (!code) {
+  document.getElementById('msg').textContent = 'Código não encontrado.';
+} else {
+  fetch('/api/discord-callback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (!data.usuario) { document.getElementById('msg').textContent = 'Falha no login.'; return; }
+    localStorage.setItem('usuario_discord', JSON.stringify(data.usuario));
+    var destino = localStorage.getItem('redirect_after_login') || 'index.html';
+    localStorage.removeItem('redirect_after_login');
+    window.location.href = destino;
+  }).catch(function() {
+    document.getElementById('msg').textContent = 'Erro ao conectar. Tente novamente.';
+  });
+}
+</script>
 </body>
 </html>
