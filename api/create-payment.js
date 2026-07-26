@@ -2,8 +2,8 @@
 // body: { discord_id, nome, itens: [{nome, preco, quantidade}], cupom, gateway }
 // gateway: 'mercadopago' (Pix + Cartão Crédito/Débito) ou 'stripe' (cartão internacional)
 // Cria o pedido como "pendente_pagamento" no banco e devolve a URL de checkout.
-const { getDB, saveDB } = require('./_db');
-const { converterBRLparaEUR } = require('./_cambio');
+const { getDB, saveDB } = require('../lib/db');
+const { converterBRLparaEUR } = require('../lib/cambio');
 
 // Mapeia a opção que a pessoa vê e clica -> gateway real + tipo de pagamento na Mercado Pago
 const MAPA_METODOS = {
