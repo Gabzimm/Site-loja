@@ -9,9 +9,6 @@
     <style>
         .admin-container { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
-        .sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; font-size: 1.3rem; }
-        .sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s; }
-        .sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
         .sidebar nav a.ver-loja { background: var(--verde); color: white; text-align: center; font-weight: bold; margin-top: 1rem; }
         .sidebar nav a.ver-loja:hover { background: var(--verde-escuro); }
         .content { flex: 1; padding: 2rem; max-width: 900px; }
@@ -93,7 +90,6 @@
                 <h3>🤖 Token do Bot Discord</h3>
                 <div class="input-group">
                     <label>Token do Bot</label>
-                    <input type="password" id="bot-token" placeholder="Cole o token do seu bot aqui">
                     <small>⚠️ Usado para verificar clans dos usuários. Salvo apenas no seu navegador e sincronizado via JSONBin.</small>
                 </div>
             </div>
@@ -129,8 +125,8 @@
     </div>
 
     <script>
-        if (!localStorage.getItem('admin_logado')) { window.location.href = 'login.html'; }
-        function sair() { localStorage.removeItem('admin_logado'); window.location.href = 'login.html'; }
+        if (!localStorage.getItem('admin_sessao')) { window.location.href = 'login.html'; }
+        function sair() { localStorage.removeItem('admin_sessao'); window.location.href = 'login.html'; }
 
         var config = JSON.parse(localStorage.getItem('config_loja')) || {
             nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0,
