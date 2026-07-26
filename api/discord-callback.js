@@ -1,8 +1,8 @@
 // POST /api/discord-callback  { code }
 // Troca o "code" do OAuth do Discord pelo access_token e busca o usuário.
 // Se o usuário for admin, devolve também um token de sessão de admin.
-const { getDB, ehAdmin } = require('./_db');
-const { gerarSessao } = require('./_session');
+const { getDB, ehAdmin } = require('../lib/db');
+const { gerarSessao } = require('../lib/session');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
