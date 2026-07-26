@@ -26,7 +26,11 @@ if (!code) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: code, redirect_uri: REDIRECT_URI })
   }).then(function(r) { return r.json(); }).then(function(data) {
-    if (!data.usuario) { document.getElementById('msg').textContent = 'Falha no login.'; return; }
+    if (!data.usuario) {
+      document.getElementById('msg').textContent = 'Falha no login.' + (data.detalhe ? (' Detalhe: ' + data.detalhe) : '');
+      console.error('Resposta do /api/discord-callback:', data);
+      return;
+    }
     localStorage.setItem('usuario_discord', JSON.stringify(data.usuario));
     var destino = localStorage.getItem('redirect_after_login') || 'index.html';
     localStorage.removeItem('redirect_after_login');
