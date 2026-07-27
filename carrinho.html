@@ -202,9 +202,7 @@ function renderizarCarrinho(){
   resumoHtml+='</div>';
 
   resumoHtml+='<div class="pagamento-section"><h3>💳 Forma de Pagamento</h3><div class="pagamento-opcoes">';
-  resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='pix'?' selecionado':'')+'" onclick="selecionarMetodo(\'pix\')">📱 PIX</div>';
-  resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='credito'?' selecionado':'')+'" onclick="selecionarMetodo(\'credito\')">💳 Cartão de Crédito</div>';
-  resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='debito'?' selecionado':'')+'" onclick="selecionarMetodo(\'debito\')">💳 Cartão de Débito</div>';
+  resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='mercadopago'?' selecionado':'')+'" onclick="selecionarMetodo(\'mercadopago\')">💳 Mercado Pago<br><small>PIX / Crédito / Débito / Boleto, etc.</small></div>';
   resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='mby'?' selecionado':'')+'" onclick="selecionarMetodo(\'mby\')">🌎 MBY</div>';
   resumoHtml+='</div>';
   if(metodoSelecionado==='mby'){
