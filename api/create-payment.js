@@ -5,11 +5,9 @@
 const { getDB, saveDB } = require('../lib/db');
 const { converterBRLparaEUR } = require('../lib/cambio');
 
-// Mapeia a opção que a pessoa vê e clica -> gateway real + tipo de pagamento na Mercado Pago
+// Mapeia a opção que a pessoa vê e clica -> gateway real
 const MAPA_METODOS = {
-  pix: { gateway: 'mercadopago', tipoMP: 'bank_transfer', nomeExibicao: 'PIX' },
-  credito: { gateway: 'mercadopago', tipoMP: 'credit_card', nomeExibicao: 'Cartão de Crédito' },
-  debito: { gateway: 'mercadopago', tipoMP: 'debit_card', nomeExibicao: 'Cartão de Débito' },
+  mercadopago: { gateway: 'mercadopago', nomeExibicao: null }, // a própria página do MP mostra Pix/Crédito/Débito/Boleto/etc
   mby: { gateway: 'stripe', nomeExibicao: 'MBY' }
 };
 
