@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Logs</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/db.js"></script>
+<style>
+.admin-container { display: flex; min-height: 100vh; }
+.content { flex: 1; padding: 2rem; }
+.tabela-logs { background: var(--card); border-radius: 10px; padding: 1rem; overflow-x: auto; }
+.tabela-logs table { width: 100%; border-collapse: collapse; }
+.tabela-logs th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--roxo); color: var(--amarelo); white-space:nowrap; }
+.tabela-logs td { padding: 1rem; border-bottom: 1px solid #333; }
+.acao-badge { background: rgba(139,92,246,0.2); color: var(--roxo-claro); padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.85rem; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="admin-container">
+<aside class="sidebar">
+<h2>⚙️ Admin</h2>
+<nav>
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="produtos.html">📦 Produtos</a>
+<a href="categorias.html">📂 Categorias</a>
+<a href="pedidos.html">📋 Pedidos</a>
+<a href="cupons.html">🏷️ Cupons</a>
+<a href="staff.html">👥 Staff</a>
+<a href="logs.html" class="ativo">🧾 Logs</a>
+<a href="configuracoes.html">🎨 Configurações</a>
+<a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
+<a href="#" onclick="sair()">🚪 Sair</a>
+</nav>
+</aside>
+<main class="content">
+<h1>🧾 Logs de Auditoria</h1>
+<p style="color:var(--texto-cinza);margin-bottom:1.5rem;">Quem mexeu em quê, e quando.</p>
+<div class="tabela-logs"><table><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Detalhes</th></tr></thead><tbody id="lista-logs"></tbody></table></div>
+</main>
+</div>
+<script>
+if (!localStorage.getItem('admin_sessao')) window.location.href = 'login.html';
+function sair() { localStorage.removeItem('admin_sessao'); window.location.href = 'login.html'; }
+
+sincronizarLocalStorage().then(function() {
+    var logs = JSON.parse(localStorage.getItem('logs')) || [];
+    var t = document.getElementById('lista-logs');
+    if (logs.length === 0) { t.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;">🧾 Nenhum registro ainda</td></tr>'; return; }
+    t.innerHTML = logs.map(function(l) {
+        return '<tr>' +
+            '<td>' + new Date(l.data).toLocaleString('pt-BR') + '</td>' +
+            '<td>' + (l.quem_nome || l.quem_id) + '<br><small style="color:var(--texto-cinza);">' + l.quem_id + '</small></td>' +
+            '<td><span class="acao-badge">' + l.acao + '</span></td>' +
+            '<td>' + (l.detalhes || '—') + '</td>' +
+        '</tr>';
+    }).join('');
+});
+</script>
+</body>
+</html>
