@@ -49,7 +49,7 @@ module.exports = async function handler(req, res) {
       cupom: cupom || null,
       data: new Date().toISOString(),
       status: 'pendente_pagamento',
-      pagamento: info.nomeExibicao, // já mostra "PIX", "Cartão de Crédito" etc, não o nome do gateway
+      pagamento: info.gateway === 'mercadopago' ? null : info.nomeExibicao, // no MP só sabemos o método de verdade depois do webhook
       gateway: info.gateway,
       transacao_id: null
     };
@@ -59,12 +59,9 @@ module.exports = async function handler(req, res) {
     const SITE_URL = process.env.SITE_URL; // ex: https://reycraft-hc.shop
 
     if (info.gateway === 'mercadopago') {
-      // PIX, Cartão de Crédito e Cartão de Débito passam todos pelo Checkout Pro do Mercado Pago —
-      // a própria página deles gera o QR Code/copia-e-cola quando a pessoa escolhe PIX, sem
-      // precisarmos chamar a API de Pagamentos direta (que exige conta com verificação completa).
-      const TODOS_OS_TIPOS = ['credit_card', 'debit_card', 'bank_transfer', 'ticket', 'atm', 'digital_wallet', 'prepaid_card'];
-      const excluidos = TODOS_OS_TIPOS.filter(function(t) { return t !== info.tipoMP; }).map(function(t) { return { id: t }; });
-
+      // Não restringe mais o tipo de pagamento — deixa o próprio Mercado Pago mostrar a tela
+      // completa dele (Pix, Cartões, Boleto, PicPay, Saldo, etc.), sem exigir login,
+      // igual acontece em outras lojas (Blaze, por exemplo).
       const prefResp = await fetch('https://api.mercadopago.com/checkout/preferences', {
         method: 'POST',
         headers: {
@@ -76,7 +73,6 @@ module.exports = async function handler(req, res) {
             return { title: i.nome, quantity: i.quantidade, unit_price: Number(i.preco), currency_id: 'BRL' };
           }),
           external_reference: String(pedidoId),
-          payment_methods: { excluded_payment_types: excluidos },
           back_urls: {
             success: SITE_URL + '/carrinho.html?status=sucesso',
             failure: SITE_URL + '/carrinho.html?status=falha',
