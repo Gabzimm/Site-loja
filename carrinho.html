@@ -62,7 +62,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var
 <script>
 (function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite+' - Carrinho'; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon; if(c.logoUrl){var l=document.getElementById('logo-img');if(l)l.src=c.logoUrl;} if(c.logoTamanho){var l=document.getElementById('logo-img');if(l)l.style.height=c.logoTamanho+'px';}}})();
 
-var DISCORD_CLIENT_ID='1515464456719695952', REDIRECT_URI='https://reycraft-hc.shop/callback.html';
+var DISCORD_CLIENT_ID='1515464456719695952', REDIRECT_URI='https://www.reycraft-hc.shop/callback.html';
 var carrinho=JSON.parse(localStorage.getItem('carrinho'))||[], cupons=[], cupomAplicado=null, metodoSelecionado=null, valorEuroPreview=null, usuario=JSON.parse(localStorage.getItem('usuario_discord'));
 
 // Ao voltar do Mercado Pago/Stripe com ?status=..., avisa o usuário (a confirmação real vem do webhook, não da URL)
