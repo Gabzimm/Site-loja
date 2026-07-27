@@ -5,7 +5,12 @@ const { getDB, saveDB, notificarDiscord } = require('../lib/db');
 const NOMES_METODO = {
   pix: 'PIX',
   credit_card: 'Cartão de Crédito',
-  debit_card: 'Cartão de Débito'
+  debit_card: 'Cartão de Débito',
+  ticket: 'Boleto',
+  atm: 'Caixa Eletrônico/Lotérica',
+  digital_wallet: 'Carteira Digital (PicPay, etc.)',
+  account_money: 'Saldo em Conta',
+  prepaid_card: 'Cartão Pré-pago'
 };
 
 module.exports = async function handler(req, res) {
@@ -26,7 +31,7 @@ module.exports = async function handler(req, res) {
     if (!pedido || pedido.status === 'confirmado') return res.status(200).json({ ok: true });
 
     pedido.status = 'confirmado';
-    // pedido.pagamento já foi preenchido em create-payment.js (PIX/Cartão de Crédito/Débito) na hora do checkout
+    pedido.pagamento = NOMES_METODO[pagamento.payment_type_id] || pagamento.payment_type_id; // agora reflete o que a pessoa escolheu de verdade no Mercado Pago
     pedido.gateway = 'mercadopago';
     pedido.transacao_id = String(pagamento.id);
 
