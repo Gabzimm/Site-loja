@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
       // PIX, Cartão de Crédito e Cartão de Débito passam todos pelo Checkout Pro do Mercado Pago —
       // a própria página deles gera o QR Code/copia-e-cola quando a pessoa escolhe PIX, sem
       // precisarmos chamar a API de Pagamentos direta (que exige conta com verificação completa).
-      const TODOS_OS_TIPOS = ['credit_card', 'debit_card', 'bank_transfer', 'ticket', 'atm', 'digital_wallet', 'prepaid_card'];
+      const TODOS_OS_TIPOS = ['credit_card', 'debit_card', 'bank_transfer', 'ticket', 'atm', 'digital_wallet', 'prepaid_card', 'account_money'];
       const excluidos = TODOS_OS_TIPOS.filter(function(t) { return t !== info.tipoMP; }).map(function(t) { return { id: t }; });
 
       const prefResp = await fetch('https://api.mercadopago.com/checkout/preferences', {
