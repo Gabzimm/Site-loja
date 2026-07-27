@@ -58,7 +58,48 @@ module.exports = async function handler(req, res) {
 
     const SITE_URL = process.env.SITE_URL; // ex: https://reycraft-hc.shop
 
+    if (info.gateway === 'mercadopago' && metodo === 'pix') {
+      // PIX usa a API de Pagamentos direta (não o Checkout Pro) pra devolver QR Code + copia-e-cola
+      const pagResp = await fetch('https://api.mercadopago.com/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + process.env.MP_ACCESS_TOKEN,
+          'X-Idempotency-Key': 'pedido-' + pedidoId
+        },
+        body: JSON.stringify({
+          transaction_amount: Number(total),
+          description: 'Pedido #' + pedidoId,
+          payment_method_id: 'pix',
+          external_reference: String(pedidoId),
+          notification_url: SITE_URL + '/api/mercadopago-webhook',
+          payer: {
+            email: discord_id + '@cliente.reycraft-hc.shop',
+            first_name: (nome || 'Cliente').split(' ')[0]
+          }
+        })
+      });
+      const pagamento = await pagResp.json();
+
+      if (!pagResp.ok || !pagamento.point_of_interaction) {
+        console.error('Erro ao gerar PIX:', JSON.stringify(pagamento));
+        return res.status(500).json({ error: 'Não foi possível gerar o PIX. Tente novamente.' });
+      }
+
+      pedido.transacao_id = String(pagamento.id);
+      await saveDB(data);
+
+      const dadosPix = pagamento.point_of_interaction.transaction_data;
+      return res.status(200).json({
+        tipo: 'pix',
+        qr_code: dadosPix.qr_code,                 // código copia-e-cola
+        qr_code_base64: dadosPix.qr_code_base64,   // imagem do QR já pronta em base64
+        pedido_id: pedidoId
+      });
+    }
+
     if (info.gateway === 'mercadopago') {
+      // Cartão de Crédito/Débito continuam pelo Checkout Pro (já testado e funcionando)
       // Restringe o checkout do Mercado Pago a mostrar só o tipo de pagamento que a pessoa escolheu
       const TODOS_OS_TIPOS = ['credit_card', 'debit_card', 'bank_transfer', 'ticket', 'atm', 'digital_wallet', 'prepaid_card'];
       const excluidos = TODOS_OS_TIPOS.filter(function(t) { return t !== info.tipoMP; }).map(function(t) { return { id: t }; });
@@ -85,7 +126,7 @@ module.exports = async function handler(req, res) {
         })
       });
       const pref = await prefResp.json();
-      return res.status(200).json({ url: pref.init_point });
+      return res.status(200).json({ tipo: 'redirect', url: pref.init_point });
     }
 
     if (info.gateway === 'stripe') {
@@ -114,7 +155,7 @@ module.exports = async function handler(req, res) {
         body: params
       });
       const session = await sessionResp.json();
-      return res.status(200).json({ url: session.url });
+      return res.status(200).json({ tipo: 'redirect', url: session.url });
     }
 
     return res.status(400).json({ error: 'gateway inválido' });
