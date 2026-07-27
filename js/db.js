@@ -45,6 +45,14 @@ function enviarParaBin(chave, valor, acao, detalhes) {
       alert('Sua sessão expirou, faça login novamente.');
       localStorage.removeItem('admin_sessao');
       window.location.href = 'login.html';
+      return null;
+    }
+    if (!r.ok) {
+      return r.json().catch(function() { return {}; }).then(function(erro) {
+        alert('⚠️ Não salvou no servidor! Só ficou salvo neste navegador.\nMotivo: ' + (erro.error || r.status));
+        console.error('Falha ao salvar em /api/data:', r.status, erro);
+        throw new Error('falha ao salvar');
+      });
     }
     return r.json();
   });
