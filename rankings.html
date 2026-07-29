@@ -1,92 +1,152 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="titulo-pagina">ReyCraft Shop - Rankings</title>
-    <link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
-    <script src="js/db.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
-        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
-        .header-logo img { height: 40px; }
-        .icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
-        .icon-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid var(--amarelo); }
-        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; position: sticky; top: 70px; z-index: 50; background: var(--fundo); padding: 1rem 0; }
-        .tab-btn { padding: 0.8rem 1.5rem; background: var(--card); border: 2px solid transparent; color: var(--texto-cinza); border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .tab-btn:hover { border-color: var(--roxo); }
-        .tab-btn.ativo { background: var(--roxo); color: white; }
-        .ranking-list { display: flex; flex-direction: column; gap: 0.5rem; }
-        .ranking-card { background: var(--card); padding: 1.2rem 1.5rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #1e1e2e; }
-        .ranking-pos { font-size: 1.5rem; font-weight: bold; width: 50px; text-align: center; }
-        .ranking-info { flex: 1; }
-        .ranking-nome { font-weight: bold; font-size: 1.1rem; }
-        .ranking-sub { color: var(--texto-cinza); font-size: 0.85rem; }
-        .ranking-valor { font-weight: bold; color: var(--verde); font-size: 1.2rem; }
-        .medalha-1 { color: #FFD700; } .medalha-2 { color: #C0C0C0; } .medalha-3 { color: #CD7F32; }
-        .sem-dados { text-align: center; padding: 3rem; color: var(--texto-cinza); }
-        @media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .tabs { overflow-x: auto; } .tab-btn { white-space: nowrap; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="titulo-pagina">ReyCraft Shop - Rankings</title>
+<link id="favicon-pagina" rel="icon" href="https://i.imgur.com/TneGRwW.png">
+<script src="js/db.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
+.header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
+.header-logo img { height: 40px; }
+.icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
+.container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; position: sticky; top: 70px; z-index: 50; background: var(--fundo); padding: 1rem 0; }
+.tab-btn { padding: 0.8rem 1.5rem; background: var(--card); border: 2px solid transparent; color: var(--texto-cinza); border-radius: 8px; cursor: pointer; font-weight: bold; }
+.tab-btn:hover { border-color: var(--roxo); }
+.tab-btn.ativo { background: var(--roxo); color: white; }
+.ranking-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.ranking-card { background: var(--card); padding: 1.2rem 1.5rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #1e1e2e; }
+.ranking-pos { font-size: 1.5rem; font-weight: bold; width: 50px; text-align: center; flex-shrink: 0; }
+.ranking-info { flex: 1; min-width: 0; }
+.ranking-nome { font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+.ranking-nome:hover { color: var(--amarelo); text-decoration: underline; }
+.ranking-sub { color: var(--texto-cinza); font-size: 0.85rem; }
+.ranking-valor { font-weight: bold; color: var(--verde); font-size: 1.2rem; text-align: right; white-space: nowrap; }
+.medalha-1 { color: #FFD700; } .medalha-2 { color: #C0C0C0; } .medalha-3 { color: #CD7F32; }
+.sem-dados { text-align: center; padding: 3rem; color: var(--texto-cinza); }
+.modal-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.modal-box { background: var(--card); border-radius: 15px; padding: 2rem; max-width: 360px; width: 100%; text-align: center; }
+.modal-box h3 { color: var(--amarelo); margin-bottom: 1.2rem; }
+.modal-linha { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #1e1e2e; }
+.modal-fechar { background: #64748b; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 1.2rem; }
+@media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .tabs { overflow-x: auto; } .tab-btn { white-space: nowrap; } }
+</style>
 </head>
 <body>
-    <header class="header">
-        <a href="index.html" class="header-voltar">←</a>
-        <a href="index.html" class="header-logo"><img src="https://i.imgur.com/TneGRwW.png" id="logo-img"></a>
-        <a href="perfil.html" id="btn-perfil" class="icon-btn"><img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);"></a>
-    </header>
-    <div class="container">
-        <div class="tabs">
-            <button class="tab-btn ativo" onclick="mostrarRanking('clans')">🏰 TOP Clãs</button>
-            <button class="tab-btn" onclick="mostrarRanking('jogadores')">👤 TOP Jogadores</button>
-            <button class="tab-btn" onclick="mostrarRanking('donaters')">💎 TOP Donaters</button>
-        </div>
-        <div id="ranking-content" class="ranking-list"></div>
-    </div>
+<header class="header">
+<a href="index.html" class="header-voltar">←</a>
+<a href="index.html" class="header-logo"><img src="https://i.imgur.com/TneGRwW.png" id="logo-img"></a>
+<a href="perfil.html" id="btn-perfil" class="icon-btn"><img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);"></a>
+</header>
+<div class="container">
+<div class="tabs">
+<button class="tab-btn ativo" onclick="mostrarRanking('clans')">🏰 TOP Clãs</button>
+<button class="tab-btn" onclick="mostrarRanking('jogadores')">👤 TOP Jogadores</button>
+<button class="tab-btn" onclick="mostrarRanking('donaters')">💎 TOP Donaters</button>
+</div>
+<div id="ranking-content" class="ranking-list"></div>
+</div>
+<script>
+(function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite+' - Rankings'; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon; if(c.logoUrl){var l=document.getElementById('logo-img');if(l)l.src=c.logoUrl;} if(c.logoTamanho){var l=document.getElementById('logo-img');if(l)l.style.height=c.logoTamanho+'px';}}})();
+(function(){var u=JSON.parse(localStorage.getItem('usuario_discord')),b=document.getElementById('btn-perfil'),i=document.getElementById('perfil-img'); if(!b||!i)return; if(u&&u.avatar){b.style.background='transparent'; i.src=u.avatar; i.style.width='40px'; i.style.height='40px'; i.style.borderRadius='8px'; i.style.filter='none'; i.style.objectFit='cover';}})();
 
-    <script>
-        (function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite+' - Rankings'; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon; if(c.logoUrl){var l=document.getElementById('logo-img');if(l)l.src=c.logoUrl;} if(c.logoTamanho){var l=document.getElementById('logo-img');if(l)l.style.height=c.logoTamanho+'px';}}})();
-        (function(){var u=JSON.parse(localStorage.getItem('usuario_discord')),b=document.getElementById('btn-perfil'),i=document.getElementById('perfil-img'); if(!b||!i)return; if(u&&u.avatar){b.style.background='transparent'; i.src=u.avatar; i.style.width='40px'; i.style.height='40px'; i.style.borderRadius='8px'; i.style.filter='none'; i.style.objectFit='cover';}})();
+var rankingAtual = (new URLSearchParams(window.location.search)).get('tab') || 'clans';
+var kills = { jogadores: [], clans: [] };
+var doadores = [];
 
-        var rankingAtual='clans';
+// K/D usado só pra desempatar quando as kills empatam — nunca é mostrado na tela (por isso "invisível")
+function kd(item) { return (item.mortes || 0) > 0 ? item.kills / item.mortes : item.kills; }
 
-        function mostrarRanking(t){rankingAtual=t; document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('ativo')}); event.target.classList.add('ativo'); renderizarRanking();}
+function getTopClans() {
+  var r = kills.clans.slice();
+  r.sort(function(a, b) { return b.kills - a.kills; });
+  return r.slice(0, 20);
+}
+function getTopJogadores() {
+  var r = kills.jogadores.slice();
+  r.sort(function(a, b) { return b.kills - a.kills || kd(b) - kd(a); });
+  return r.slice(0, 20);
+}
+function getTopDonaters() {
+  var r = doadores.slice();
+  r.sort(function(a, b) { return b.total - a.total; });
+  return r.slice(0, 20);
+}
 
-        function getTopClans(){
-            var pedidos=JSON.parse(localStorage.getItem('pedidos'))||[], clans={};
-            pedidos.filter(function(p){return p.status==='confirmado'}).forEach(function(p){var c=p.clan||'Sem Clan'; if(!clans[c])clans[c]={nome:c,pontos:0,membros:new Set()}; clans[c].pontos+=Number(p.valor||0); clans[c].membros.add(p.discordId);});
-            var r=Object.values(clans).map(function(c){return{nome:c.nome,pontos:c.pontos,membros:c.membros.size}}); r.sort(function(a,b){return b.pontos-a.pontos}); return r.slice(0,10);
-        }
-        function getTopJogadores(){
-            var pedidos=JSON.parse(localStorage.getItem('pedidos'))||[], j={};
-            pedidos.filter(function(p){return p.status==='confirmado'}).forEach(function(p){var n=p.cliente||'Desconhecido'; if(!j[n])j[n]={nome:n,pontos:0,clan:p.clan||'Sem Clan'}; j[n].pontos+=Number(p.valor||0);});
-            var r=Object.values(j); r.sort(function(a,b){return b.pontos-a.pontos}); return r.slice(0,10);
-        }
-        function getTopDonaters(){
-            var pedidos=JSON.parse(localStorage.getItem('pedidos'))||[], d={};
-            pedidos.filter(function(p){return p.status==='confirmado'}).forEach(function(p){var n=p.cliente||'Desconhecido'; if(!d[n])d[n]={nome:n,valor:0,clan:p.clan||'Sem Clan'}; d[n].valor+=Number(p.valor||0);});
-            var r=Object.values(d); r.sort(function(a,b){return b.valor-a.valor}); return r.slice(0,10);
-        }
+function mostrarRanking(t) {
+  rankingAtual = t;
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('ativo'); });
+  event.target.classList.add('ativo');
+  renderizarRanking();
+}
 
-        function renderizarRanking(){
-            var c=document.getElementById('ranking-content'), dados=[], tipo='pontos';
-            if(rankingAtual==='clans')dados=getTopClans();
-            else if(rankingAtual==='jogadores')dados=getTopJogadores();
-            else{dados=getTopDonaters(); tipo='R$';}
-            if(dados.length===0){c.innerHTML='<div class="sem-dados">📭 Nenhum dado ainda</div>'; return;}
-            var medals=['🥇','🥈','🥉'];
-            c.innerHTML=dados.map(function(item,i){
-                var mc=i<3?'medalha-'+(i+1):'', pos=i<3?medals[i]:(i+1)+'º', v=tipo==='R$'?'R$ '+Number(item.valor).toFixed(2):item.pontos+' pts', sub='';
-                if(rankingAtual==='clans')sub=item.membros+' membros';
-                if(rankingAtual==='jogadores'||rankingAtual==='donaters')sub='<span style="color:var(--roxo);">'+(item.clan||'Sem Clan')+'</span>';
-                return '<div class="ranking-card"><div class="ranking-pos '+mc+'">'+pos+'</div><div class="ranking-info"><div class="ranking-nome">'+item.nome+'</div>'+(sub?'<div class="ranking-sub">'+sub+'</div>':'')+'</div><div class="ranking-valor">'+v+'</div></div>';
-            }).join('');
-        }
-        renderizarRanking();
-    </script>
+// Mini-perfil público ao clicar num nome: só clã, posição no ranking (de kills) e total gasto
+function abrirMiniPerfil(discordId, nomeFallback) {
+  var jogador = kills.jogadores.find(function(j) { return j.discord_id === discordId; });
+  var doador = doadores.find(function(d) { return d.discord_id === discordId; });
+  var nome = (jogador && jogador.nome) || (doador && doador.nome) || nomeFallback || 'Jogador';
+  var clan = (jogador && jogador.clan) || 'Sem Clã';
+
+  var ordenados = getTopJogadores();
+  var posicao = ordenados.findIndex(function(j) { return j.discord_id === discordId; });
+  var rankTexto = posicao >= 0 ? '#' + (posicao + 1) : '—';
+  var totalGasto = doador ? doador.total : 0;
+
+  var m = document.createElement('div');
+  m.className = 'modal-fundo';
+  m.innerHTML = '<div class="modal-box"><h3>' + nome + '</h3>' +
+    '<div class="modal-linha"><span>Clã</span><span>' + clan + '</span></div>' +
+    '<div class="modal-linha"><span>Ranking</span><span>' + rankTexto + '</span></div>' +
+    '<div class="modal-linha"><span>Total Gasto</span><span>R$ ' + Number(totalGasto).toFixed(2) + '</span></div>' +
+    '<button class="modal-fechar" onclick="this.closest(\'.modal-fundo\').remove()">Fechar</button></div>';
+  document.body.appendChild(m);
+  m.onclick = function(e) { if (e.target === m) m.remove(); };
+}
+
+function renderizarRanking() {
+  var c = document.getElementById('ranking-content'), dados = [];
+  if (rankingAtual === 'clans') dados = getTopClans();
+  else if (rankingAtual === 'jogadores') dados = getTopJogadores();
+  else dados = getTopDonaters();
+
+  if (dados.length === 0) { c.innerHTML = '<div class="sem-dados">📭 Nenhum dado ainda</div>'; return; }
+
+  var medals = ['🥇', '🥈', '🥉'];
+  c.innerHTML = dados.map(function(item, i) {
+    var mc = i < 3 ? 'medalha-' + (i + 1) : '', pos = i < 3 ? medals[i] : (i + 1) + 'º';
+    var valor, sub = '', nomeClicavel;
+
+    if (rankingAtual === 'clans') {
+      valor = item.kills + ' kills';
+      sub = (item.membros || 0) + ' membros';
+      nomeClicavel = '<span class="ranking-nome">' + item.nome + '</span>';
+    } else if (rankingAtual === 'jogadores') {
+      valor = item.kills + ' kills';
+      sub = '<span style="color:var(--roxo);">' + (item.clan || 'Sem Clã') + '</span>';
+      nomeClicavel = '<span class="ranking-nome" onclick="abrirMiniPerfil(\'' + item.discord_id + '\', \'' + item.nome.replace(/'/g, "&#39;") + '\')">' + item.nome + '</span>';
+    } else {
+      valor = 'R$ ' + Number(item.total).toFixed(2);
+      nomeClicavel = '<span class="ranking-nome" onclick="abrirMiniPerfil(\'' + item.discord_id + '\', \'' + item.nome.replace(/'/g, "&#39;") + '\')">' + item.nome + '</span>';
+    }
+
+    return '<div class="ranking-card"><div class="ranking-pos ' + mc + '">' + pos + '</div><div class="ranking-info">' + nomeClicavel + (sub ? '<div class="ranking-sub">' + sub + '</div>' : '') + '</div><div class="ranking-valor">' + valor + '</div></div>';
+  }).join('');
+}
+
+sincronizarLocalStorage().then(function() {
+  kills = JSON.parse(localStorage.getItem('kills')) || { jogadores: [], clans: [] };
+  doadores = JSON.parse(localStorage.getItem('doadores')) || [];
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('ativo'); });
+  var idx = rankingAtual === 'clans' ? 0 : rankingAtual === 'jogadores' ? 1 : 2;
+  document.querySelectorAll('.tab-btn')[idx].classList.add('ativo');
+  renderizarRanking();
+});
+</script>
 </body>
 </html>
