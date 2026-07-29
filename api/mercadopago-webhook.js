@@ -1,6 +1,6 @@
 // POST /api/mercadopago-webhook
 // O Mercado Pago chama essa URL sozinho quando o status de um pagamento muda.
-const { getDB, saveDB, notificarDiscord } = require('../lib/db');
+const { getDB, saveDB, notificarDiscord, atualizarDoador } = require('../lib/db');
 
 const NOMES_METODO = {
   pix: 'PIX',
@@ -39,6 +39,8 @@ module.exports = async function handler(req, res) {
       const c = data.cupons.find(function(x) { return x.codigo === pedido.cupom; });
       if (c) c.usos++;
     }
+
+    atualizarDoador(data, pedido.discord_id, pedido.cliente, pedido.valor);
 
     await saveDB(data);
 
