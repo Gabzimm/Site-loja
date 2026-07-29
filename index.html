@@ -357,36 +357,27 @@ return sec;
 function carregarBanner() {
 var g = document.getElementById('ranks-grid');
 if (!g) return;
-var pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
-var clans = {};
-var jogadores = {};
-var donaters = {};
-pedidos.filter(function(p) { return p.status === 'confirmado'; }).forEach(function(p) {
-var c = p.clan || 'Sem Clã';
-if (!clans[c]) clans[c] = { nome: c, pontos: 0 };
-clans[c].pontos += Number(p.valor || 0);
-var n = p.cliente || 'Desconhecido';
-if (!jogadores[n]) jogadores[n] = { nome: n, pontos: 0 };
-jogadores[n].pontos += Number(p.valor || 0);
-if (!donaters[n]) donaters[n] = { nome: n, valor: 0 };
-donaters[n].valor += Number(p.valor || 0);
-});
-var tc = Object.values(clans).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
-var tj = Object.values(jogadores).sort(function(a, b) { return b.pontos - a.pontos; }).slice(0, 3);
-var td = Object.values(donaters).sort(function(a, b) { return b.valor - a.valor; }).slice(0, 3);
+var kills = JSON.parse(localStorage.getItem('kills')) || { jogadores: [], clans: [] };
+var doadores = JSON.parse(localStorage.getItem('doadores')) || [];
+
+function kd(item) { return item.mortes > 0 ? item.kills / item.mortes : item.kills; }
+
+var tc = kills.clans.slice().sort(function(a, b) { return b.kills - a.kills; }).slice(0, 3);
+var tj = kills.jogadores.slice().sort(function(a, b) { return b.kills - a.kills || kd(b) - kd(a); }).slice(0, 3);
+var td = doadores.slice().sort(function(a, b) { return b.total - a.total; }).slice(0, 3);
 var medals = ['🥇', '🥈', '🥉'];
 function card(titulo, icone, dados, tipo, link) {
 var h = '<a href="' + link + '" style="text-decoration:none;"><div style="background:var(--card);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:left;min-width:220px;">';
 h += '<div style="color:var(--amarelo);font-weight:bold;margin-bottom:0.8rem;">' + icone + ' ' + titulo + '</div>';
 if (dados.length === 0) h += '<div style="color:var(--texto-cinza);">Nenhum dado</div>';
 else dados.forEach(function(item, i) {
-var v = tipo === 'R$' ? 'R$ ' + Number(item.valor).toFixed(2) : item.pontos + ' pts';
+var v = tipo === 'R$' ? 'R$ ' + Number(item.total).toFixed(2) : item.kills + ' kills';
 h += '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;color:var(--texto-cinza);"><span>' + medals[i] + ' ' + (item.nome || '?').substring(0, 15) + '</span><span style="color:var(--verde);">' + v + '</span></div>';
 });
 h += '<div style="text-align:center;margin-top:0.8rem;color:var(--roxo);font-weight:bold;">VER COMPLETO →</div></div></a>';
 return h;
 }
-g.innerHTML = card('TOP Clãs', '🏰', tc, 'pontos', 'rankings.html?tab=clans') + card('TOP Jogadores', '👤', tj, 'pontos', 'rankings.html?tab=jogadores') + card('TOP Donaters', '💎', td, 'R$', 'rankings.html?tab=donaters');
+g.innerHTML = card('TOP Clãs', '🏰', tc, 'kills', 'rankings.html?tab=clans') + card('TOP Jogadores', '👤', tj, 'kills', 'rankings.html?tab=jogadores') + card('TOP Donaters', '💎', td, 'R$', 'rankings.html?tab=donaters');
 }
 // ========== INICIAR ==========
 sincronizarLocalStorage().then(function() {
