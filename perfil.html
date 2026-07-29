@@ -10,29 +10,36 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --roxo: #8B5CF6; --verde: #10B981; --amarelo: #F59E0B; --fundo: #0a0a0f; --card: #14141f; --texto: #E2E8F0; --texto-cinza: #94A3B8; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; }
-        .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e1e2e; }
-        .header-logo img { height: 40px; }
-        .header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
-        .icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
-        .icon-avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid var(--amarelo); }
-        .perfil-container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .perfil-header { background: var(--card); border-radius: 15px; padding: 2rem; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .perfil-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--amarelo); object-fit: cover; }
-        .perfil-info h1 { font-size: 1.5rem; margin-bottom: 0.3rem; }
-        .perfil-info .tag { color: var(--amarelo); font-size: 0.9rem; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: var(--card); padding: 1.3rem; border-radius: 10px; text-align: center; border: 1px solid #1e1e2e; }
-        .stat-card .icone { font-size: 2rem; margin-bottom: 0.5rem; }
-        .stat-card .valor { font-size: 1.5rem; font-weight: bold; color: var(--amarelo); }
-        .stat-card .label { color: var(--texto-cinza); font-size: 0.8rem; }
-        .perfil-secao { background: var(--card); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid #1e1e2e; }
-        .perfil-secao h3 { color: var(--amarelo); margin-bottom: 1rem; }
-        .btn-sair { background: #ef4444; color: white; padding: 0.8rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 1rem; }
-        .btn-login-discord { background: #5865F2; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
-        .clan-badge { display: inline-block; background: var(--roxo); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; margin-top: 0.5rem; }
-        .btn-atualizar { background: transparent; border: 1px solid var(--amarelo); color: var(--amarelo); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; margin-top: 0.5rem; transition: all 0.3s; }
-        .btn-atualizar:hover { background: var(--amarelo); color: #000; }
+.header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1e1e2e; }
+.header-logo img { height: 40px; }
+.header-voltar { color: var(--amarelo); text-decoration: none; font-weight: bold; font-size: 1.2rem; }
+.icon-btn { width: 40px; height: 40px; background: var(--amarelo); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.icon-btn img { width: 20px; height: 20px; filter: brightness(0); }
+.perfil-container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+.perfil-header { background: var(--card); border-radius: 15px; padding: 2rem; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+.perfil-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--amarelo); object-fit: cover; }
+.perfil-info h1 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+.perfil-info .tag { color: var(--amarelo); font-size: 0.9rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: var(--card); padding: 1.3rem; border-radius: 10px; text-align: center; border: 1px solid #1e1e2e; }
+.stat-card .icone { font-size: 2rem; margin-bottom: 0.5rem; }
+.stat-card .valor { font-size: 1.4rem; font-weight: bold; color: var(--amarelo); }
+.stat-card .label { color: var(--texto-cinza); font-size: 0.8rem; }
+.perfil-secao { background: var(--card); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 1px solid #1e1e2e; }
+.perfil-secao h3 { color: var(--amarelo); margin-bottom: 1rem; }
+.compra-item { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0.5rem; border-bottom: 1px solid #1e1e2e; cursor: pointer; border-radius: 6px; }
+.compra-item:hover { background: rgba(139,92,246,0.1); }
+.compra-item .seta { color: var(--texto-cinza); }
+.btn-sair { background: #ef4444; color: white; padding: 0.8rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 1rem; }
+.btn-login-discord { background: #5865F2; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
+.clan-badge { display: inline-block; background: var(--roxo); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; margin-top: 0.5rem; }
+.btn-atualizar { background: transparent; border: 1px solid var(--amarelo); color: var(--amarelo); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; margin-top: 0.5rem; }
+.btn-atualizar:hover { background: var(--amarelo); color: #000; }
+.modal-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.modal-box { background: var(--card); border-radius: 15px; padding: 2rem; max-width: 420px; width: 100%; }
+.modal-box h3 { color: var(--amarelo); margin-bottom: 1rem; }
+.modal-item-linha { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #1e1e2e; }
+.modal-fechar { background: #64748b; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 1rem; }
     </style>
 </head>
 <body>
@@ -42,30 +49,26 @@
         <a href="perfil.html" id="btn-perfil" class="icon-btn"><img src="https://cdn-icons-png.flaticon.com/512/3106/3106921.png" id="perfil-img" style="width:20px;height:20px;filter:brightness(0);"></a>
     </header>
     <div class="perfil-container" id="perfil-content"></div>
-
     <script>
         (function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite+' - Perfil'; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon; if(c.logoUrl){var l=document.getElementById('logo-img');if(l)l.src=c.logoUrl;} if(c.logoTamanho){var l=document.getElementById('logo-img');if(l)l.style.height=c.logoTamanho+'px';}}})();
-
         var usuario=JSON.parse(localStorage.getItem('usuario_discord'));
-
         (function(){var b=document.getElementById('btn-perfil'),i=document.getElementById('perfil-img'); if(!b||!i)return; if(usuario&&usuario.avatar){b.style.background='transparent'; i.src=usuario.avatar; i.style.width='40px'; i.style.height='40px'; i.style.borderRadius='8px'; i.style.filter='none'; i.style.objectFit='cover';}})();
 
-        function loginDiscord(){var u='https://discord.com/api/oauth2/authorize?client_id=1515464456719695952&redirect_uri='+encodeURIComponent('https://reycraft-hc.shop/callback.html')+'&response_type=code&scope=identify'; localStorage.setItem('redirect_after_login','perfil.html'); window.location.href=u;}
-        function sair(){localStorage.removeItem('usuario_discord'); window.location.reload();}
+        function loginDiscord(){var u='https://discord.com/api/oauth2/authorize?client_id=1515464456719695952&redirect_uri='+encodeURIComponent('https://www.reycraft-hc.shop/callback.html')+'&response_type=code&scope=identify'; localStorage.setItem('redirect_after_login','perfil.html'); window.location.href=u;}
+        function sair(){localStorage.removeItem('usuario_discord'); localStorage.removeItem('user_sessao'); window.location.reload();}
 
         function atualizarClan(){
             var s=document.getElementById('status-clan');
             if(s){s.textContent='🔄 Verificando...'; s.style.color='#94A3B8';}
-            
-            fetch('/api/verificar-clan?id=' + usuario.id)
+            fetch('/api/clan-lookup?discord_id=' + usuario.id)
             .then(function(r){return r.json();})
             .then(function(data){
-                if(data.clan){
+                if(data.clan && data.clan !== 'Sem Clã'){
                     localStorage.setItem('meu_clan_' + usuario.id, data.clan);
-                    if(s){s.textContent='✅ Clan: '+data.clan; s.style.color='#10B981';}
-                    setTimeout(function(){location.reload();},1500);
+                    if(s){s.textContent='✅ Clã: '+data.clan; s.style.color='#10B981';}
+                    setTimeout(function(){location.reload();},1200);
                 }else{
-                    if(s){s.textContent='❌ Nenhum clan encontrado.'; s.style.color='#ef4444';}
+                    if(s){s.textContent='❌ Nenhum clã encontrado.'; s.style.color='#ef4444';}
                 }
             })
             .catch(function(){
@@ -73,27 +76,76 @@
             });
         }
 
+        function mostrarItensPedido(pedido){
+            var m=document.createElement('div');
+            m.className='modal-fundo';
+            var itensHtml=(pedido.itens||[]).map(function(i){
+                return '<div class="modal-item-linha"><span>'+i.quantidade+'x '+i.nome+'</span><span>R$ '+(Number(i.preco)*Number(i.quantidade)).toFixed(2)+'</span></div>';
+            }).join('') || '<p style="color:var(--texto-cinza);">Sem detalhes de itens.</p>';
+            m.innerHTML='<div class="modal-box"><h3>🛒 Pedido #'+pedido.id+'</h3>'+
+                '<div class="modal-item-linha"><span>Status</span><span>'+pedido.status+'</span></div>'+
+                '<div class="modal-item-linha"><span>Pagamento</span><span>'+(pedido.pagamento||'aguardando')+'</span></div>'+
+                '<div class="modal-item-linha"><span>Data</span><span>'+new Date(pedido.data).toLocaleString('pt-BR')+'</span></div>'+
+                '<div style="margin-top:1rem;"><strong>Itens:</strong></div>'+itensHtml+
+                '<div class="modal-item-linha" style="font-weight:bold;"><span>Total</span><span>R$ '+Number(pedido.valor).toFixed(2)+'</span></div>'+
+                '<button class="modal-fechar" onclick="this.closest(\'.modal-fundo\').remove()">Fechar</button></div>';
+            document.body.appendChild(m);
+            m.onclick=function(e){ if(e.target===m) m.remove(); };
+        }
+
         function carregarPerfil(){
             if(!usuario){document.getElementById('perfil-content').innerHTML='<div style="text-align:center;padding:4rem;"><div style="font-size:5rem;">🔒</div><h2>Faça login</h2><p style="color:var(--texto-cinza);margin:1rem 0 2rem;">Conecte com Discord para ver seu perfil</p><button class="btn-login-discord" onclick="loginDiscord()">Login com Discord</button></div>'; return;}
-            
-            var pedidos=JSON.parse(localStorage.getItem('pedidos'))||[], meus=pedidos.filter(function(p){return p.discordId===usuario.id&&p.status==='confirmado'}), total=meus.reduce(function(t,p){return t+Number(p.valor)},0);
-            var meuClan=localStorage.getItem('meu_clan_' + usuario.id);
-            if(!meuClan&&meus.length>0){meuClan=meus[meus.length-1].clan; if(meuClan&&meuClan!=='Sem Clan')localStorage.setItem('meu_clan_'+usuario.id,meuClan); else meuClan=null;}
-            
-            var clanMostrado=meuClan||'Não definido';
-            var clanHtml=meuClan?'<span class="clan-badge">🏰 '+meuClan+'</span>':'<span class="clan-badge" style="background:#333;">🏰 '+clanMostrado+'</span><br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clan</button><br><small id="status-clan" style="color:var(--texto-cinza);"></small>';
-            
-            document.getElementById('perfil-content').innerHTML=
-                '<div class="perfil-header"><img src="'+usuario.avatar+'" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>'+(usuario.global_name||usuario.username)+'</h1><p class="tag">@'+usuario.username+'</p>'+clanHtml+'</div></div>'+
-                '<div class="stats-grid">'+
-                    '<div class="stat-card"><div class="icone">🛒</div><div class="valor">'+meus.length+'</div><div class="label">Compras</div></div>'+
-                    '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ '+total.toFixed(2)+'</div><div class="label">Total Gasto</div></div>'+
-                    '<div class="stat-card"><div class="icone">🏰</div><div class="valor">'+clanMostrado+'</div><div class="label">Seu Clan</div></div>'+
-                    '<div class="stat-card"><div class="icone">🏆</div><div class="valor">—</div><div class="label">Rank</div></div>'+
-                '</div>'+
-                '<div class="perfil-secao"><h3>📋 Histórico</h3>'+(meus.length>0?meus.map(function(p){return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;"><span>🛒 #'+p.id+'</span><span>R$ '+Number(p.valor).toFixed(2)+'</span><span style="color:var(--amarelo);">'+p.status+'</span><span style="color:var(--texto-cinza);">'+p.data+'</span></div>';}).join(''):'<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>')+'</div>'+
-                '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
+
+            var sessao=localStorage.getItem('user_sessao');
+            var headers=sessao?{'Authorization':'Bearer '+sessao}:{};
+
+            Promise.all([
+                sincronizarLocalStorage(),
+                fetch('/api/meus-pedidos', {headers:headers}).then(function(r){return r.ok?r.json():{pedidos:[]};}).catch(function(){return {pedidos:[]};})
+            ]).then(function(resultados){
+                var meusPedidosResp = resultados[1];
+                var meus = (meusPedidosResp.pedidos||[]).filter(function(p){return p.status==='confirmado';});
+                var total = meus.reduce(function(t,p){return t+Number(p.valor);},0);
+
+                var kills = JSON.parse(localStorage.getItem('kills')||'null') || {jogadores:[]};
+                var meuKillsInfo = kills.jogadores.find(function(j){return j.discord_id===usuario.id;});
+                var minhasKills = meuKillsInfo ? meuKillsInfo.kills : 0;
+                var minhasMortes = meuKillsInfo ? meuKillsInfo.mortes : 0;
+
+                // Rank calculado localmente (posição entre os jogadores ordenados por kills, com K/D como desempate invisível)
+                var todosOrdenados = kills.jogadores.slice().sort(function(a,b){
+                    if(b.kills !== a.kills) return b.kills - a.kills;
+                    var kdA = a.mortes>0 ? a.kills/a.mortes : a.kills;
+                    var kdB = b.mortes>0 ? b.kills/b.mortes : b.kills;
+                    return kdB - kdA;
+                });
+                var minhaPosicao = todosOrdenados.findIndex(function(j){return j.discord_id===usuario.id;});
+                var rankTexto = minhaPosicao>=0 ? '#'+(minhaPosicao+1) : '—';
+
+                var meuClan = (meuKillsInfo && meuKillsInfo.clan) || localStorage.getItem('meu_clan_' + usuario.id);
+                var clanMostrado = meuClan || 'Não definido';
+                var clanHtml = meuClan
+                    ? '<span class="clan-badge">'+meuClan+'</span>'
+                    : '<span class="clan-badge" style="background:#333;">Não definido</span><br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clã</button><br><small id="status-clan" style="color:var(--texto-cinza);"></small>';
+
+                document.getElementById('perfil-content').innerHTML=
+                    '<div class="perfil-header"><img src="'+usuario.avatar+'" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>'+(usuario.global_name||usuario.username)+'</h1><p class="tag">@'+usuario.username+'</p>'+clanHtml+'</div></div>'+
+                    '<div class="stats-grid">'+
+                        '<div class="stat-card"><div class="icone">🛒</div><div class="valor">'+meus.length+'</div><div class="label">Compras</div></div>'+
+                        '<div class="stat-card"><div class="icone">💰</div><div class="valor">R$ '+total.toFixed(2)+'</div><div class="label">Total Gasto</div></div>'+
+                        '<div class="stat-card"><div class="icone">🗡️</div><div class="valor">'+minhasKills+'</div><div class="label">Kills</div></div>'+
+                        '<div class="stat-card"><div class="icone">💀</div><div class="valor">'+minhasMortes+'</div><div class="label">Mortes</div></div>'+
+                        '<div class="stat-card"><div class="icone">🏆</div><div class="valor">'+rankTexto+'</div><div class="label">Rank (Kills)</div></div>'+
+                    '</div>'+
+                    '<div class="perfil-secao"><h3>📋 Histórico de Compras</h3>'+
+                    (meus.length>0 ? meus.map(function(p, idx){
+                        return '<div class="compra-item" onclick=\'mostrarItensPedido('+JSON.stringify(p).replace(/'/g,"&#39;")+')\'><span>🛒 #'+p.id+' — '+new Date(p.data).toLocaleDateString('pt-BR')+'</span><span>R$ '+Number(p.valor).toFixed(2)+' <span class="seta">›</span></span></div>';
+                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>')+
+                    '</div>'+
+                    '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
+            });
         }
+
         carregarPerfil();
     </script>
 </body>
