@@ -32,6 +32,7 @@ if (!code) {
       return;
     }
     localStorage.setItem('usuario_discord', JSON.stringify(data.usuario));
+    if (data.sessao) localStorage.setItem('user_sessao', data.sessao);
     var destino = localStorage.getItem('redirect_after_login') || 'index.html';
     localStorage.removeItem('redirect_after_login');
     window.location.href = destino;
