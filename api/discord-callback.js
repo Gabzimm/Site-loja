@@ -39,7 +39,7 @@ module.exports = async function handler(req, res) {
 
     const data = await getDB();
     const isAdmin = await ehAdmin(data, usuario.id);
-    const sessao = isAdmin ? gerarSessao(usuario.id) : null;
+    const sessao = gerarSessao(usuario.id); // agora todo mundo logado recebe uma sessão (usada em /api/meus-pedidos); o admin ainda é checado à parte
 
     return res.status(200).json({ usuario: usuario, admin: isAdmin, sessao: sessao });
   } catch (e) {
