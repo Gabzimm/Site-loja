@@ -2,7 +2,7 @@
 // Precisa do corpo cru (raw body) pra validar a assinatura, por isso desligamos
 // o bodyParser padrão da Vercel aqui embaixo.
 const crypto = require('crypto');
-const { getDB, saveDB, notificarDiscord } = require('../lib/db');
+const { getDB, saveDB, notificarDiscord, atualizarDoador } = require('../lib/db');
 
 module.exports.config = { api: { bodyParser: false } };
 
@@ -55,6 +55,8 @@ module.exports = async function handler(req, res) {
       const c = data.cupons.find(function(x) { return x.codigo === pedido.cupom; });
       if (c) c.usos++;
     }
+
+    atualizarDoador(data, pedido.discord_id, pedido.cliente, pedido.valor); // usa o valor em BRL, mesma base dos outros métodos
 
     await saveDB(data);
 
