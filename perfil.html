@@ -98,10 +98,14 @@
 
             var sessao=localStorage.getItem('user_sessao');
             var headers=sessao?{'Authorization':'Bearer '+sessao}:{};
+            var sessaoExpirada=false;
 
             Promise.all([
                 sincronizarLocalStorage(),
-                fetch('/api/meus-pedidos', {headers:headers}).then(function(r){return r.ok?r.json():{pedidos:[]};}).catch(function(){return {pedidos:[]};})
+                fetch('/api/meus-pedidos', {headers:headers}).then(function(r){
+                    if(r.status===401){sessaoExpirada=true; return {pedidos:[]};}
+                    return r.ok?r.json():{pedidos:[]};
+                }).catch(function(){return {pedidos:[]};})
             ]).then(function(resultados){
                 var meusPedidosResp = resultados[1];
                 var meus = (meusPedidosResp.pedidos||[]).filter(function(p){return p.status==='confirmado';});
@@ -122,11 +126,10 @@
                 var minhaPosicao = todosOrdenados.findIndex(function(j){return j.discord_id===usuario.id;});
                 var rankTexto = minhaPosicao>=0 ? '#'+(minhaPosicao+1) : '—';
 
-                var meuClan = (meuKillsInfo && meuKillsInfo.clan) || localStorage.getItem('meu_clan_' + usuario.id);
-                var clanMostrado = meuClan || 'Não definido';
+                var meuClan = meuKillsInfo && meuKillsInfo.clan; // vem direto do bot (dados sempre atuais) — nada de cache local antigo
                 var clanHtml = meuClan
                     ? '<span class="clan-badge">'+meuClan+'</span>'
-                    : '<span class="clan-badge" style="background:#333;">Não definido</span><br><button class="btn-atualizar" onclick="atualizarClan()">🔄 Verificar Clã</button><br><small id="status-clan" style="color:var(--texto-cinza);"></small>';
+                    : '<span class="clan-badge" style="background:#333;">Sem Clã</span>';
 
                 document.getElementById('perfil-content').innerHTML=
                     '<div class="perfil-header"><img src="'+usuario.avatar+'" class="perfil-avatar" alt="Avatar"><div class="perfil-info"><h1>'+(usuario.global_name||usuario.username)+'</h1><p class="tag">@'+usuario.username+'</p>'+clanHtml+'</div></div>'+
@@ -138,9 +141,10 @@
                         '<div class="stat-card"><div class="icone">🏆</div><div class="valor">'+rankTexto+'</div><div class="label">Rank (Kills)</div></div>'+
                     '</div>'+
                     '<div class="perfil-secao"><h3>📋 Histórico de Compras</h3>'+
+                    (sessaoExpirada ? '<p style="color:#ef4444;">⚠️ Sua sessão expirou, isso pode estar escondendo suas compras. <a href="#" onclick="sair();return false;" style="color:var(--amarelo);">Clique aqui pra logar de novo</a>.</p>' :
                     (meus.length>0 ? meus.map(function(p, idx){
                         return '<div class="compra-item" onclick=\'mostrarItensPedido('+JSON.stringify(p).replace(/'/g,"&#39;")+')\'><span>🛒 #'+p.id+' — '+new Date(p.data).toLocaleDateString('pt-BR')+'</span><span>R$ '+Number(p.valor).toFixed(2)+' <span class="seta">›</span></span></div>';
-                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>')+
+                    }).join('') : '<p style="color:var(--texto-cinza);">Nenhuma compra confirmada.</p>'))+
                     '</div>'+
                     '<button class="btn-sair" onclick="sair()">🚪 Sair</button>';
             });
