@@ -1,202 +1,196 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Configurações</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/db.js"></script>
-    <style>
-        .admin-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
-        .sidebar nav a.ver-loja { background: var(--verde); color: white; text-align: center; font-weight: bold; margin-top: 1rem; }
-        .sidebar nav a.ver-loja:hover { background: var(--verde-escuro); }
-        .content { flex: 1; padding: 2rem; max-width: 900px; }
-        
-        .config-section { background: var(--card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem; border: 1px solid #333; }
-        .config-section h3 { color: var(--amarelo); margin-bottom: 1.5rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
-        
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--texto); }
-        .input-group input[type="text"], .input-group input[type="url"], .input-group input[type="password"] {
-            width: 100%; padding: 0.8rem; background: var(--fundo);
-            border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem;
-        }
-        .input-group input[type="color"] { width: 80px; height: 50px; padding: 5px; cursor: pointer; }
-        .input-group input[type="range"] { width: 100%; cursor: pointer; }
-        .input-group select { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
-        .input-group small { color: var(--texto-cinza); display: block; margin-top: 0.3rem; }
-        
-        .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .color-item { display: flex; align-items: center; gap: 1rem; background: var(--fundo); padding: 1rem; border-radius: 8px; }
-        .color-item input[type="color"] { width: 60px; height: 40px; border: none; cursor: pointer; }
-        .color-info { flex: 1; }
-        .color-info strong { display: block; }
-        .color-info small { color: var(--texto-cinza); }
-        
-        .btn-salvar-config { background: var(--verde); color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 1rem; transition: all 0.3s; }
-        .btn-salvar-config:hover { background: var(--verde-escuro); transform: scale(1.02); }
-        .btn-resetar { background: #ef4444; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 1rem; width: 100%; }
-        .btn-resetar:hover { background: #dc2626; }
-        
-        .range-value { display: inline-block; background: var(--roxo); padding: 0.2rem 0.8rem; border-radius: 10px; margin-left: 0.5rem; font-size: 0.9rem; }
-        .mensagem-sucesso { background: rgba(16, 185, 129, 0.2); color: var(--verde); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; display: none; }
-        
-        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--roxo); } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Configurações</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/db.js"></script>
+<style>
+.admin-container { display: flex; min-height: 100vh; }
+.sidebar { width: 250px; background: var(--card); padding: 2rem 1rem; border-right: 2px solid var(--roxo); }
+.sidebar h2 { color: var(--roxo); margin-bottom: 2rem; text-align: center; font-size: 1.3rem; }
+.sidebar nav a { display: block; padding: 1rem; color: var(--texto); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s; }
+.sidebar nav a:hover, .sidebar nav a.ativo { background: var(--roxo); color: white; }
+.sidebar nav a.ver-loja { background: var(--verde); color: white; text-align: center; font-weight: bold; margin-top: 1rem; }
+.sidebar nav a.ver-loja:hover { background: var(--verde-escuro); }
+.content { flex: 1; padding: 2rem; max-width: 900px; }
+.config-section { background: var(--card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem; border: 1px solid #333; }
+.config-section h3 { color: var(--amarelo); margin-bottom: 1.5rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+.input-group { margin-bottom: 1.5rem; }
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--texto); }
+.input-group input[type="text"], .input-group input[type="url"], .input-group input[type="password"] {
+width: 100%; padding: 0.8rem; background: var(--fundo);
+border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem;
+}
+.input-group input[type="color"] { width: 80px; height: 50px; padding: 5px; cursor: pointer; }
+.input-group input[type="range"] { width: 100%; cursor: pointer; }
+.input-group select { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
+.input-group small { color: var(--texto-cinza); display: block; margin-top: 0.3rem; }
+.color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.color-item { display: flex; align-items: center; gap: 1rem; background: var(--fundo); padding: 1rem; border-radius: 8px; }
+.color-item input[type="color"] { width: 60px; height: 40px; border: none; cursor: pointer; }
+.color-info { flex: 1; }
+.color-info strong { display: block; }
+.color-info small { color: var(--texto-cinza); }
+.btn-salvar-config { background: var(--verde); color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 1rem; transition: all 0.3s; }
+.btn-salvar-config:hover { background: var(--verde-escuro); transform: scale(1.02); }
+.btn-resetar { background: #ef4444; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 1rem; width: 100%; }
+.btn-resetar:hover { background: #dc2626; }
+.range-value { display: inline-block; background: var(--roxo); padding: 0.2rem 0.8rem; border-radius: 10px; margin-left: 0.5rem; font-size: 0.9rem; }
+.mensagem-sucesso { background: rgba(16, 185, 129, 0.2); color: var(--verde); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; display: none; }
+@media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--roxo); } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
+</style>
 </head>
 <body>
-    <div class="admin-container">
-        <aside class="sidebar">
-            <h2>⚙️ Admin</h2>
-            <nav>
-                <a href="dashboard.html">📊 Dashboard</a>
-                <a href="produtos.html">📦 Produtos</a>
-                <a href="categorias.html">📂 Categorias</a>
-                <a href="pedidos.html">📋 Pedidos</a>
-                <a href="cupons.html">🏷️ Cupons</a>
-                <a href="staff.html">👥 Staff</a>
-                <a href="configuracoes.html" class="ativo">🎨 Configurações</a>
-                <a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
-                <a href="#" onclick="sair()" style="color:#ef4444;">🚪 Sair</a>
-            </nav>
-        </aside>
+<div class="admin-container">
+<aside class="sidebar">
+<h2>⚙️ Admin</h2>
+<nav>
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="produtos.html">📦 Produtos</a>
+<a href="categorias.html">📂 Categorias</a>
+<a href="pedidos.html">📋 Pedidos</a>
+<a href="cupons.html">🏷️ Cupons</a>
+<a href="staff.html">👥 Staff</a>
+<a href="configuracoes.html" class="ativo">🎨 Configurações</a>
+<a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
+<a href="#" onclick="sair()" style="color:#ef4444;">🚪 Sair</a>
+</nav>
+</aside>
+<main class="content">
+<h1>🎨 Configurações da Loja</h1>
+<p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize cores, logo, favicon e token do bot</p>
+<div class="mensagem-sucesso" id="msg-sucesso">✅ Configurações salvas com sucesso!</div>
+<!-- NOME DO SITE -->
+<div class="config-section">
+<h3>🏷️ Nome do Site</h3>
+<div class="input-group">
+<label>Nome da Loja</label>
+<input type="text" id="nome-site" placeholder="ReyCraft Shop">
+<small>Este nome aparece na aba do navegador</small>
+</div>
+</div>
+<!-- LOGO -->
+<div class="config-section">
+<h3>🖼️ Logo Principal</h3>
+<div class="input-group"><label>URL da Logo</label><input type="url" id="logo-url" placeholder="https://i.imgur.com/TneGRwW.png"></div>
+<div class="input-group"><label>Tamanho: <span class="range-value" id="logo-tamanho-valor">40px</span></label><input type="range" id="logo-tamanho" min="25" max="80" value="40" oninput="document.getElementById('logo-tamanho-valor').textContent=this.value+'px'"></div>
+<div class="input-group"><label>Posição Horizontal</label><input type="range" id="logo-posicao" min="-150" max="150" value="0" oninput="document.getElementById('logo-posicao-valor').textContent=this.value+'px'"><small>← <span id="logo-posicao-valor">0px</span> →</small></div>
+</div>
+<!-- TOKEN DO BOT -->
+<div class="config-section" style="border-color: var(--amarelo);">
+<h3>🤖 Token do Bot Discord</h3>
+<div class="input-group">
+<label>Token do Bot</label>
+<input type="password" id="bot-token" placeholder="Cole o token do seu bot aqui">
+<small>⚠️ Usado para verificar clans dos usuários. Salvo apenas no seu navegador e sincronizado via JSONBin.</small>
+</div>
+</div>
+<!-- CORES -->
+<div class="config-section">
+<h3>🎨 Cores do Tema</h3>
+<div class="color-grid">
+<div class="color-item"><input type="color" id="cor-roxo" value="#8B5CF6"><div class="color-info"><strong>Roxo</strong><small>Principal</small></div></div>
+<div class="color-item"><input type="color" id="cor-verde" value="#10B981"><div class="color-info"><strong>Verde</strong><small>Secundário</small></div></div>
+<div class="color-item"><input type="color" id="cor-amarelo" value="#F59E0B"><div class="color-info"><strong>Amarelo</strong><small>Terciário</small></div></div>
+</div>
+</div>
+<!-- FAVICON -->
+<div class="config-section">
+<h3>🖼️ Favicon</h3>
+<div class="input-group"><label>URL do Favicon</label><input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png"></div>
+</div>
+<!-- IMAGEM DE FUNDO -->
+<div class="config-section">
+<h3>🌄 Imagem de Fundo</h3>
+<div class="input-group"><label>URL</label><input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg"></div>
+<div class="input-group"><label>Opacidade: <span class="range-value" id="opacidade-valor">50%</span></label><input type="range" id="bg-opacidade" min="0" max="100" value="50" oninput="document.getElementById('opacidade-valor').textContent=this.value+'%'"></div>
+<div class="input-group"><label>Modo</label><select id="bg-modo"><option value="cover">Cobrir</option><option value="contain">Completa</option><option value="repeat">Repetir</option><option value="no-repeat">Não repetir</option></select></div>
+<div class="input-group"><label>Posição</label><select id="bg-posicao"><option value="center">Centro</option><option value="top">Topo</option><option value="bottom">Embaixo</option><option value="left">Esquerda</option><option value="right">Direita</option></select></div>
+</div>
+<button class="btn-salvar-config" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
+<button class="btn-resetar" onclick="resetarConfiguracoes()">🔄 Restaurar Padrão</button>
+</main>
+</div>
+<script>
+if (!localStorage.getItem('admin_logado')) { window.location.href = 'login.html'; }
+function sair() { localStorage.removeItem('admin_logado'); window.location.href = 'login.html'; }
 
-        <main class="content">
-            <h1>🎨 Configurações da Loja</h1>
-            <p style="color: var(--texto-cinza); margin-bottom: 2rem;">Personalize cores, logo, favicon e token do bot</p>
-            <div class="mensagem-sucesso" id="msg-sucesso">✅ Configurações salvas com sucesso!</div>
+var config = { nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0, botToken: '', corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B', favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center' };
 
-            <!-- NOME DO SITE -->
-            <div class="config-section">
-                <h3>🏷️ Nome do Site</h3>
-                <div class="input-group">
-                    <label>Nome da Loja</label>
-                    <input type="text" id="nome-site" placeholder="ReyCraft Shop">
-                    <small>Este nome aparece na aba do navegador</small>
-                </div>
-            </div>
+function carregarConfig() {
+config = JSON.parse(localStorage.getItem('config_loja')) || config;
+document.getElementById('nome-site').value = config.nomeSite || '';
+document.getElementById('logo-url').value = config.logoUrl || '';
+document.getElementById('logo-tamanho').value = config.logoTamanho || 40;
+document.getElementById('logo-posicao').value = config.logoPosicao || 0;
+document.getElementById('logo-tamanho-valor').textContent = (config.logoTamanho || 40) + 'px';
+document.getElementById('bot-token').value = config.botToken || '';
+document.getElementById('cor-roxo').value = config.corRoxo;
+document.getElementById('cor-verde').value = config.corVerde;
+document.getElementById('cor-amarelo').value = config.corAmarelo;
+document.getElementById('favicon-url').value = config.favicon || '';
+document.getElementById('bg-imagem').value = config.bgImagem || '';
+document.getElementById('bg-opacidade').value = config.bgOpacidade;
+document.getElementById('bg-modo').value = config.bgModo;
+document.getElementById('bg-posicao').value = config.bgPosicao;
+document.getElementById('opacidade-valor').textContent = config.bgOpacidade + '%';
+}
 
-            <!-- LOGO -->
-            <div class="config-section">
-                <h3>🖼️ Logo Principal</h3>
-                <div class="input-group"><label>URL da Logo</label><input type="url" id="logo-url" placeholder="https://i.imgur.com/TneGRwW.png"></div>
-                <div class="input-group"><label>Tamanho: <span class="range-value" id="logo-tamanho-valor">40px</span></label><input type="range" id="logo-tamanho" min="25" max="80" value="40" oninput="document.getElementById('logo-tamanho-valor').textContent=this.value+'px'"></div>
-                <div class="input-group"><label>Posição Horizontal</label><input type="range" id="logo-posicao" min="-150" max="150" value="0" oninput="document.getElementById('logo-posicao-valor').textContent=this.value+'px'"><small>← <span id="logo-posicao-valor">0px</span> →</small></div>
-            </div>
+function salvarConfiguracoes() {
+config = {
+nomeSite: document.getElementById('nome-site').value || 'ReyCraft Shop',
+logoUrl: document.getElementById('logo-url').value,
+logoTamanho: parseInt(document.getElementById('logo-tamanho').value),
+logoPosicao: parseInt(document.getElementById('logo-posicao').value),
+botToken: document.getElementById('bot-token').value,
+corRoxo: document.getElementById('cor-roxo').value,
+corVerde: document.getElementById('cor-verde').value,
+corAmarelo: document.getElementById('cor-amarelo').value,
+favicon: document.getElementById('favicon-url').value,
+bgImagem: document.getElementById('bg-imagem').value,
+bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
+bgModo: document.getElementById('bg-modo').value,
+bgPosicao: document.getElementById('bg-posicao').value
+};
 
-            <!-- TOKEN DO BOT -->
-            <div class="config-section" style="border-color: var(--amarelo);">
-                <h3>🤖 Token do Bot Discord</h3>
-                <div class="input-group">
-                    <label>Token do Bot</label>
-                    <small>⚠️ Usado para verificar clans dos usuários. Salvo apenas no seu navegador e sincronizado via JSONBin.</small>
-                </div>
-            </div>
+localStorage.setItem('config_loja', JSON.stringify(config));
 
-            <!-- CORES -->
-            <div class="config-section">
-                <h3>🎨 Cores do Tema</h3>
-                <div class="color-grid">
-                    <div class="color-item"><input type="color" id="cor-roxo" value="#8B5CF6"><div class="color-info"><strong>Roxo</strong><small>Principal</small></div></div>
-                    <div class="color-item"><input type="color" id="cor-verde" value="#10B981"><div class="color-info"><strong>Verde</strong><small>Secundário</small></div></div>
-                    <div class="color-item"><input type="color" id="cor-amarelo" value="#F59E0B"><div class="color-info"><strong>Amarelo</strong><small>Terciário</small></div></div>
-                </div>
-            </div>
+enviarParaBin().then(function() {
+var msg = document.getElementById('msg-sucesso');
+msg.style.display = 'block';
+msg.textContent = '✅ Configurações salvas e sincronizadas!';
+setTimeout(function() { msg.style.display = 'none'; }, 3000);
+}).catch(function() {
+var msg = document.getElementById('msg-sucesso');
+msg.style.display = 'block';
+msg.textContent = '⚠️ Salvo localmente. Erro ao sincronizar.';
+msg.style.background = 'rgba(245, 158, 11, 0.2)';
+msg.style.color = '#F59E0B';
+setTimeout(function() { msg.style.display = 'none'; }, 3000);
+});
+}
 
-            <!-- FAVICON -->
-            <div class="config-section">
-                <h3>🖼️ Favicon</h3>
-                <div class="input-group"><label>URL do Favicon</label><input type="url" id="favicon-url" placeholder="https://exemplo.com/icone.png"></div>
-            </div>
+function resetarConfiguracoes() {
+if (confirm('Restaurar padrão?')) {
+localStorage.removeItem('config_loja');
+config = { nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0, botToken: '', corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B', favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center' };
+carregarConfig();
+enviarParaBin();
+alert('✅ Restaurado!');
+}
+}
 
-            <!-- IMAGEM DE FUNDO -->
-            <div class="config-section">
-                <h3>🌄 Imagem de Fundo</h3>
-                <div class="input-group"><label>URL</label><input type="url" id="bg-imagem" placeholder="https://exemplo.com/fundo.jpg"></div>
-                <div class="input-group"><label>Opacidade: <span class="range-value" id="opacidade-valor">50%</span></label><input type="range" id="bg-opacidade" min="0" max="100" value="50" oninput="document.getElementById('opacidade-valor').textContent=this.value+'%'"></div>
-                <div class="input-group"><label>Modo</label><select id="bg-modo"><option value="cover">Cobrir</option><option value="contain">Completa</option><option value="repeat">Repetir</option><option value="no-repeat">Não repetir</option></select></div>
-                <div class="input-group"><label>Posição</label><select id="bg-posicao"><option value="center">Centro</option><option value="top">Topo</option><option value="bottom">Embaixo</option><option value="left">Esquerda</option><option value="right">Direita</option></select></div>
-            </div>
-
-            <button class="btn-salvar-config" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
-            <button class="btn-resetar" onclick="resetarConfiguracoes()">🔄 Restaurar Padrão</button>
-        </main>
-    </div>
-
-    <script>
-        if (!localStorage.getItem('admin_sessao')) { window.location.href = 'login.html'; }
-        function sair() { localStorage.removeItem('admin_sessao'); window.location.href = 'login.html'; }
-
-        var config = JSON.parse(localStorage.getItem('config_loja')) || {
-            nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0,
-            botToken: '',
-            corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B',
-            favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center'
-        };
-
-        function carregarConfig() {
-            document.getElementById('nome-site').value = config.nomeSite || '';
-            document.getElementById('logo-url').value = config.logoUrl || '';
-            document.getElementById('logo-tamanho').value = config.logoTamanho || 40;
-            document.getElementById('logo-posicao').value = config.logoPosicao || 0;
-            document.getElementById('logo-tamanho-valor').textContent = (config.logoTamanho || 40) + 'px';
-            document.getElementById('bot-token').value = config.botToken || '';
-            document.getElementById('cor-roxo').value = config.corRoxo;
-            document.getElementById('cor-verde').value = config.corVerde;
-            document.getElementById('cor-amarelo').value = config.corAmarelo;
-            document.getElementById('favicon-url').value = config.favicon || '';
-            document.getElementById('bg-imagem').value = config.bgImagem || '';
-            document.getElementById('bg-opacidade').value = config.bgOpacidade;
-            document.getElementById('bg-modo').value = config.bgModo;
-            document.getElementById('bg-posicao').value = config.bgPosicao;
-            document.getElementById('opacidade-valor').textContent = config.bgOpacidade + '%';
-        }
-
-        function salvarConfiguracoes() {
-            config = {
-                nomeSite: document.getElementById('nome-site').value || 'ReyCraft Shop',
-                logoUrl: document.getElementById('logo-url').value,
-                logoTamanho: parseInt(document.getElementById('logo-tamanho').value),
-                logoPosicao: parseInt(document.getElementById('logo-posicao').value),
-                botToken: document.getElementById('bot-token').value,
-                corRoxo: document.getElementById('cor-roxo').value,
-                corVerde: document.getElementById('cor-verde').value,
-                corAmarelo: document.getElementById('cor-amarelo').value,
-                favicon: document.getElementById('favicon-url').value,
-                bgImagem: document.getElementById('bg-imagem').value,
-                bgOpacidade: parseInt(document.getElementById('bg-opacidade').value),
-                bgModo: document.getElementById('bg-modo').value,
-                bgPosicao: document.getElementById('bg-posicao').value
-            };
-            localStorage.setItem('config_loja', JSON.stringify(config));
-            
-            enviarParaBin().then(function() {
-                var msg = document.getElementById('msg-sucesso');
-                msg.style.display = 'block';
-                msg.textContent = '✅ Configurações salvas e sincronizadas!';
-                setTimeout(function() { msg.style.display = 'none'; }, 3000);
-            }).catch(function() {
-                var msg = document.getElementById('msg-sucesso');
-                msg.style.display = 'block';
-                msg.textContent = '⚠️ Salvo localmente. Erro ao sincronizar.';
-                msg.style.background = 'rgba(245, 158, 11, 0.2)';
-                msg.style.color = '#F59E0B';
-                setTimeout(function() { msg.style.display = 'none'; }, 3000);
-            });
-        }
-
-        function resetarConfiguracoes() {
-            if (confirm('Restaurar padrão?')) {
-                localStorage.removeItem('config_loja');
-                config = { nomeSite: 'ReyCraft Shop', logoUrl: 'https://i.imgur.com/TneGRwW.png', logoTamanho: 40, logoPosicao: 0, botToken: '', corRoxo: '#8B5CF6', corVerde: '#10B981', corAmarelo: '#F59E0B', favicon: '', bgImagem: '', bgOpacidade: 50, bgModo: 'cover', bgPosicao: 'center' };
-                carregarConfig();
-                enviarParaBin();
-                alert('✅ Restaurado!');
-            }
-        }
-
-        carregarConfig();
-    </script>
+// Puxa os dados mais recentes do JSONBin antes de mostrar o formulário —
+// senão a página edita uma cópia desatualizada só do navegador local, e o
+// "Salvar" acaba sobrescrevendo produtos/pedidos/cupons/admins do banco
+// inteiro com essa cópia velha.
+sincronizarLocalStorage().then(function(){
+carregarConfig();
+}).catch(function(){
+carregarConfig(); // se não conseguir sincronizar, usa o que já tem local
+});
+</script>
 </body>
 </html>
