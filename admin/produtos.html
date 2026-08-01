@@ -1,99 +1,127 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Produtos</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/db.js"></script>
-    <style>
-        .admin-container { display: flex; min-height: 100vh; }
-        .sidebar nav a.ver-loja { background: var(--verde); color: white; text-align: center; font-weight: bold; margin-top: 1rem; }
-        .content { flex: 1; padding: 2rem; }
-        .btn-adicionar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 2rem; }
-        .form-produto { background: var(--card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem; display: none; }
-        .form-produto.ativo { display: block; }
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
-        .input-group textarea { resize: vertical; min-height: 100px; }
-        .input-group small { color: var(--texto-cinza); display: block; margin-top: 0.3rem; }
-        .upload-area { border: 2px dashed var(--roxo); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; background: var(--fundo); }
-        .upload-area:hover { border-color: var(--amarelo); background: rgba(139,92,246,0.1); }
-        .upload-area .icone { font-size: 3rem; margin-bottom: 0.5rem; }
-        .preview-imagem { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-top: 1rem; display: none; }
-        .preview-imagem.ativo { display: block; }
-        .btn-remover-imagem { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; display: none; }
-        .btn-remover-imagem.ativo { display: inline-block; }
-        .tabela-produtos { background: var(--card); border-radius: 10px; padding: 1rem; overflow-x: auto; }
-        .tabela-produtos table { width: 100%; border-collapse: collapse; }
-        .tabela-produtos th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--roxo); color: var(--amarelo); }
-        .tabela-produtos td { padding: 1rem; border-bottom: 1px solid #333; }
-        .btn-editar { background: var(--amarelo); color: #000; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-right: 0.5rem; }
-        .btn-remover { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-salvar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 0.5rem; }
-        .btn-cancelar-form { background: #64748b; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .sem-produtos { text-align: center; padding: 3rem; color: var(--texto-cinza); }
-        .badge-destaque { display: inline-block; background: #F59E0B; color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
-        @media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 2px solid var(--roxo); } .sidebar nav { display: flex; flex-wrap: wrap; gap: 0.5rem; } .sidebar nav a { flex: 1; text-align: center; min-width: 120px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Produtos</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="../js/db.js"></script>
+<style>
+.admin-container { display: flex; min-height: 100vh; }
+.content { flex: 1; padding: 2rem; }
+.btn-adicionar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 2rem; }
+.form-produto { background: var(--card); padding: 2rem; border-radius: 10px; margin-bottom: 2rem; display: none; }
+.form-produto.ativo { display: block; }
+.input-group { margin-bottom: 1.5rem; }
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+.input-group input, .input-group textarea, .input-group select { width: 100%; padding: 0.8rem; background: var(--fundo); border: 2px solid var(--roxo); border-radius: 8px; color: var(--texto); font-size: 1rem; }
+.input-group textarea { resize: vertical; min-height: 100px; }
+.input-group small { color: var(--texto-cinza); display: block; margin-top: 0.3rem; }
+.upload-area { border: 2px dashed var(--roxo); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; background: var(--fundo); }
+.upload-area:hover { border-color: var(--amarelo); background: rgba(139,92,246,0.1); }
+.upload-area .icone { font-size: 3rem; margin-bottom: 0.5rem; }
+.preview-imagem { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-top: 1rem; display: none; }
+.preview-imagem.ativo { display: block; }
+.btn-remover-imagem { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; display: none; }
+.btn-remover-imagem.ativo { display: inline-block; }
+.tabela-produtos { background: var(--card); border-radius: 10px; padding: 1rem; overflow-x: auto; }
+.tabela-produtos table { width: 100%; border-collapse: collapse; }
+.tabela-produtos th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--roxo); color: var(--amarelo); }
+.tabela-produtos td { padding: 1rem; border-bottom: 1px solid #333; }
+.btn-editar { background: var(--amarelo); color: #000; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; margin-right: 0.5rem; }
+.btn-remover { background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
+.btn-salvar { background: var(--verde); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-right: 0.5rem; }
+.btn-cancelar-form { background: #64748b; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.sem-produtos { text-align: center; padding: 3rem; color: var(--texto-cinza); }
+.badge-destaque { display: inline-block; background: #F59E0B; color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+.badge-vip { display: inline-block; background: var(--roxo); color: white; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.7rem; font-weight: bold; margin-left: 0.3rem; }
+.vip-section { background: var(--fundo); border: 2px solid var(--roxo); border-radius: 10px; padding: 1.2rem; margin-bottom: 1.5rem; }
+.vip-section label.checkbox-label { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; margin-bottom: 0; }
+.vip-section input[type="checkbox"] { width: auto; accent-color: var(--roxo); }
+.campo-cargo-vip { display: none; margin-top: 1rem; }
+.campo-cargo-vip.ativo { display: block; }
+@media (max-width: 768px) { .admin-container { flex-direction: column; } }
+</style>
 </head>
 <body>
-    <div class="admin-container">
-        <aside class="sidebar">
-            <h2>⚙️ Admin</h2>
-            <nav>
-                <a href="dashboard.html">📊 Dashboard</a>
-                <a href="produtos.html" class="ativo">📦 Produtos</a>
-                <a href="categorias.html">📂 Categorias</a>
-                <a href="pedidos.html">📋 Pedidos</a>
-                <a href="cupons.html">🏷️ Cupons</a>
-                <a href="staff.html">👥 Staff</a>
-                <a href="configuracoes.html">🎨 Configurações</a>
-                <a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
-                <a href="#" onclick="sair()">🚪 Sair</a>
-            </nav>
-        </aside>
+<div class="admin-container">
+<aside class="sidebar">
+<h2>⚙️ Admin</h2>
+<nav>
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="produtos.html" class="ativo">📦 Produtos</a>
+<a href="categorias.html">📂 Categorias</a>
+<a href="pedidos.html">📋 Pedidos</a>
+<a href="cupons.html">🏷️ Cupons</a>
+<a href="staff.html">👥 Staff</a>
+<a href="logs.html">🧾 Logs</a>
+<a href="configuracoes.html">🎨 Configurações</a>
+<a href="../index.html" class="ver-loja">🏪 Ver Loja</a>
+<a href="#" onclick="sair()">🚪 Sair</a>
+</nav>
+</aside>
+<main class="content">
+<h1>📦 Gerenciar Produtos</h1>
+<button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
+<div class="form-produto" id="form-produto">
+<h2 id="form-titulo">➕ Novo Produto</h2>
+<div class="input-group"><label>🏷️ Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: VIP Mensal"></div>
+<div class="input-group"><label>💰 Preço Original (R$)</label><input type="number" id="preco-produto" placeholder="29.90" step="0.01"></div>
+<div class="input-group"><label>💥 Preço Promocional (opcional)</label><input type="number" id="preco-promo" placeholder="Deixe vazio se não tiver promoção" step="0.01"><small>Se preenchido, o preço original aparece riscado na loja</small></div>
+<div class="input-group"><label>📂 Categoria</label><select id="categoria-produto"><option value="">Nenhuma</option></select><small>Cadastre categorias na página 📂 Categorias</small></div>
+<div class="input-group"><label>🏆 Em Destaque</label><select id="destaque-produto"><option value="sim">Sim - Mostrar nos Destaques</option><option value="nao">Não - Apenas na categoria</option></select><small>Produtos em destaque aparecem no topo da loja</small></div>
+<div class="input-group"><label>😀 Emoji (aparece se não tiver imagem)</label><input type="text" id="emoji-produto" placeholder="👑" maxlength="2"></div>
 
-        <main class="content">
-            <h1>📦 Gerenciar Produtos</h1>
-            <button class="btn-adicionar" onclick="mostrarForm()">➕ Adicionar Produto</button>
-            
-            <div class="form-produto" id="form-produto">
-                <h2 id="form-titulo">➕ Novo Produto</h2>
-                
-                <div class="input-group"><label>🏷️ Nome do Produto</label><input type="text" id="nome-produto" placeholder="Ex: VIP Mensal"></div>
-                <div class="input-group"><label>💰 Preço Original (R$)</label><input type="number" id="preco-produto" placeholder="29.90" step="0.01"></div>
-                <div class="input-group"><label>💥 Preço Promocional (opcional)</label><input type="number" id="preco-promo" placeholder="Deixe vazio se não tiver promoção" step="0.01"><small>Se preenchido, o preço original aparece riscado na loja</small></div>
-                <div class="input-group"><label>📂 Categoria</label><select id="categoria-produto"><option value="">Nenhuma</option></select><small>Cadastre categorias na página 📂 Categorias</small></div>
-                <div class="input-group"><label>🏆 Em Destaque</label><select id="destaque-produto"><option value="sim">Sim - Mostrar nos Destaques</option><option value="nao">Não - Apenas na categoria</option></select><small>Produtos em destaque aparecem no topo da loja</small></div>
-                <div class="input-group"><label>😀 Emoji (aparece se não tiver imagem)</label><input type="text" id="emoji-produto" placeholder="👑" maxlength="2"></div>
-                <div class="input-group">
-                    <label>🖼️ Imagem do Produto</label>
-                    <div class="upload-area" onclick="document.getElementById('input-imagem').click()"><div class="icone">📁</div><p>Clique para escolher uma imagem (máx 200KB)</p><small>Para imagens maiores, cole a URL abaixo</small></div>
-                    <input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
-                    <img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
-                    <button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
-                    <small style="margin-top: 0.5rem;">Ou cole uma URL de imagem (recomendado):</small>
-                    <input type="url" id="url-imagem" placeholder="https://imgur.com/seu-link.png" oninput="previewUrl(this.value)">
-                </div>
-                <div class="input-group"><label>📝 Descrição do Produto</label><textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece ao clicar em Detalhes)"></textarea></div>
-                
-                <button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
-                <button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
-            </div>
+<div class="vip-section">
+<label class="checkbox-label"><input type="checkbox" id="eh-vip" onchange="alternarCampoVip()"> <strong>🎖️ Este produto é um VIP (concede cargo automaticamente)</strong></label>
+<div class="campo-cargo-vip" id="campo-cargo-vip">
+<div class="input-group" style="margin-top:1rem;margin-bottom:0;">
+<label>🆔 ID do Cargo do VIP (Discord) *</label>
+<input type="text" id="cargo-vip-id" placeholder="Ex: 1234567890123456789">
+<small>⚠️ Obrigatório para VIPs. Ao ser confirmada a compra, esse cargo é dado automaticamente ao comprador e ele recebe uma mensagem no privado. Clique com botão direito no cargo no Discord (Modo Desenvolvedor ativado) → Copiar ID.</small>
+</div>
+</div>
+</div>
 
-            <div class="tabela-produtos">
-                <table>
-                    <thead>
-                        <tr><th>Img</th><th>Produto</th><th>Preço</th><th>Categoria</th><th>Destaque</th><th>Ações</th></tr>
-                    </thead>
-                    <tbody id="lista-produtos-admin"></tbody>
-                </table>
-            </div>
-        </main>
-    </div>
+<div class="vip-section">
+<label class="checkbox-label"><input type="checkbox" id="eh-vip-clan" onchange="alternarCampoVipClan()"> <strong>🏰 Esse VIP é dos Clãs?</strong></label>
+<div class="campo-cargo-vip" id="campo-vip-clan">
+<div class="input-group" style="margin-top:1rem;">
+<label>🔗 Esse VIP clã tem algum VIP vinculado?</label>
+<select id="vip-clan-vinculado"><option value="">Não, não tem VIP vinculado</option></select>
+<small>Se marcar um VIP aqui, esse VIP clã fica associado a ele (a lógica de como isso se aplica ainda vamos definir juntos).</small>
+</div>
+<div class="input-group" style="margin-bottom:0;">
+<label>➕ Quanto de limite irá adicionar no clã? *</label>
+<input type="number" id="vip-clan-limite" placeholder="Digite o limite, APENAS NÚMEROS" min="1" step="1">
+<small>⚠️ Obrigatório para VIP de clã. Quantos membros a mais o clã pode ter ao usar esse VIP.</small>
+</div>
+</div>
+</div>
 
-    <script src="../js/admin.js"></script>
+<div class="input-group">
+<label>🖼️ Imagem do Produto</label>
+<div class="upload-area" onclick="document.getElementById('input-imagem').click()"><div class="icone">📁</div><p>Clique para escolher uma imagem (máx 200KB)</p><small>Para imagens maiores, cole a URL abaixo</small></div>
+<input type="file" id="input-imagem" accept="image/*" style="display: none;" onchange="previewImagem(this)">
+<img id="preview-imagem" class="preview-imagem" src="" alt="Preview">
+<button id="btn-remover-imagem" class="btn-remover-imagem" onclick="removerImagem()">🗑️ Remover Imagem</button>
+<small style="margin-top: 0.5rem;">Ou cole uma URL de imagem (recomendado):</small>
+<input type="url" id="url-imagem" placeholder="https://imgur.com/seu-link.png" oninput="previewUrl(this.value)">
+</div>
+<div class="input-group"><label>📝 Descrição do Produto</label><textarea id="descricao-produto" placeholder="Descreva detalhes do produto... (aparece ao clicar em Detalhes)"></textarea></div>
+<button class="btn-salvar" onclick="salvarProduto()">💾 Salvar Produto</button>
+<button class="btn-cancelar-form" onclick="fecharForm()">Cancelar</button>
+</div>
+<div class="tabela-produtos">
+<table>
+<thead>
+<tr><th>Img</th><th>Produto</th><th>Preço</th><th>Categoria</th><th>Destaque</th><th>Ações</th></tr>
+</thead>
+<tbody id="lista-produtos-admin"></tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="../js/admin.js"></script>
 </body>
 </html>
