@@ -2,7 +2,8 @@
 // Precisa do corpo cru (raw body) pra validar a assinatura, por isso desligamos
 // o bodyParser padrão da Vercel aqui embaixo.
 const crypto = require('crypto');
-const { getDB, saveDB, notificarDiscord, atualizarDoador } = require('../lib/db');
+const { getDB, saveDB, notificarDiscord, atualizarDoador, criarSolicitacoesVipClan } = require('../lib/db');
+const { processarVipsDoPedido } = require('../lib/discord');
 
 module.exports.config = { api: { bodyParser: false } };
 
@@ -57,8 +58,11 @@ module.exports = async function handler(req, res) {
     }
 
     atualizarDoador(data, pedido.discord_id, pedido.cliente, pedido.valor); // usa o valor em BRL, mesma base dos outros métodos
+    criarSolicitacoesVipClan(data, pedido, data.produtos);
 
     await saveDB(data);
+
+    await processarVipsDoPedido(pedido, data.produtos); // dá o cargo VIP e manda a DM, se for o caso
 
     await notificarDiscord('✅ Pagamento confirmado (Stripe)', [
       ['Pedido', '#' + pedido.id],
