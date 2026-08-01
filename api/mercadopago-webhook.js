@@ -1,6 +1,7 @@
 // POST /api/mercadopago-webhook
 // O Mercado Pago chama essa URL sozinho quando o status de um pagamento muda.
-const { getDB, saveDB, notificarDiscord, atualizarDoador } = require('../lib/db');
+const { getDB, saveDB, notificarDiscord, atualizarDoador, criarSolicitacoesVipClan } = require('../lib/db');
+const { processarVipsDoPedido } = require('../lib/discord');
 
 const NOMES_METODO = {
   pix: 'PIX',
@@ -41,8 +42,11 @@ module.exports = async function handler(req, res) {
     }
 
     atualizarDoador(data, pedido.discord_id, pedido.cliente, pedido.valor);
+    criarSolicitacoesVipClan(data, pedido, data.produtos);
 
     await saveDB(data);
+
+    await processarVipsDoPedido(pedido, data.produtos); // dá o cargo VIP e manda a DM, se for o caso
 
     await notificarDiscord('✅ Pagamento confirmado', [
       ['Pedido', '#' + pedido.id],
