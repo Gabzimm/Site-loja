@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'method not allowed' });
 
   try {
-    const { discord_id, nome, itens, cupom, metodo } = req.body; // metodo: 'pix' | 'credito' | 'debito' | 'mby'
+    const { discord_id, nome, itens, cupom, metodo, tokenClan } = req.body; // metodo: 'mercadopago' | 'mby'
     if (!discord_id || !itens || !itens.length) return res.status(400).json({ error: 'dados incompletos' });
     const info = MAPA_METODOS[metodo];
     if (!info) return res.status(400).json({ error: 'método de pagamento inválido' });
@@ -45,6 +45,7 @@ module.exports = async function handler(req, res) {
       itens: itens,
       valor: total,
       cupom: cupom || null,
+      tokenClan: tokenClan || null,
       data: new Date().toISOString(),
       status: 'pendente_pagamento',
       pagamento: info.gateway === 'mercadopago' ? null : info.nomeExibicao, // no MP só sabemos o método de verdade depois do webhook
