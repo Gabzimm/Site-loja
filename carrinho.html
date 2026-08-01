@@ -42,6 +42,10 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var
 .pagamento-opt small { color: var(--texto-cinza); font-weight: normal; }
 .pagamento-opt.selecionado { border-color: var(--verde); background: rgba(16,185,129,0.1); }
 .euro-preview { color: var(--amarelo); font-weight: bold; margin-top: 0.8rem; text-align: center; }
+.token-clan-section { background: var(--card); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 2px solid var(--amarelo); }
+.token-clan-section h3 { color: var(--amarelo); margin-bottom: 0.5rem; font-size: 1rem; }
+.token-clan-section small { color: var(--texto-cinza); display: block; margin-bottom: 0.8rem; }
+.token-clan-section input { width: 100%; padding: 0.8rem; background: #0a0a0f; border: 2px solid var(--amarelo); border-radius: 8px; color: var(--texto); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 .modal-pix-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 .modal-pix-box { background: var(--card); border-radius: 15px; padding: 2rem; max-width: 380px; width: 100%; text-align: center; }
 .modal-pix-box h3 { color: var(--amarelo); margin-bottom: 1rem; }
@@ -79,7 +83,7 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var
 (function(){var c=JSON.parse(localStorage.getItem('config_loja')); if(c){if(c.nomeSite)document.getElementById('titulo-pagina').textContent=c.nomeSite+' - Carrinho'; if(c.favicon)document.getElementById('favicon-pagina').href=c.favicon; if(c.logoUrl){var l=document.getElementById('logo-img');if(l)l.src=c.logoUrl;} if(c.logoTamanho){var l=document.getElementById('logo-img');if(l)l.style.height=c.logoTamanho+'px';}}})();
 
 var DISCORD_CLIENT_ID='1515464456719695952', REDIRECT_URI='https://www.reycraft-hc.shop/callback.html';
-var carrinho=JSON.parse(localStorage.getItem('carrinho'))||[], cupons=[], cupomAplicado=null, metodoSelecionado=null, valorEuroPreview=null, usuario=JSON.parse(localStorage.getItem('usuario_discord'));
+var carrinho=JSON.parse(localStorage.getItem('carrinho'))||[], cupons=[], produtosSync=[], cupomAplicado=null, metodoSelecionado=null, valorEuroPreview=null, tokenClan='', usuario=JSON.parse(localStorage.getItem('usuario_discord'));
 
 // Ao voltar do Mercado Pago/Stripe com ?status=..., avisa o usuário (a confirmação real vem do webhook, não da URL)
 (function(){
@@ -89,7 +93,7 @@ var carrinho=JSON.parse(localStorage.getItem('carrinho'))||[], cupons=[], cupomA
   if(status==='falha') setTimeout(function(){mostrarToast('❌ Pagamento não concluído.','erro');},300);
 })();
 
-sincronizarLocalStorage().then(function(){ cupons=JSON.parse(localStorage.getItem('cupons'))||[]; renderizarCarrinho(); });
+sincronizarLocalStorage().then(function(){ cupons=JSON.parse(localStorage.getItem('cupons'))||[]; produtosSync=JSON.parse(localStorage.getItem('produtos'))||[]; renderizarCarrinho(); });
 
 function mostrarToast(m,t){var toast=document.createElement('div'); toast.className='toast-aviso'+(t==='erro'?' toast-erro':''); toast.textContent=m; document.body.appendChild(toast); setTimeout(function(){if(toast.parentNode)toast.parentNode.removeChild(toast);},4000);}
 function salvarCarrinho(){localStorage.setItem('carrinho',JSON.stringify(carrinho)); renderizarCarrinho();}
@@ -98,6 +102,12 @@ function alterarQuantidade(id,d){var i=carrinho.find(function(x){return x.id===i
 function calcularSubtotal(){return carrinho.reduce(function(t,i){return t+(i.preco*i.quantidade)},0);}
 function calcularDesconto(){if(!cupomAplicado)return 0; var s=calcularSubtotal(); return cupomAplicado.tipo==='porcentagem'?s*(cupomAplicado.valor/100):Math.min(cupomAplicado.valor,s);}
 function calcularTotal(){return Math.max(0,calcularSubtotal()-calcularDesconto());}
+function temVipClanNoCarrinho(){
+  return carrinho.some(function(item){
+    var p=produtosSync.find(function(x){return x.id===item.id});
+    return p && p.ehVipClan;
+  });
+}
 
 function aplicarCupom(){
   var codigo=document.getElementById('input-cupom').value.trim().toUpperCase();
@@ -130,6 +140,7 @@ function finalizarCompra(){
   if(!usuario){mostrarToast('Faça login!','erro');return;}
   if(carrinho.length===0){mostrarToast('Carrinho vazio!','erro');return;}
   if(!metodoSelecionado){mostrarToast('Escolha a forma de pagamento!','erro');return;}
+  if(temVipClanNoCarrinho() && !tokenClan.trim()){mostrarToast('Digite o Token do Clã!','erro');return;}
   var btn=document.querySelector('.btn-finalizar'); btn.disabled=true; btn.textContent='Redirecionando...';
 
   fetch('/api/create-payment', {
@@ -138,9 +149,10 @@ function finalizarCompra(){
     body: JSON.stringify({
       discord_id: usuario.id,
       nome: usuario.global_name || usuario.username,
-      itens: carrinho.map(function(i){return {nome:i.nome, preco:i.preco, quantidade:i.quantidade};}),
+      itens: carrinho.map(function(i){return {id:i.id, nome:i.nome, preco:i.preco, quantidade:i.quantidade};}),
       cupom: cupomAplicado ? cupomAplicado.codigo : null,
-      metodo: metodoSelecionado
+      metodo: metodoSelecionado,
+      tokenClan: tokenClan.trim() || null
     })
   }).then(function(r){return r.json();}).then(function(resp){
     if(resp.tipo==='pix'){
@@ -200,6 +212,10 @@ function renderizarCarrinho(){
   if(cupomAplicado)resumoHtml+='<div class="cupom-aplicado"><span>✅ '+cupomAplicado.codigo+'</span><button onclick="removerCupom()" style="background:#ef4444;color:white;border:none;padding:0.3rem 0.8rem;border-radius:5px;cursor:pointer;">Remover</button></div>';
   else resumoHtml+='<div class="cupom-input"><input id="input-cupom" placeholder="Código"><button onclick="aplicarCupom()">Aplicar</button></div><div class="cupom-erro-msg" id="cupom-erro-msg"></div>';
   resumoHtml+='</div>';
+
+  if(temVipClanNoCarrinho()){
+    resumoHtml+='<div class="token-clan-section"><h3>🏰 Token do Clã</h3><small>Seu carrinho tem um VIP de Clã. Digite o token do clã que vai receber o benefício.</small><input id="input-token-clan" placeholder="Ex: F234C" value="'+tokenClan+'" oninput="tokenClan=this.value.toUpperCase()" maxlength="10"></div>';
+  }
 
   resumoHtml+='<div class="pagamento-section"><h3>💳 Forma de Pagamento</h3><div class="pagamento-opcoes">';
   resumoHtml+='<div class="pagamento-opt'+(metodoSelecionado==='mercadopago'?' selecionado':'')+'" onclick="selecionarMetodo(\'mercadopago\')">💳 Mercado Pago<br><small>PIX / Crédito / Débito / Boleto, etc.</small></div>';
