@@ -33,6 +33,7 @@ if (!code) {
     }
     localStorage.setItem('usuario_discord', JSON.stringify(data.usuario));
     if (data.sessao) localStorage.setItem('user_sessao', data.sessao);
+    if (data.admin && data.sessao) localStorage.setItem('admin_sessao', data.sessao); // já é staff? não precisa logar de novo no admin
     var destino = localStorage.getItem('redirect_after_login') || 'index.html';
     localStorage.removeItem('redirect_after_login');
     window.location.href = destino;
