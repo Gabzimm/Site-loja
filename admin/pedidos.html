@@ -43,6 +43,7 @@
 </aside>
 <main class="content">
 <h1>📋 Pedidos</h1>
+<button onclick="recalcularDoadores()" style="background:var(--amarelo);color:#000;border:none;padding:0.6rem 1.2rem;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:1rem;">💎 Recalcular Doadores (corrige histórico)</button>
 <div class="filtros">
 <button class="filtro-btn ativo" onclick="filtrar('todos')">Todos</button>
 <button class="filtro-btn" onclick="filtrar('pendente_pagamento')">Aguardando pagamento</button>
@@ -56,6 +57,17 @@ if (!localStorage.getItem('admin_sessao')) window.location.href = 'login.html';
 function sair() { localStorage.removeItem('admin_sessao'); window.location.href = 'login.html'; }
 
 var pedidos = [], filtroAtual = 'todos';
+
+function recalcularDoadores() {
+    var sessao = localStorage.getItem('admin_sessao');
+    fetch('/api/recalcular-doadores', { method: 'POST', headers: { 'Authorization': 'Bearer ' + sessao } })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) alert('✅ Doadores recalculados! ' + d.doadores + ' pessoas na lista agora.');
+            else alert('❌ Erro: ' + (d.error || 'desconhecido'));
+        })
+        .catch(function() { alert('❌ Erro ao recalcular.'); });
+}
 
 function filtrar(f) {
     filtroAtual = f;
