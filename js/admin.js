@@ -41,6 +41,29 @@ function fecharConfirmacao() {
     if (modal) modal.classList.remove('ativo');
 }
 
+// ========== VIP: mostrar/esconder campo do cargo ==========
+function alternarCampoVip() {
+    var marcado = document.getElementById('eh-vip').checked;
+    document.getElementById('campo-cargo-vip').classList.toggle('ativo', marcado);
+}
+
+// ========== VIP DE CLÃ: mostrar/esconder campos + popular lista de VIPs vinculáveis ==========
+function alternarCampoVipClan() {
+    var marcado = document.getElementById('eh-vip-clan').checked;
+    document.getElementById('campo-vip-clan').classList.toggle('ativo', marcado);
+    if (marcado) popularVipsVinculaveis();
+}
+
+function popularVipsVinculaveis(idAtual) {
+    var select = document.getElementById('vip-clan-vinculado');
+    var valorAtual = select.value;
+    select.innerHTML = '<option value="">Não, não tem VIP vinculado</option>';
+    produtos.filter(function(p) { return p.cargoVipId && p.id !== idAtual; }).forEach(function(p) {
+        select.innerHTML += '<option value="' + p.id + '">' + p.nome + '</option>';
+    });
+    select.value = valorAtual;
+}
+
 // ========== PRODUTOS ==========
 var produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 var imagemTemporaria = null;
@@ -82,6 +105,14 @@ function mostrarForm(id) {
         document.getElementById('url-imagem').value = produto.imagem || '';
         document.getElementById('categoria-produto').value = produto.categoria || '';
         document.getElementById('destaque-produto').value = produto.destaque === false ? 'nao' : 'sim';
+        document.getElementById('eh-vip').checked = !!produto.cargoVipId;
+        document.getElementById('cargo-vip-id').value = produto.cargoVipId || '';
+        alternarCampoVip();
+        document.getElementById('eh-vip-clan').checked = !!produto.ehVipClan;
+        popularVipsVinculaveis(produto.id);
+        document.getElementById('vip-clan-vinculado').value = produto.vipClanVinculadoId || '';
+        document.getElementById('vip-clan-limite').value = produto.vipClanLimiteAdicional || '';
+        alternarCampoVipClan();
         document.getElementById('form-produto').dataset.editId = id;
         document.getElementById('form-titulo').textContent = '✏️ Editar Produto';
         if (produto.imagem) {
@@ -110,6 +141,13 @@ function limparForm() {
     document.getElementById('url-imagem').value = '';
     document.getElementById('categoria-produto').value = '';
     document.getElementById('destaque-produto').value = 'sim';
+    document.getElementById('eh-vip').checked = false;
+    document.getElementById('cargo-vip-id').value = '';
+    document.getElementById('campo-cargo-vip').classList.remove('ativo');
+    document.getElementById('eh-vip-clan').checked = false;
+    document.getElementById('vip-clan-vinculado').value = '';
+    document.getElementById('vip-clan-limite').value = '';
+    document.getElementById('campo-vip-clan').classList.remove('ativo');
     document.getElementById('preview-imagem').classList.remove('ativo');
     document.getElementById('btn-remover-imagem').classList.remove('ativo');
     document.getElementById('input-imagem').value = '';
@@ -169,11 +207,28 @@ function salvarProduto() {
     var categoria = document.getElementById('categoria-produto').value;
     var destaque = document.getElementById('destaque-produto').value === 'sim';
     var imagem = imagemTemporaria || urlImagem || '';
+    var ehVip = document.getElementById('eh-vip').checked;
+    var cargoVipId = document.getElementById('cargo-vip-id').value.trim();
+    var ehVipClan = document.getElementById('eh-vip-clan').checked;
+    var vipClanVinculadoId = document.getElementById('vip-clan-vinculado').value ? parseInt(document.getElementById('vip-clan-vinculado').value) : null;
+    var vipClanLimiteAdicional = document.getElementById('vip-clan-limite').value ? parseInt(document.getElementById('vip-clan-limite').value) : null;
 
     if (!nome || !preco) {
         alert('⚠️ Preencha nome e preço!');
         return;
     }
+
+    if (ehVip && !cargoVipId) {
+        alert('⚠️ Produto marcado como VIP precisa do ID do Cargo do Discord! Preencha o campo "ID do Cargo do VIP".');
+        return;
+    }
+    if (!ehVip) cargoVipId = ''; // se desmarcou, não concede cargo nenhum
+
+    if (ehVipClan && (!vipClanLimiteAdicional || vipClanLimiteAdicional <= 0)) {
+        alert('⚠️ VIP de Clã precisa do limite de membros a adicionar! Preencha só com números.');
+        return;
+    }
+    if (!ehVipClan) { vipClanVinculadoId = null; vipClanLimiteAdicional = null; }
 
     var editId = document.getElementById('form-produto').dataset.editId;
 
@@ -185,14 +240,16 @@ function salvarProduto() {
                 var index = produtos.findIndex(function(p) { return p.id === parseInt(editId); });
                 produtos[index] = {
                     id: produtos[index].id, nome: nome, preco: preco, precoPromo: precoPromo,
-                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque
+                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque,
+                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional
                 };
                 salvarProdutos('Editou produto', nome);
             } else {
                 var novoId = produtos.length > 0 ? Math.max.apply(null, produtos.map(function(p) { return p.id; })) + 1 : 1;
                 produtos.push({
                     id: novoId, nome: nome, preco: preco, precoPromo: precoPromo,
-                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque
+                    emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque,
+                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional
                 });
                 salvarProdutos('Criou produto', nome);
             }
@@ -285,9 +342,11 @@ function renderizarTabela() {
         }
         var catAtual = produto.categoria || '—';
         var destaqueBadge = produto.destaque !== false ? ' <span class="badge-destaque">⭐</span>' : '—';
+        var vipBadge = produto.cargoVipId ? ' <span class="badge-vip">🎖️ VIP</span>' : '';
+        var vipClanBadge = produto.ehVipClan ? ' <span class="badge-vip" style="background:var(--amarelo);color:#000;">🏰 +' + (produto.vipClanLimiteAdicional || 0) + ' Clã</span>' : '';
         return '<tr>' +
             '<td>' + imgCell + '</td>' +
-            '<td>' + produto.nome + '</td>' +
+            '<td>' + produto.nome + vipBadge + vipClanBadge + '</td>' +
             '<td>' + precoCell + '</td>' +
             '<td><span id="cat-txt-' + produto.id + '">' + catAtual + '</span> <button onclick="mudarCategoria(' + produto.id + ')" style="background:var(--roxo);color:white;border:none;padding:0.2rem 0.5rem;border-radius:5px;cursor:pointer;font-size:0.8rem;">📂</button></td>' +
             '<td>' + destaqueBadge + '</td>' +
