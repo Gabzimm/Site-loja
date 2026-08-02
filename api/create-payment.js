@@ -82,6 +82,11 @@ module.exports = async function handler(req, res) {
         })
       });
       const pref = await prefResp.json();
+      console.log(JSON.stringify({
+        id: pref.id,
+        collector_id: pref.collector_id,
+        payment_methods: pref.payment_methods
+      }, null, 2));
       if (!prefResp.ok) {
         console.error('Erro ao criar preferência MP:', JSON.stringify(pref));
         return res.status(500).json({ error: 'Não foi possível gerar o pagamento. Tente novamente.' });
