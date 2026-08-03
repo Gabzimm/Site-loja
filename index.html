@@ -13,10 +13,12 @@
 body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); color: var(--texto); min-height: 100vh; position: relative; }
 body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 .header { background: #0a0a0f; padding: 0.8rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.header-ip { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--texto-cinza); font-size: 0.85rem; position: relative; }
-.header-ip:hover { color: var(--amarelo); }
-.header-ip .ip-porta { color: var(--verde); font-weight: bold; }
-.header-ip .ip-endereco { color: var(--texto); }
+.header-ip { display: flex; align-items: center; gap: 0; cursor: pointer; font-size: 0.85rem; position: relative; background: #1a1a2a; border-radius: 8px; overflow: hidden; border: 1px solid #2a2a3a; }
+.header-ip .ip-porta { background: var(--roxo); color: white; font-weight: bold; padding: 0.5rem 0.7rem; }
+.header-ip .ip-endereco { color: var(--texto); padding: 0.5rem 0.9rem; font-weight: bold; letter-spacing: 0.3px; }
+.header-ip .ip-tooltip { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 6px; background: #000; color: var(--texto-cinza); font-size: 0.7rem; padding: 0.3rem 0.7rem; border-radius: 5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; display: flex; align-items: center; gap: 0.3rem; }
+.header-ip:hover .ip-tooltip { opacity: 1; }
+.header-ip:hover { border-color: var(--roxo); }
 .copiado-msg { position: absolute; top: 100%; left: 0; background: var(--verde); color: white; padding: 0.3rem 0.8rem; border-radius: 5px; font-size: 0.75rem; display: none; }
 .copiado-msg.mostrar { display: block; animation: fadeOut 2s forwards; }
 @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
@@ -54,9 +56,23 @@ body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 1
 .btn-detalhes { width: 100%; padding: 0.5rem; background: transparent; border: 1px solid #1e1e2e; color: var(--texto-cinza); border-radius: 8px; margin-top: 0.5rem; cursor: pointer; font-size: 0.8rem; }
 .btn-detalhes:hover { border-color: var(--roxo); color: var(--texto); }
 .loja-vazia { text-align: center; padding: 4rem; color: var(--texto-cinza); }
-.toast-aviso { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: bold; z-index: 9999; animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards; }
+.toast-aviso { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--verde); color: white; padding: 1rem 2rem; border-radius: 10px; font-weight: bold; z-index: 9999; animation: slideUp 0.3s ease, fadeOutToast 2.5s forwards; cursor: pointer; }
 @keyframes slideUp { from { transform: translateX(-50%) translateY(100px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 @keyframes fadeOutToast { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+.popup-cupom-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.popup-cupom-box { background: linear-gradient(160deg, #1a0f2e, #150a24); border: 1px solid #3d2a5c; border-radius: 16px; padding: 2.2rem 2rem; max-width: 380px; width: 100%; text-align: center; position: relative; box-shadow: 0 20px 60px rgba(107,33,168,0.4); }
+.popup-cupom-fechar-x { position: absolute; top: 1rem; right: 1.2rem; color: var(--texto-cinza); cursor: pointer; font-size: 1.3rem; background: none; border: none; }
+.popup-cupom-icone { width: 65px; height: 65px; background: linear-gradient(135deg, #8B5CF6, #6D28D9); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1.2rem; }
+.popup-cupom-titulo { font-size: 1.3rem; font-weight: 900; color: white; margin-bottom: 0.6rem; }
+.popup-cupom-titulo span { color: var(--roxo-claro); }
+.popup-cupom-desc { color: var(--texto-cinza); font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.4; }
+.popup-cupom-codigo-label { color: var(--texto-cinza); font-size: 0.7rem; letter-spacing: 1.5px; margin-bottom: 0.5rem; }
+.popup-cupom-codigo-box { border: 2px dashed #5b3a8c; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.2s; }
+.popup-cupom-codigo-box:hover { background: rgba(139,92,246,0.08); border-color: var(--roxo-claro); }
+.popup-cupom-codigo { font-size: 1.5rem; font-weight: 900; color: white; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.popup-cupom-timer { color: var(--texto-cinza); font-size: 0.75rem; }
+.popup-cupom-timer b { color: var(--roxo-claro); }
 .modal-detalhes-fundo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 2rem; }
 .modal-detalhes-box { background: var(--card); border-radius: 15px; padding: 2.5rem; width: 100%; max-width: 900px; max-height: 85vh; overflow-y: auto; }
 .modal-detalhes-titulo { color: var(--amarelo); font-size: 2rem; font-weight: bold; text-align: center; margin-bottom: 2rem; }
@@ -74,8 +90,9 @@ body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 1
 <body>
 <header class="header">
 <div class="header-ip" onclick="copiarIP()">
-<span class="ip-porta">26813</span> | <span class="ip-endereco">reycraft.blazebr.com</span>
+<span class="ip-porta">26813</span><span class="ip-endereco">reycraft.blazebr.com</span>
 <span class="copiado-msg" id="copiado-msg">✅ Copiado!</span>
+<span class="ip-tooltip">📋 Clique para copiar</span>
 </div>
 <a href="index.html" class="header-logo" id="header-logo-link">
 <img src="https://i.imgur.com/TneGRwW.png" id="logo-img">
@@ -212,10 +229,11 @@ var btn = document.getElementById('btn-admin-flutuante');
 if (u && a.indexOf(u.id) !== -1) btn.style.display = 'block';
 else btn.style.display = 'none';
 }
-function mostrarToast(m) {
+function mostrarToast(m, clicavel) {
 var t = document.createElement('div');
 t.className = 'toast-aviso';
-t.textContent = m;
+t.textContent = m + (clicavel ? ' →' : '');
+if (clicavel) t.onclick = function() { window.location.href = 'carrinho.html'; };
 document.body.appendChild(t);
 setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 2800);
 }
@@ -230,7 +248,7 @@ var item = carrinho.find(function(i) { return i.id === id; });
 if (item) item.quantidade++;
 else carrinho.push({ id: p.id, nome: p.nome, preco: pf, emoji: p.emoji || '', imagem: p.imagem || '', categoria: p.categoria || '', quantidade: 1 });
 salvarCarrinho();
-mostrarToast(p.nome + ' adicionado! 🛒');
+mostrarToast(p.nome + ' adicionado! 🛒', true);
 }
 function atualizarContador() {
 var t = 0;
@@ -289,7 +307,11 @@ c.appendChild(criarSecao('🔥 Produtos em Destaque', 'destaque', produtos));
 if (categorias.length > 0) {
 categorias.forEach(function(cat) {
 var p = produtos.filter(function(x) { return x.categoria === cat.nome; });
-if (p.length > 0) c.appendChild(criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), p));
+if (p.length > 0) {
+var secaoEl = criarSecao(cat.nome, 'cat-' + cat.nome.replace(/\s+/g, '-'), p);
+if (cat.nome.toLowerCase().indexOf('vip') !== -1) secaoEl.dataset.secaoVip = 'true';
+c.appendChild(secaoEl);
+}
 });
 }
 }
@@ -379,11 +401,98 @@ return h;
 }
 g.innerHTML = card('TOP Clãs', '🏰', tc, 'kills', 'rankings.html?tab=clans') + card('TOP Jogadores', '👤', tj, 'kills', 'rankings.html?tab=jogadores') + card('TOP Donaters', '💎', td, 'R$', 'rankings.html?tab=donaters');
 }
+// ========== POPUP DE CUPOM (roxo escuro) ==========
+var cupons = [];
+
+function cupomValidoParaMim(cupom) {
+if (!cupom || !cupom.ativo) return false;
+var u = JSON.parse(localStorage.getItem('usuario_discord'));
+if (cupom.unicoPorComprador) {
+if (!u) return true; // deixa mostrar; a validação de verdade acontece no carrinho/servidor
+return !(cupom.usados_por && cupom.usados_por.indexOf(u.id) !== -1);
+}
+return cupom.limite == null || cupom.usos < cupom.limite;
+}
+
+function mostrarPopupCupom(cupom, tituloExtra) {
+if (document.querySelector('.popup-cupom-fundo')) return; // já tem um popup aberto, não empilha
+var jaFechadoNestaSessao = sessionStorage.getItem('cupom_popup_' + cupom.codigo);
+if (jaFechadoNestaSessao) return;
+
+var validoAte = Date.now() + 30 * 60 * 1000; // janela de 30min só pra criar urgência visual
+var m = document.createElement('div');
+m.className = 'popup-cupom-fundo';
+m.innerHTML =
+'<div class="popup-cupom-box">' +
+'<button class="popup-cupom-fechar-x" onclick="fecharPopupCupom(\'' + cupom.codigo + '\')">✕</button>' +
+'<div class="popup-cupom-icone">🎁</div>' +
+'<div class="popup-cupom-titulo">' + (tituloExtra || 'CUPOM <span>ATIVO</span>') + '</div>' +
+'<div class="popup-cupom-desc">Aproveite nosso desconto especial exclusivo para você.</div>' +
+'<div class="popup-cupom-codigo-label">CÓDIGO DO CUPOM</div>' +
+'<div class="popup-cupom-codigo-box" onclick="copiarCodigoCupom(\'' + cupom.codigo + '\')">' +
+'<div class="popup-cupom-codigo">' + cupom.codigo + ' <span style="font-size:1rem;">📋</span></div>' +
+'</div>' +
+'<div class="popup-cupom-timer">Cupom válido por <b id="cupom-timer-txt">30:00</b></div>' +
+'</div>';
+document.body.appendChild(m);
+m.onclick = function(e) { if (e.target === m) fecharPopupCupom(cupom.codigo); };
+
+var intervalo = setInterval(function() {
+var restante = validoAte - Date.now();
+if (restante <= 0 || !document.body.contains(m)) { clearInterval(intervalo); return; }
+var min = Math.floor(restante / 60000), seg = Math.floor((restante % 60000) / 1000);
+var el = document.getElementById('cupom-timer-txt');
+if (el) el.textContent = min + ':' + (seg < 10 ? '0' : '') + seg;
+}, 1000);
+}
+
+function fecharPopupCupom(codigo) {
+sessionStorage.setItem('cupom_popup_' + codigo, '1');
+var m = document.querySelector('.popup-cupom-fundo');
+if (m) m.remove();
+}
+
+function copiarCodigoCupom(codigo) {
+navigator.clipboard.writeText(codigo).then(function() { mostrarToast('✅ Cupom ' + codigo + ' copiado!'); });
+}
+
+// Gatilho 1: rolar até a seção de VIPs mostra o cupom de primeira compra
+function configurarObserverVip() {
+var secaoVip = document.querySelector('[data-secao-vip="true"]');
+if (!secaoVip || !('IntersectionObserver' in window)) return;
+var observer = new IntersectionObserver(function(entries) {
+entries.forEach(function(entry) {
+if (entry.isIntersecting) {
+var cupomPrimeira = cupons.find(function(c) { return c.codigo === 'PRIMEIRACOMPRA20%'; });
+if (cupomPrimeira && cupomValidoParaMim(cupomPrimeira)) {
+mostrarPopupCupom(cupomPrimeira, 'CUPOM DE <span>PRIMEIRA COMPRA</span>');
+}
+observer.disconnect();
+}
+});
+}, { threshold: 0.3 });
+observer.observe(secaoVip);
+}
+
+// Gatilho 2: popup periódico com algum cupom ativo (primeira vez aos 5min, depois a cada 10min)
+function configurarPopupPeriodico() {
+function tentarMostrar() {
+if (document.querySelector('.popup-cupom-fundo')) return; // não interrompe se já tem um aberto
+var candidato = cupons.find(function(c) { return cupomValidoParaMim(c) && !sessionStorage.getItem('cupom_popup_' + c.codigo); });
+if (candidato) mostrarPopupCupom(candidato);
+}
+setTimeout(function() {
+tentarMostrar();
+setInterval(tentarMostrar, 10 * 60 * 1000);
+}, 5 * 60 * 1000);
+}
+
 // ========== INICIAR ==========
 sincronizarLocalStorage().then(function() {
 produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 categorias = JSON.parse(localStorage.getItem('categorias')) || [];
 carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+cupons = JSON.parse(localStorage.getItem('cupons')) || [];
 aplicarCoresENome();
 aplicarFundo();
 aplicarConfigLogo();
@@ -393,6 +502,8 @@ renderizarTodasSecoes();
 atualizarContador();
 verificarBotaoAdmin();
 atualizarPerfilHeader();
+configurarObserverVip();
+configurarPopupPeriodico();
 }).catch(function() {
 produtos = JSON.parse(localStorage.getItem('produtos')) || [];
 categorias = JSON.parse(localStorage.getItem('categorias')) || [];
