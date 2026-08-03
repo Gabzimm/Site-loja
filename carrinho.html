@@ -113,7 +113,11 @@ function aplicarCupom(){
   var codigo=document.getElementById('input-cupom').value.trim().toUpperCase();
   var erroEl=document.getElementById('cupom-erro-msg');
   if(!codigo){erroEl.textContent='Digite um código.'; erroEl.classList.add('mostrar'); return;}
-  var cupom=cupons.find(function(c){return c.codigo===codigo&&c.ativo&&c.usos<c.limite});
+  var cupom=cupons.find(function(c){
+    if(c.codigo!==codigo || !c.ativo) return false;
+    if(c.unicoPorComprador) return !(c.usados_por && usuario && c.usados_por.indexOf(usuario.id)!==-1);
+    return c.limite==null || c.usos<c.limite;
+  });
   if(cupom){cupomAplicado=cupom; erroEl.classList.remove('mostrar'); document.getElementById('input-cupom').value=''; renderizarCarrinho(); mostrarToast('✅ Cupom '+cupom.codigo+' aplicado!');}
   else{erroEl.textContent='Cupom errado, veja se digitou corretamente.'; erroEl.classList.add('mostrar');}
 }
