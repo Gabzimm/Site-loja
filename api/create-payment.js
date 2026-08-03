@@ -2,7 +2,7 @@
 // body: { discord_id, nome, itens: [{nome, preco, quantidade}], cupom, gateway }
 // gateway: 'mercadopago' (Pix + Cartão Crédito/Débito) ou 'stripe' (cartão internacional)
 // Cria o pedido como "pendente_pagamento" no banco e devolve a URL de checkout.
-const { getDB, saveDB } = require('../lib/db');
+const { getDB, saveDB, cupomValidoParaUsuario } = require('../lib/db');
 const { converterBRLparaEUR } = require('../lib/cambio');
 
 // Mapeia a opção que a pessoa vê e clica -> gateway real
@@ -19,7 +19,7 @@ function gerarId(data) {
 function calcularTotal(itens, cupom, cupons) {
   const subtotal = itens.reduce(function(t, i) { return t + i.preco * i.quantidade; }, 0);
   if (!cupom) return subtotal;
-  const c = cupons.find(function(x) { return x.codigo === cupom && x.ativo && x.usos < x.limite; });
+  const c = cupons.find(function(x) { return x.codigo === cupom; });
   if (!c) return subtotal;
   const desconto = c.tipo === 'porcentagem' ? subtotal * (c.valor / 100) : Math.min(c.valor, subtotal);
   return Math.max(0, subtotal - desconto);
@@ -35,6 +35,14 @@ module.exports = async function handler(req, res) {
     if (!info) return res.status(400).json({ error: 'método de pagamento inválido' });
 
     const data = await getDB();
+
+    if (cupom) {
+      const cupomObj = data.cupons.find(function(c) { return c.codigo === cupom; });
+      if (!cupomObj || !cupomValidoParaUsuario(cupomObj, discord_id)) {
+        return res.status(400).json({ error: 'Esse cupom não é válido (já usado, expirado ou inexistente).' });
+      }
+    }
+
     const total = calcularTotal(itens, cupom, data.cupons);
     const pedidoId = gerarId(data);
 
@@ -82,11 +90,6 @@ module.exports = async function handler(req, res) {
         })
       });
       const pref = await prefResp.json();
-      console.log(JSON.stringify({
-        id: pref.id,
-        collector_id: pref.collector_id,
-        payment_methods: pref.payment_methods
-      }, null, 2));
       if (!prefResp.ok) {
         console.error('Erro ao criar preferência MP:', JSON.stringify(pref));
         return res.status(500).json({ error: 'Não foi possível gerar o pagamento. Tente novamente.' });
