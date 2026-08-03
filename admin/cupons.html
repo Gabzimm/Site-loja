@@ -50,7 +50,8 @@
 <div class="input-group"><label>Código</label><input type="text" id="codigo-cupom" placeholder="WELCOME20"></div>
 <div class="input-group"><label>Tipo</label><select id="tipo-desconto"><option value="porcentagem">%</option><option value="fixo">R$</option></select></div>
 <div class="input-group"><label>Valor</label><input type="number" id="valor-desconto" placeholder="20" step="0.01"></div>
-<div class="input-group"><label>Limite de Usos</label><input type="number" id="limite-usos" placeholder="100"></div>
+<div class="input-group" id="grupo-limite"><label>Limite de Usos (total)</label><input type="number" id="limite-usos" placeholder="100"></div>
+<div class="input-group"><label style="display:flex;align-items:center;gap:0.5rem;font-weight:normal;"><input type="checkbox" id="unico-comprador" onchange="alternarUnicoComprador()" style="width:auto;"> 🔒 Uso único por comprador (sem limite total, só 1 vez por pessoa)</label></div>
 <button class="btn-salvar" onclick="salvarCupom()">💾 Salvar</button>
 <button class="btn-cancelar" onclick="fecharForm()">Cancelar</button>
 </div>
@@ -70,22 +71,29 @@ function salvarCupons(acao, detalhes) {
 }
 
 function mostrarForm() { document.getElementById('form-cupom').classList.add('ativo'); }
+function alternarUnicoComprador() {
+    var marcado = document.getElementById('unico-comprador').checked;
+    document.getElementById('grupo-limite').style.display = marcado ? 'none' : 'block';
+}
 function fecharForm() {
     document.getElementById('form-cupom').classList.remove('ativo');
     document.getElementById('codigo-cupom').value = '';
     document.getElementById('valor-desconto').value = '';
     document.getElementById('limite-usos').value = '';
+    document.getElementById('unico-comprador').checked = false;
+    document.getElementById('grupo-limite').style.display = 'block';
 }
 
 function salvarCupom() {
     var c = document.getElementById('codigo-cupom').value.toUpperCase();
     var t = document.getElementById('tipo-desconto').value;
     var v = parseFloat(document.getElementById('valor-desconto').value);
-    var l = parseInt(document.getElementById('limite-usos').value);
+    var unico = document.getElementById('unico-comprador').checked;
+    var l = unico ? null : parseInt(document.getElementById('limite-usos').value);
     if (!c || !v) { alert('Preencha!'); return; }
     if (cupons.find(function(x) { return x.codigo === c; })) { alert('Já existe!'); return; }
-    cupons.push({ codigo: c, tipo: t, valor: v, limite: l, usos: 0, ativo: true });
-    salvarCupons('Criou cupom', c + ' (' + (t === 'porcentagem' ? v + '%' : 'R$ ' + v) + ')');
+    cupons.push({ codigo: c, tipo: t, valor: v, limite: l, usos: 0, ativo: true, unicoPorComprador: unico, usados_por: [] });
+    salvarCupons('Criou cupom', c + ' (' + (t === 'porcentagem' ? v + '%' : 'R$ ' + v) + (unico ? ', único por comprador' : '') + ')');
     fecharForm();
 }
 
@@ -108,7 +116,12 @@ function renderizar() {
     var c = document.getElementById('lista-cupons');
     if (cupons.length === 0) { c.innerHTML = '<p style="text-align:center;color:var(--texto-cinza);">🏷️ Nenhum</p>'; return; }
     c.innerHTML = cupons.map(function(cp) {
-        return '<div class="cupom-card' + (cp.ativo ? '' : ' inativo') + '"><button class="btn-remover-cupom" onclick="removerCupom(\'' + cp.codigo + '\')">🗑️</button><div class="cupom-codigo">' + cp.codigo + '</div><div class="cupom-desconto">' + (cp.tipo === 'porcentagem' ? cp.valor + '%' : 'R$ ' + cp.valor) + ' OFF</div><div>Usos: ' + cp.usos + '/' + cp.limite + '</div><button onclick="alternarCupom(\'' + cp.codigo + '\')" style="margin-top:0.5rem;background:var(--amarelo);color:#000;border:none;padding:0.3rem 0.8rem;border-radius:5px;cursor:pointer;">' + (cp.ativo ? 'Desativar' : 'Ativar') + '</button></div>';
+        var infoUso = cp.unicoPorComprador
+            ? ('Usado por ' + ((cp.usados_por && cp.usados_por.length) || 0) + ' pessoa(s) — ilimitado, 1x cada')
+            : ('Usos: ' + cp.usos + '/' + (cp.limite == null ? '∞' : cp.limite));
+        var btnRemover = cp.interno ? '' : '<button class="btn-remover-cupom" onclick="removerCupom(\'' + cp.codigo + '\')">🗑️</button>';
+        var badgeInterno = cp.interno ? ' <span style="font-size:0.7rem;background:var(--roxo);padding:0.1rem 0.5rem;border-radius:8px;">interno</span>' : '';
+        return '<div class="cupom-card' + (cp.ativo ? '' : ' inativo') + '">' + btnRemover + '<div class="cupom-codigo">' + cp.codigo + badgeInterno + '</div><div class="cupom-desconto">' + (cp.tipo === 'porcentagem' ? cp.valor + '%' : 'R$ ' + cp.valor) + ' OFF</div><div>' + infoUso + '</div><button onclick="alternarCupom(\'' + cp.codigo + '\')" style="margin-top:0.5rem;background:var(--amarelo);color:#000;border:none;padding:0.3rem 0.8rem;border-radius:5px;cursor:pointer;">' + (cp.ativo ? 'Desativar' : 'Ativar') + '</button></div>';
     }).join('');
 }
 
