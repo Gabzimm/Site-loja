@@ -37,12 +37,12 @@ body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 1
 .loja-titulo { text-align: center; padding: 2.5rem 1rem 1rem; }
 .loja-titulo h1 { font-size: 2rem; font-weight: 900; color: white; letter-spacing: 1px; }
 .loja-titulo p { color: var(--texto-cinza); font-size: 0.85rem; letter-spacing: 3px; margin-top: 0.4rem; text-transform: uppercase; }
-.main-container { display: flex; align-items: flex-start; gap: 1rem; padding-left: 1rem; }
-.sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 1rem; height: fit-content; background: var(--amarelo); border-radius: 14px; padding: 1.5rem 1.2rem; }
+.main-container { display: flex; align-items: flex-start; gap: 1rem; }
+.sidebar { width: 220px; flex-shrink: 0; position: fixed; top: 50%; left: 1rem; transform: translateY(-50%); height: fit-content; background: var(--amarelo); border-radius: 14px; padding: 1.5rem 1.2rem; z-index: 60; }
 .sidebar-titulo { color: #000; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(0,0,0,0.2); font-weight: bold; }
 .categoria-btn { display: block; width: 100%; padding: 0.7rem 1rem; background: transparent; border: none; color: #000; text-align: left; cursor: pointer; border-radius: 8px; font-size: 0.9rem; margin-bottom: 0.2rem; font-weight: 500; }
 .categoria-btn:hover { background: rgba(0,0,0,0.1); }
-.produtos-area { flex: 1; min-width: 0; padding: 2.5rem 2.5rem 2.5rem 3rem; max-width: 1400px; }
+.produtos-area { flex: 1; min-width: 0; margin-left: 240px; padding: 2.5rem 2.5rem 2.5rem 1rem; max-width: 1400px; }
 .categoria-secao { margin-bottom: 3.5rem; }
 .categoria-titulo { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.8rem; font-size: 1.5rem; font-weight: bold; }
 .categoria-barra { width: 4px; height: 32px; background: var(--amarelo); border-radius: 3px; }
@@ -88,7 +88,7 @@ body.com-fundo::before { content: ''; position: fixed; top: 0; left: 0; width: 1
 .modal-detalhes-preco { font-size: 2.2rem; font-weight: bold; color: var(--verde); }
 .modal-detalhes-fechar { background: var(--roxo); color: white; padding: 1rem 2.5rem; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
 .modal-detalhes-fechar:hover { background: var(--roxo-escuro); }
-@media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .main-container { flex-direction: column; } .sidebar { position: static; width: 100%; height: auto; display: flex; gap: 0.5rem; overflow-x: auto; } .sidebar-titulo { display: none; } .categoria-btn { white-space: nowrap; width: auto; } .produtos-area { padding: 1.5rem 1rem; } .grid-produtos { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; } .modal-detalhes-conteudo { flex-direction: column; } .modal-detalhes-img, .modal-detalhes-placeholder { width: 100%; height: 250px; } }
+@media (max-width: 768px) { .header { padding: 0.8rem 1rem; } .main-container { flex-direction: column; } .sidebar { position: static; width: 100%; height: auto; transform: none; left: auto; top: auto; display: flex; gap: 0.5rem; overflow-x: auto; } .sidebar-titulo { display: none; } .categoria-btn { white-space: nowrap; width: auto; } .produtos-area { margin-left: 0; padding: 1.5rem 1rem; } .grid-produtos { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; } .modal-detalhes-conteudo { flex-direction: column; } .modal-detalhes-img, .modal-detalhes-placeholder { width: 100%; height: 250px; } }
 </style>
 </head>
 <body>
