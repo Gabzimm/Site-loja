@@ -96,6 +96,16 @@
 <input type="number" id="vip-clan-limite" placeholder="Digite o limite, APENAS NÚMEROS" min="1" step="1">
 <small>⚠️ Obrigatório para VIP de clã. Quantos membros a mais o clã pode ter ao usar esse VIP.</small>
 </div>
+<div class="input-group" style="margin-bottom:0;margin-top:1rem;">
+<label>🎮 Nível do LegendQuest (efeitos no jogo)</label>
+<select id="vip-clan-legendquest">
+<option value="">Nenhum (só aumenta o limite)</option>
+<option value="VIP_MENSAL">VIP — Mensal (glowing, +5 limite in-game, 1.5x kills)</option>
+<option value="VIP_TRIMESTRAL">VIP+ — Trimestral (glowing, +10 limite in-game, 2x kills, partículas)</option>
+<option value="VIP_ANUAL">MVP — Anual (glowing, +15 limite in-game, 3x kills, voo na base)</option>
+</select>
+<small>Se escolher um nível, avisamos o plugin LegendQuest no servidor pra aplicar o glowing/bônus/partículas no clã automaticamente. Os nomes/efeitos de cada nível são configurados lá no <code>config.yml</code> do plugin.</small>
+</div>
 </div>
 </div>
 
