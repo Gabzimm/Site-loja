@@ -2,6 +2,7 @@
 // O Mercado Pago chama essa URL sozinho quando o status de um pagamento muda.
 const { getDB, saveDB, notificarDiscord, atualizarDoador, criarSolicitacoesVipClan, marcarCupomUsado } = require('../lib/db');
 const { processarVipsDoPedido } = require('../lib/discord');
+const { processarLegendQuestDoPedido } = require('../lib/legendquest');
 
 const NOMES_METODO = {
   pix: 'PIX',
@@ -44,6 +45,7 @@ module.exports = async function handler(req, res) {
     await saveDB(data);
 
     await processarVipsDoPedido(pedido, data.produtos); // dá o cargo VIP e manda a DM, se for o caso
+    await processarLegendQuestDoPedido(pedido, data.produtos, data.vinculos); // aplica o nível VIP+efeitos no jogo, se for o caso
 
     await notificarDiscord('✅ Pagamento confirmado', [
       ['Pedido', '#' + pedido.id],
