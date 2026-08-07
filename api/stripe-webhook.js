@@ -2,8 +2,9 @@
 // Precisa do corpo cru (raw body) pra validar a assinatura, por isso desligamos
 // o bodyParser padrão da Vercel aqui embaixo.
 const crypto = require('crypto');
-const { getDB, saveDB, notificarDiscord, atualizarDoador, criarSolicitacoesVipClan } = require('../lib/db');
+const { getDB, saveDB, notificarDiscord, atualizarDoador, criarSolicitacoesVipClan, marcarCupomUsado } = require('../lib/db');
 const { processarVipsDoPedido } = require('../lib/discord');
+const { processarLegendQuestDoPedido } = require('../lib/legendquest');
 
 module.exports.config = { api: { bodyParser: false } };
 
@@ -52,10 +53,7 @@ module.exports = async function handler(req, res) {
     pedido.gateway = 'stripe';
     pedido.transacao_id = session.payment_intent;
 
-    if (pedido.cupom) {
-      const c = data.cupons.find(function(x) { return x.codigo === pedido.cupom; });
-      if (c) c.usos++;
-    }
+    if (pedido.cupom) marcarCupomUsado(data, pedido.cupom, pedido.discord_id);
 
     atualizarDoador(data, pedido.discord_id, pedido.cliente, pedido.valor); // usa o valor em BRL, mesma base dos outros métodos
     criarSolicitacoesVipClan(data, pedido, data.produtos);
@@ -63,6 +61,7 @@ module.exports = async function handler(req, res) {
     await saveDB(data);
 
     await processarVipsDoPedido(pedido, data.produtos); // dá o cargo VIP e manda a DM, se for o caso
+    await processarLegendQuestDoPedido(pedido, data.produtos, data.vinculos);
 
     await notificarDiscord('✅ Pagamento confirmado (Stripe)', [
       ['Pedido', '#' + pedido.id],
