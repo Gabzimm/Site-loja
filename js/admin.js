@@ -112,6 +112,7 @@ function mostrarForm(id) {
         popularVipsVinculaveis(produto.id);
         document.getElementById('vip-clan-vinculado').value = produto.vipClanVinculadoId || '';
         document.getElementById('vip-clan-limite').value = produto.vipClanLimiteAdicional || '';
+        document.getElementById('vip-clan-legendquest').value = produto.legendquestPacote || '';
         alternarCampoVipClan();
         document.getElementById('form-produto').dataset.editId = id;
         document.getElementById('form-titulo').textContent = '✏️ Editar Produto';
@@ -147,6 +148,7 @@ function limparForm() {
     document.getElementById('eh-vip-clan').checked = false;
     document.getElementById('vip-clan-vinculado').value = '';
     document.getElementById('vip-clan-limite').value = '';
+    document.getElementById('vip-clan-legendquest').value = '';
     document.getElementById('campo-vip-clan').classList.remove('ativo');
     document.getElementById('preview-imagem').classList.remove('ativo');
     document.getElementById('btn-remover-imagem').classList.remove('ativo');
@@ -212,6 +214,7 @@ function salvarProduto() {
     var ehVipClan = document.getElementById('eh-vip-clan').checked;
     var vipClanVinculadoId = document.getElementById('vip-clan-vinculado').value ? parseInt(document.getElementById('vip-clan-vinculado').value) : null;
     var vipClanLimiteAdicional = document.getElementById('vip-clan-limite').value ? parseInt(document.getElementById('vip-clan-limite').value) : null;
+    var legendquestPacote = document.getElementById('vip-clan-legendquest').value || null;
 
     if (!nome || !preco) {
         alert('⚠️ Preencha nome e preço!');
@@ -228,7 +231,7 @@ function salvarProduto() {
         alert('⚠️ VIP de Clã precisa do limite de membros a adicionar! Preencha só com números.');
         return;
     }
-    if (!ehVipClan) { vipClanVinculadoId = null; vipClanLimiteAdicional = null; }
+    if (!ehVipClan) { vipClanVinculadoId = null; vipClanLimiteAdicional = null; legendquestPacote = null; }
 
     var editId = document.getElementById('form-produto').dataset.editId;
 
@@ -241,7 +244,7 @@ function salvarProduto() {
                 produtos[index] = {
                     id: produtos[index].id, nome: nome, preco: preco, precoPromo: precoPromo,
                     emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque,
-                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional
+                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional, legendquestPacote: legendquestPacote
                 };
                 salvarProdutos('Editou produto', nome);
             } else {
@@ -249,7 +252,7 @@ function salvarProduto() {
                 produtos.push({
                     id: novoId, nome: nome, preco: preco, precoPromo: precoPromo,
                     emoji: emoji, descricao: descricao, imagem: imagem, categoria: categoria, destaque: destaque,
-                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional
+                    cargoVipId: cargoVipId, ehVipClan: ehVipClan, vipClanVinculadoId: vipClanVinculadoId, vipClanLimiteAdicional: vipClanLimiteAdicional, legendquestPacote: legendquestPacote
                 });
                 salvarProdutos('Criou produto', nome);
             }
